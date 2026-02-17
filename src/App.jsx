@@ -6,10 +6,11 @@ const API_BASE = '/api'
 function App() {
   const [view, setView] = useState('home')
   const [prevView, setPrevView] = useState('home')
-  const [theme, setTheme] = useState('dark')
+  const [theme, setTheme] = useState('light')
   const [profileImage, setProfileImage] = useState(null)
   const [userTier, setUserTier] = useState('free')
-  const [user, setUser] = useState({ email: 'carlos@example.com', name: 'Carlos Rodríguez', id: 'usr_123' })
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [user, setUser] = useState({ email: 'usuario@example.com', name: 'Usuario Gourmet', id: 'usr_123' })
   const [language, setLanguage] = useState('es')
   const [inventory, setInventory] = useState([])
   const [recipes, setRecipes] = useState([])
@@ -187,6 +188,8 @@ function App() {
     const params = new URLSearchParams(window.location.search);
     if (params.get('status') === 'success') {
       setUserTier('pro');
+      setTheme('dark'); // El modo oscuro es premium
+      setIsLoggedIn(true); // Aseguramos que está logueado al volver
       // Limpiar la URL sin recargar para estética "premium"
       window.history.replaceState({}, document.title, window.location.pathname);
     }
@@ -435,8 +438,9 @@ function App() {
       const missingB = getMissingIngredients(b).length;
       return missingA - missingB;
     });
-    const featuredIdx = suggestedRecipes.length > 0 ? (refreshSeed % suggestedRecipes.length) : 0;
-    const featured = suggestedRecipes.length > 0 ? suggestedRecipes[featuredIdx] : null;
+
+    // Si no hay sugerencias por falta de inventario, mostramos una receta destacada por defecto
+    const featured = suggestedRecipes.length > 0 ? suggestedRecipes[refreshSeed % suggestedRecipes.length] : (recipes.length > 0 ? recipes[0] : null);
     const missingItems = featured ? getMissingIngredients(featured) : [];
 
     return (
@@ -1723,8 +1727,44 @@ function App() {
 
   if (isLoading) return <div className="flex-center" style={{ height: '100vh', background: 'var(--bg-color)', color: 'var(--text-main)' }}>Cargando Pantry Gourmet...</div>
 
+  const renderLanding = () => (
+    <div className="container animate-fade-in" style={{ height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: '2rem', background: 'var(--bg-color)' }}>
+      <div style={{ marginBottom: '3rem' }}>
+        <div style={{ background: 'var(--primary)', width: '80px', height: '80px', borderRadius: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', boxShadow: '0 10px 25px rgba(var(--primary-rgb), 0.3)' }}>
+          <span className="material-icons-round notranslate" style={{ color: 'white', fontSize: '3rem' }}>restaurant</span>
+        </div>
+        <h1 style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.5rem' }}>Instant <span style={{ color: 'var(--primary)' }}>Pantry</span></h1>
+        <p style={{ color: 'var(--text-muted)', fontSize: '1rem', maxWidth: '280px', margin: '0 auto' }}>Reduce el desperdicio y cocina como un chef profesional.</p>
+      </div>
+
+      <div style={{ width: '100%', maxWidth: '320px', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <input
+          type="email"
+          placeholder="Tu email"
+          style={{ width: '100%', padding: '1.25rem', borderRadius: '16px', background: 'var(--card-bg)', border: '1px solid var(--border-color)', color: 'var(--text-main)', outline: 'none', fontSize: '1rem' }}
+        />
+        <button
+          className="btn-primary"
+          style={{ width: '100%', padding: '1.25rem', borderRadius: '16px', fontSize: '1.1rem', fontWeight: 800, cursor: 'pointer', boxShadow: '0 10px 20px rgba(var(--primary-rgb), 0.2)' }}
+          onClick={() => setIsLoggedIn(true)}
+        >
+          LOGUEARSE / ENTRAR
+        </button>
+        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>Al entrar aceptas nuestros términos y condiciones.</p>
+      </div>
+
+      <div style={{ marginTop: '4rem', opacity: 0.5 }}>
+        <p style={{ fontSize: '0.75rem' }}>Powered by Maeki AI • 2026</p>
+      </div>
+    </div>
+  )
+
+  if (!isLoggedIn) {
+    return <div className={`App ${theme}`} data-theme={theme}>{renderLanding()}</div>
+  }
+
   return (
-    <div className="App" style={{ background: 'var(--bg-color)', minHeight: '100vh', color: 'var(--text-main)' }}>
+    <div className={`App ${theme}`} data-theme={theme} style={{ background: 'var(--bg-color)', minHeight: '100vh', color: 'var(--text-main)' }}>
       {view === 'home' && renderHome()}
       {view === 'inventory' && renderInventory()}
       {view === 'add-product' && renderAddProduct()}
@@ -1737,7 +1777,7 @@ function App() {
       {view === 'achievements' && renderAchievements()}
 
       {/* Navigation Bar (iOS Style Premium) */}
-      <nav className="ios-tab-bar">
+      <nav className="ios-tab-bar" style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', opacity: view === 'home' ? 1 : 0.4, minWidth: '45px' }} onClick={() => goTo('home')}>
           <span className="material-icons-round notranslate" translate="no" style={{ color: view === 'home' ? 'var(--primary)' : 'var(--text-main)', fontSize: '1.5rem' }}>home</span>
           <span style={{ fontSize: '0.6rem', fontWeight: 600, color: view === 'home' ? 'var(--primary)' : 'var(--text-main)' }}>{t('inicio')}</span>
@@ -1795,6 +1835,7 @@ function App() {
           <span style={{ fontSize: '0.6rem', fontWeight: 600, color: view === 'chat' ? 'var(--primary)' : 'var(--text-main)' }}>{t('iachef')}</span>
         </div>
       </nav>
+
       {showUpgradeModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
           <div className="card premium-glow animate-scale-in" style={{ width: '100%', maxWidth: '400px', padding: '2.5rem', textAlign: 'center', position: 'relative' }}>
@@ -1822,7 +1863,7 @@ function App() {
             </div>
             <button
               className="btn-primary"
-              style={{ width: '100%', padding: '1.25rem', borderRadius: '15px', fontSize: '1.1rem', fontWeight: 800 }}
+              style={{ width: '100%', padding: '1.25rem', borderRadius: '15px', fontSize: '1.1rem', fontWeight: 800, cursor: 'pointer' }}
               onClick={async () => {
                 try {
                   const res = await fetch(`${API_BASE}/create-checkout-session`, {
