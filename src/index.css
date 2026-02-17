@@ -1,0 +1,482 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Brand Colors - Primary is now Sage Green for Light Mode */
+  --primary: #84A98C;
+  --primary-rgb: 132, 169, 140;
+  --accent-sage: #84A98C;
+  --accent-sage-rgb: 132, 169, 140;
+  --terrakotta: #BC6C25;
+  /* Solo para alertas puntuales en modo claro */
+  --soft-cream: #F5F5DC;
+  --charcoal: #2F3E46;
+
+  /* Semantic Colors */
+  --status-green: #4ade80;
+  --status-yellow: #fbbf24;
+  --status-red: #f87171;
+  --text-on-primary: #ffffff;
+
+  /* Backgrounds */
+  --bg-light: var(--soft-cream);
+  --bg-dark: #1A1D1E;
+  --surface-dark: #2F3E46;
+
+  /* Shared values */
+  --radius-sm: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
+
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --ios-blur: blur(12px);
+  --ios-blur-deep: blur(20px);
+}
+
+/* Dark Mode Theme (Premium - Terrakotta Emphasis) */
+[data-theme='dark'] {
+  --bg-color: var(--bg-dark);
+  --card-bg: rgba(47, 62, 70, 0.4);
+  --text-main: var(--soft-cream);
+  --text-muted: rgba(245, 245, 220, 0.6);
+  --border-color: rgba(245, 245, 220, 0.1);
+  --glass: rgba(47, 62, 70, 0.6);
+  --nav-bg: rgba(26, 29, 30, 0.85);
+  --primary: #D88C51;
+  /* Terrakotta Vibrante para modo oscuro */
+  --primary-rgb: 216, 140, 81;
+  --accent-sage: #B2D8B7;
+  /* Neon Sage */
+}
+
+/* Light Mode Theme (Organic - Sage Emphasis) */
+[data-theme='light'] {
+  --bg-color: var(--bg-light);
+  --card-bg: #ffffff;
+  --text-main: var(--charcoal);
+  --text-muted: #4b5563;
+  --border-color: rgba(47, 62, 70, 0.1);
+  --glass: rgba(132, 169, 140, 0.1);
+  --nav-bg: rgba(245, 245, 220, 0.9);
+  --primary: #84A98C;
+  --primary-rgb: 132, 169, 140;
+}
+
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-main);
+}
+
+.App {
+  max-width: 480px;
+  /* Tamaño móvil por defecto */
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-color);
+  box-shadow: 0 0 100px rgba(0, 0, 0, 0.5);
+}
+
+/* Tablet / iPad Architecture */
+@media (min-width: 768px) {
+  .App {
+    max-width: 900px;
+    /* Ancho Bento para iPad */
+    border-radius: 40px;
+    margin: 40px auto;
+    min-height: calc(100vh - 80px);
+    overflow: hidden;
+  }
+}
+
+.container {
+  padding: 1.5rem;
+  padding-bottom: 110px;
+  /* Slightly more space for nav */
+  flex: 1;
+  width: 100%;
+}
+
+/* Premium Styles from Stitch */
+.glass-overlay {
+  background: var(--glass);
+  -webkit-backdrop-filter: var(--ios-blur);
+  backdrop-filter: var(--ios-blur);
+  border: 1px solid var(--border-color);
+}
+
+.glass-panel {
+  background: var(--glass);
+  -webkit-backdrop-filter: var(--ios-blur-deep);
+  backdrop-filter: var(--ios-blur-deep);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.premium-border {
+  border: 1px solid rgba(var(--primary-rgb), 0.2);
+}
+
+.premium-glow {
+  box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.4);
+}
+
+.ios-tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  /* Ancho controlado para la nav en mobile */
+  height: 90px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 1rem 20px 1rem;
+  z-index: 100;
+  background: var(--nav-bg);
+  -webkit-backdrop-filter: var(--ios-blur-deep);
+  backdrop-filter: var(--ios-blur-deep);
+  border-top: 1px solid var(--border-color);
+  border-radius: 20px 20px 0 0;
+}
+
+@media (min-width: 768px) {
+  .ios-tab-bar {
+    max-width: 900px;
+    border-radius: 0 0 40px 40px;
+    bottom: 40px;
+    /* Alineada con el contenedor en iPad */
+  }
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: var(--text-muted);
+  font-size: 0.6rem;
+  /* Slightly smaller to fit better */
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  flex: 1;
+  /* Equal width for all items */
+  min-width: 0;
+  /* Prevent overflow */
+  text-align: center;
+}
+
+.nav-item.active {
+  color: var(--primary);
+}
+
+.nav-item.nav-scanner {
+  position: relative;
+  z-index: 2;
+}
+
+.nav-item.nav-scanner .nav-icon-container {
+  background: var(--primary);
+  color: var(--text-on-primary);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: -35px;
+  box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.4);
+  transition: var(--transition);
+  border: 4px solid var(--bg-color);
+}
+
+.nav-item.nav-scanner.active .nav-icon-container {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(var(--primary-rgb), 0.6);
+}
+
+.nav-icon {
+  font-size: 1.5rem;
+}
+
+/* Animations */
+@keyframes dot-pulse {
+
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+.dot-animate {
+  display: inline-block;
+  animation: dot-pulse 1.4s infinite ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* Utils */
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.mb-1 {
+  margin-bottom: 0.5rem;
+}
+
+.mb-2 {
+  margin-bottom: 1rem;
+}
+
+.mt-1 {
+  margin-top: 0.5rem;
+}
+
+.mt-2 {
+  margin-top: 1rem;
+}
+
+/* Utilities */
+.relative {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.sticky {
+  position: sticky;
+}
+
+.top-0 {
+  top: 0;
+}
+
+.inset-0 {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.z-50 {
+  z-index: 50;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.h-full {
+  height: 100%;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.items-end {
+  align-items: end;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.gap-3 {
+  gap: 0.75rem;
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.rounded-xl {
+  border-radius: 1rem;
+}
+
+.rounded-full {
+  border-radius: 9999px;
+}
+
+.p-4 {
+  padding: 1rem;
+}
+
+.p-5 {
+  padding: 1.25rem;
+}
+
+.p-6 {
+  padding: 1.5rem;
+}
+
+.pt-8 {
+  padding-top: 2rem;
+}
+
+.pb-2 {
+  padding-bottom: 0.5rem;
+}
+
+.pb-4 {
+  padding-bottom: 1rem;
+}
+
+.pb-6 {
+  padding-bottom: 1.5rem;
+}
+
+.pb-8 {
+  padding-bottom: 2rem;
+}
+
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.mb-8 {
+  margin-bottom: 2rem;
+}
+
+.mb-10 {
+  margin-bottom: 2.5rem;
+}
+
+.-mx-4 {
+  margin-left: -1rem;
+  margin-right: -1rem;
+}
+
+.backdrop-blur-md {
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari and Opera */
+}
+
+/* Home Indicator */
+.home-indicator {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ed9121",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#121212",
+                        "card-dark": "#1e1e1e",
+                        "status-green": "#4ade80",
+                        "status-yellow": "#fbbf24",
+                        "status-red": "#f87171",
+                    },
+                    fontFamily: {
+                        "display": ["Work Sans"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .safe-area-bottom {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .glass-nav {
+            background: rgba(30, 30, 30, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white min-h-screen">
+<!-- iOS Top Bar / Notch Area -->
+<div class="sticky top-0 z-50 bg-background-dark/80 backdrop-blur-md px-6 pt-12 pb-4">
+<div class="flex justify-between items-end">
+<div>
+<p class="text-primary text-xs font-semibold uppercase tracking-widest mb-1">Instant Pantry</p>
+<h1 class="text-3xl font-bold">Despensa</h1>
+</div>
+<div class="flex gap-4">
+<button class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-icons text-xl">search</span>
+</button>
+<button class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-icons text-xl">tune</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Main Content Area -->
+<main class="px-6 pb-32 pt-4">
+<!-- Summary Stats (Premium touch) -->
+<div class="grid grid-cols-3 gap-4 mb-8">
+<div class="bg-card-dark p-4 rounded-xl border border-white/5">
+<p class="text-white/40 text-[10px] uppercase font-bold">Total</p>
+<p class="text-xl font-bold">24</p>
+</div>
+<div class="bg-card-dark p-4 rounded-xl border border-white/5">
+<p class="text-status-red/60 text-[10px] uppercase font-bold">Vence</p>
+<p class="text-xl font-bold text-status-red">3</p>
+</div>
+<div class="bg-card-dark p-4 rounded-xl border border-white/5">
+<p class="text-primary/60 text-[10px] uppercase font-bold">Agotado</p>
+<p class="text-xl font-bold text-primary">5</p>
+</div>
+</div>
+<!-- Inventory List -->
+<div class="space-y-3">
+<!-- Salmón Card -->
+<div class="flex items-center justify-between p-4 bg-card-dark rounded-lg border border-white/5 active:scale-[0.98] transition-transform">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center">
+<img alt="Salmón" class="w-8 h-8 rounded-full object-cover" data-alt="Fresh raw salmon fillet on dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGwq3UDEYIpI3-FmxV721gSx9EzOAtwk3PI8KKh19ortXwsCKzxO9iQuQhODnKEUeJPdiMV1szX7lNv1hxWz4AfscaEIBUdXD1XgQkgPF-v0XGKG4sTA5E2FdwuwWRePjnGih4sjHlJtuKIHjiRJDM6PNdyOx3zlruTv-RPUkuCf38LGDqYFnhWxf9B8y63Ve3bgBAjzQfQRkPkpBeBLfr_av2JmLiZr2q14JJepLf0nvoBZi6v77iPmV257X0HNNhwcbcYB5cMRY"/>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<h3 class="font-semibold text-white">Salmón</h3>
+<div class="w-2 h-2 rounded-full bg-status-green"></div>
+</div>
+<p class="text-xs text-status-green font-medium">Fresco</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-sm font-medium text-white/60">500g</p>
+<p class="text-[10px] text-white/30">Nevera</p>
+</div>
+</div>
+<!-- Huevos Card -->
+<div class="flex items-center justify-between p-4 bg-card-dark rounded-lg border border-white/5 active:scale-[0.98] transition-transform">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center">
+<img alt="Huevos" class="w-8 h-8 rounded-full object-cover" data-alt="Brown organic eggs in a basket" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBToDpG_G0CfgQ2-Wc9CjoDQE3jCMhT6Olv3KuIhHbBwvaPad6yhDau8yxNxlZElh-_ZtyJmUvdvKZeCLYjf_qv7r5zKIZ7BBL4kYLpt8491mBQ0cT4FyqihyPGGl_b0wsa9AwyGVWgnblE-nesDaa88HZt0YAA6rX3STSN5QoLgJpMFXhQ0txecjA97zPeYLdqqER1q663WME29dXaEALoIhfezuOSzOzDzR4C_XesKnoP5u9PUdEOncl5AKJfVjFF_ycAxVwNMyI"/>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<h3 class="font-semibold text-white">Huevos</h3>
+<div class="w-2 h-2 rounded-full bg-status-green"></div>
+</div>
+<p class="text-xs text-status-green font-medium">Fresco</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-sm font-medium text-white/60">12 uds</p>
+<p class="text-[10px] text-white/30">Despensa</p>
+</div>
+</div>
+<!-- Aguacate Card -->
+<div class="flex items-center justify-between p-4 bg-card-dark rounded-lg border border-white/5 active:scale-[0.98] transition-transform">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center">
+<img alt="Aguacate" class="w-8 h-8 rounded-full object-cover" data-alt="Sliced fresh avocado showing the pit" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBtYhgMzWTucTEYx75ZfZ-cmBw12X8Xl66IhOhcw6DsJ2WDPKCM7qwK9ENm6HDQ8-A6L_S5VxgfAnv5DX5FP6FM7zfRJ1su0YkZH864qASxQXe5V8AqLsAAzKREYjd84svxPtEiIigWnOxSYfzrDwOxAsAxiGpqMZRc4tQzPnPNx_WK8RVCdqXzP-KT3Kjtj18TZkQ-16VNj9dawOkkKk2EKkHdeFJBfKTRiKlQgpvkO-3c14kMDZz8m9pPfvYDRaOy9rG22iVwsn0"/>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<h3 class="font-semibold text-white">Aguacate</h3>
+<div class="w-2 h-2 rounded-full bg-status-yellow shadow-[0_0_8px_rgba(251,191,36,0.4)]"></div>
+</div>
+<p class="text-xs text-status-yellow font-medium">3 días</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-sm font-medium text-white/60">2 uds</p>
+<p class="text-[10px] text-white/30">Frutero</p>
+</div>
+</div>
+<!-- Leche Card -->
+<div class="flex items-center justify-between p-4 bg-card-dark rounded-lg border border-white/5 active:scale-[0.98] transition-transform">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center">
+<img alt="Leche" class="w-8 h-8 rounded-full object-cover" data-alt="Glass bottle of fresh white milk" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCG9gvLXL1X7QV9NK1PlbvRG79B1-u4DwlDKft_-_oHvlm-0XCyYFX7ZmbTvEhprpgpa1q-N-Lgch3NiPwIn9iAR1x8waABAvMUR63uT67giDjkmio-mYQHvcxKvx_TjXFxF7AE1F_SovupuXys86NAVbfbCk-NIyJqeZ7B2bH3yAGFxmjyn1UQenkAxBHLRCM58UWlwF_bc0CznG50yTB28syvsALrkopYFx3TfVoGhPH2SMRT_u20VvM2l-gd-5qEcw14ldWMqLQ"/>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<h3 class="font-semibold text-white">Leche</h3>
+<div class="w-2 h-2 rounded-full bg-status-red shadow-[0_0_8px_rgba(248,113,113,0.4)]"></div>
+</div>
+<p class="text-xs text-status-red font-medium italic">Caduca pronto</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-sm font-medium text-white/60">1 L</p>
+<p class="text-[10px] text-white/30">Nevera</p>
+</div>
+</div>
+<!-- Additional filler cards for scroll context -->
+<div class="flex items-center justify-between p-4 bg-card-dark/40 rounded-lg border border-white/5 opacity-60">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+<span class="material-icons text-white/30">restaurant</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<h3 class="font-semibold text-white">Pasta Penne</h3>
+<div class="w-2 h-2 rounded-full bg-status-green"></div>
+</div>
+<p class="text-xs text-status-green/60 font-medium italic">Fresco</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-sm font-medium text-white/60">1 kg</p>
+<p class="text-[10px] text-white/30">Despensa</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action Button -->
+<button class="fixed right-6 bottom-28 w-16 h-16 bg-primary rounded-full shadow-lg shadow-primary/30 flex items-center justify-center text-white active:scale-90 transition-transform z-40">
+<span class="material-icons text-3xl">add</span>
+</button>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 glass-nav z-50">
+<div class="flex justify-around items-center pt-3 pb-8 px-4 safe-area-bottom">
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-icons">inventory_2</span>
+<span class="text-[10px] font-medium">Despensa</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-white/40 active:text-primary transition-colors">
+<span class="material-icons">menu_book</span>
+<span class="text-[10px] font-medium">Recetas</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-white/40 active:text-primary transition-colors">
+<span class="material-icons">shopping_basket</span>
+<span class="text-[10px] font-medium">Compras</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-white/40 active:text-primary transition-colors">
+<span class="material-icons">person</span>
+<span class="text-[10px] font-medium">Perfil</span>
+</button>
+</div>
+</nav>
+</body></html>

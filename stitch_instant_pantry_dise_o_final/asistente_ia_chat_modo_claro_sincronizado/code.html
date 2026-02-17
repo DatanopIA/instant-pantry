@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Instant Pantry - Asistente Chef</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ed9121",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#221a10",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .ios-blur { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        .message-shadow { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); }
+        .chat-container { height: calc(100vh - 170px); }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-800 dark:text-slate-100 overflow-hidden">
+<!-- iOS Status Bar Spacer -->
+<div class="h-12 bg-background-light dark:bg-background-dark w-full fixed top-0 z-50"></div>
+<!-- Header -->
+<header class="fixed top-12 left-0 right-0 z-40 bg-background-light/80 dark:bg-background-dark/80 ios-blur border-b border-primary/10 px-6 py-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center overflow-hidden border border-emerald-200 dark:border-emerald-800">
+<img alt="Chef Logo" class="w-full h-full object-cover" data-alt="Green leaf logo for organic cooking" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDaelHOsCmbAEloTkHCNZb4oQprYNBo4QYiqns2YRx4EPyCFerV_sjHHmndj7RIuF2q-1O2gpb0H4pfts2nTDNZhDXbISVGa3iNfiijl2D04TAJKhqPrkPn5eBPm7qXW4iKSgzOMT5BmDtsdJhSO-DP7AUtj_kofg4niyMONNZiAbuHXJ3biO3f0p2UPTT81cLdQYUEtdNJAE8RxE_qNSggOzqSapIdrj8SkAosjqnRPJDL7Y5Dxc1DttfKBvZzRAz3Dpt4hxxsflA"/>
+</div>
+<div>
+<h1 class="font-bold text-lg leading-tight">Asistente Chef</h1>
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span class="text-xs font-medium text-emerald-600 dark:text-emerald-400">En línea</span>
+</div>
+</div>
+</div>
+<button class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-icons">more_horiz</span>
+</button>
+</header>
+<!-- Chat Interface -->
+<main class="chat-container pt-32 pb-4 px-4 overflow-y-auto flex flex-col gap-6">
+<!-- Date Indicator -->
+<div class="flex justify-center">
+<span class="text-[10px] uppercase tracking-widest font-semibold text-slate-400 dark:text-slate-500">Hoy</span>
+</div>
+<!-- AI Message -->
+<div class="flex flex-col gap-2 max-w-[85%] self-start">
+<div class="bg-white dark:bg-slate-800 p-4 rounded-xl rounded-tl-none message-shadow">
+<p class="text-[15px] leading-relaxed">¡Hola! Soy tu Asistente de Instant Pantry. Veo que tienes tomates, albahaca y pasta en tu despensa. ¿Te gustaría que te sugiera una receta rápida?</p>
+</div>
+<span class="text-[10px] text-slate-400 ml-1">10:42 AM</span>
+</div>
+<!-- User Message -->
+<div class="flex flex-col gap-2 max-w-[85%] self-end">
+<div class="bg-primary/10 dark:bg-primary/20 p-4 rounded-xl rounded-tr-none border border-primary/20">
+<p class="text-[15px] leading-relaxed text-slate-800 dark:text-slate-100">Sí, por favor. Algo que tome menos de 20 minutos.</p>
+</div>
+<span class="text-[10px] text-slate-400 self-end mr-1">10:43 AM</span>
+</div>
+<!-- AI Message with Recipe Card -->
+<div class="flex flex-col gap-2 max-w-[85%] self-start">
+<div class="bg-white dark:bg-slate-800 p-4 rounded-xl rounded-tl-none message-shadow flex flex-col gap-3">
+<p class="text-[15px] leading-relaxed">¡Perfecto! Te recomiendo una **Pasta Pomodoro Express**. Es deliciosa y solo requiere 15 minutos.</p>
+<div class="rounded-lg overflow-hidden border border-slate-100 dark:border-slate-700">
+<img alt="Pasta Pomodoro" class="w-full h-32 object-cover" data-alt="Delicious fresh pasta pomodoro with basil" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWfnCS9cJRicf5wco11w6jHHEd6-vXhIJS6RgastNp7fvtfgYBugDFBl4eDZBMaa_Wz1AJYzUwzh-b5-BcTLOboY7hhBlZDYKcILkXYkcKrg2ynwRk5CnMCJx_I9w7eMn6o-tpKMMXke-1PABUQ8Vs-3i1cvFeCFxYFAzVc6qikUd6V2kss2bQgfJh8Ab88MQ3rrPLsL40DjiTerVAJDxiIVF65mQsNh61-FRpu-Jx3K1qxq3hBp9rijJhqsc-F1tRWGr6QGpEGhg"/>
+<div class="p-3 bg-slate-50 dark:bg-slate-900/50">
+<p class="text-xs font-bold text-primary uppercase">Sugerencia</p>
+<p class="text-sm font-medium">Pasta Pomodoro Clásica</p>
+</div>
+</div>
+</div>
+<span class="text-[10px] text-slate-400 ml-1">10:43 AM</span>
+</div>
+<!-- Suggestion Chips -->
+<div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+<button class="shrink-0 px-4 py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium hover:border-primary transition-colors">
+                Ver ingredientes
+            </button>
+<button class="shrink-0 px-4 py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium hover:border-primary transition-colors">
+                Paso a paso
+            </button>
+<button class="shrink-0 px-4 py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium hover:border-primary transition-colors">
+                Otra opción
+            </button>
+</div>
+</main>
+<!-- Input Area -->
+<div class="fixed bottom-[88px] left-0 right-0 px-4 pb-4 bg-background-light/95 dark:bg-background-dark/95 ios-blur">
+<div class="flex items-center gap-2 bg-white dark:bg-slate-800 p-2 rounded-full shadow-lg border border-slate-100 dark:border-slate-700">
+<button class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-primary">
+<span class="material-icons">mic</span>
+</button>
+<input class="flex-1 bg-transparent border-none focus:ring-0 text-sm py-2 px-1 placeholder-slate-400 dark:placeholder-slate-500" placeholder="Pregunta sobre tus ingredientes..." type="text"/>
+<button class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white shadow-md shadow-primary/30">
+<span class="material-icons text-sm">send</span>
+</button>
+</div>
+</div>
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-900/90 ios-blur border-t border-slate-100 dark:border-slate-800 px-6 pb-8 pt-3 flex justify-between items-center z-50">
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-icons text-[24px]">home</span>
+<span class="text-[10px] font-medium">Inicio</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-icons text-[24px]">qr_code_scanner</span>
+<span class="text-[10px] font-medium">Escáner</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-icons text-[24px]">auto_awesome</span>
+<span class="text-[10px] font-bold">Asistente</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-icons text-[24px]">kitchen</span>
+<span class="text-[10px] font-medium">Despensa</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-icons text-[24px]">person_outline</span>
+<span class="text-[10px] font-medium">Perfil</span>
+</a>
+</nav>
+<!-- Safe Area Indicator (iOS) -->
+<div class="fixed bottom-0 left-0 right-0 h-1 bg-transparent pointer-events-none">
+<div class="w-32 h-1 bg-slate-300 dark:bg-slate-700 mx-auto rounded-full mt-2 opacity-50"></div>
+</div>
+<style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</body></html>

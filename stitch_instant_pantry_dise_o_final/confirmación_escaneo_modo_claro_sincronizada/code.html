@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Instant Pantry - Confirmar Productos</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ed9121",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#221a10",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display min-h-screen flex justify-center items-center">
+<!-- Mobile Device Container -->
+<div class="relative w-full max-w-[400px] h-[852px] bg-background-light dark:bg-background-dark shadow-2xl overflow-hidden flex flex-col border border-primary/10">
+<!-- Status Bar Space (iOS style) -->
+<div class="h-12 w-full flex justify-between items-center px-8 pt-4">
+<span class="text-sm font-semibold text-stone-800 dark:text-stone-100">9:41</span>
+<div class="flex gap-1.5 items-center">
+<span class="material-icons-round text-sm text-stone-800 dark:text-stone-100">signal_cellular_alt</span>
+<span class="material-icons-round text-sm text-stone-800 dark:text-stone-100">wifi</span>
+<span class="material-icons-round text-sm text-stone-800 dark:text-stone-100">battery_full</span>
+</div>
+</div>
+<!-- Header -->
+<header class="px-6 py-4 flex items-center justify-between">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-stone-200/50 dark:hover:bg-white/10 transition-colors">
+<span class="material-icons-round text-stone-600 dark:text-stone-300">chevron_left</span>
+</button>
+<h1 class="text-xl font-bold text-stone-800 dark:text-stone-100">Confirmar Productos</h1>
+<div class="w-10"></div> <!-- Spacer for centering -->
+</header>
+<!-- Main Content (Scrollable List) -->
+<main class="flex-1 overflow-y-auto px-6 py-2 space-y-4">
+<p class="text-stone-500 dark:text-stone-400 text-sm mb-2 px-1">Se han detectado 3 artículos</p>
+<!-- Item 1: Salmón Noruego -->
+<div class="bg-white dark:bg-stone-900/40 border border-stone-200/40 dark:border-stone-800 p-4 rounded-xl shadow-sm flex items-center gap-4 transition-all active:scale-[0.98]">
+<div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+<span class="material-icons-round text-primary">set_meal</span>
+</div>
+<div class="flex-1">
+<h3 class="font-semibold text-stone-800 dark:text-stone-100">Salmón Noruego</h3>
+<p class="text-xs text-stone-400 dark:text-stone-500">Pescadería</p>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 rounded-full text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-white/5 transition-colors">
+<span class="material-icons-round text-[20px]">edit</span>
+</button>
+<button class="p-2 rounded-full text-stone-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+<span class="material-icons-round text-[20px]">close</span>
+</button>
+</div>
+</div>
+<!-- Item 2: Aguacate -->
+<div class="bg-white dark:bg-stone-900/40 border border-stone-200/40 dark:border-stone-800 p-4 rounded-xl shadow-sm flex items-center gap-4 transition-all active:scale-[0.98]">
+<div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+<span class="material-icons-round text-primary">eco</span>
+</div>
+<div class="flex-1">
+<h3 class="font-semibold text-stone-800 dark:text-stone-100">Aguacate</h3>
+<p class="text-xs text-stone-400 dark:text-stone-500">Frutas y Verduras</p>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 rounded-full text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-white/5 transition-colors">
+<span class="material-icons-round text-[20px]">edit</span>
+</button>
+<button class="p-2 rounded-full text-stone-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+<span class="material-icons-round text-[20px]">close</span>
+</button>
+</div>
+</div>
+<!-- Item 3: Leche -->
+<div class="bg-white dark:bg-stone-900/40 border border-stone-200/40 dark:border-stone-800 p-4 rounded-xl shadow-sm flex items-center gap-4 transition-all active:scale-[0.98]">
+<div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+<span class="material-icons-round text-primary">water_drop</span>
+</div>
+<div class="flex-1">
+<h3 class="font-semibold text-stone-800 dark:text-stone-100">Leche</h3>
+<p class="text-xs text-stone-400 dark:text-stone-500">Lácteos</p>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 rounded-full text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-white/5 transition-colors">
+<span class="material-icons-round text-[20px]">edit</span>
+</button>
+<button class="p-2 rounded-full text-stone-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+<span class="material-icons-round text-[20px]">close</span>
+</button>
+</div>
+</div>
+<!-- Empty slot visual hint -->
+<button class="w-full py-4 border-2 border-dashed border-stone-300 dark:border-stone-800 rounded-xl flex items-center justify-center gap-2 text-stone-400 hover:bg-white dark:hover:bg-white/5 transition-colors">
+<span class="material-icons-round">add</span>
+<span class="text-sm font-medium">Añadir producto manualmente</span>
+</button>
+</main>
+<!-- Fixed Footer Action -->
+<div class="px-6 pt-4 pb-10 bg-gradient-to-t from-background-light via-background-light to-transparent dark:from-background-dark dark:via-background-dark">
+<button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-full shadow-lg shadow-primary/25 flex items-center justify-center gap-2 active:scale-[0.98] transition-all">
+<span class="material-icons-round">check_circle</span>
+                Añadir a la Despensa
+            </button>
+</div>
+<!-- Navigation Bar -->
+<nav class="absolute bottom-0 left-0 right-0 h-20 bg-white/80 dark:bg-stone-900/80 backdrop-blur-md border-t border-stone-200 dark:border-stone-800 flex justify-around items-center px-4 pb-4">
+<button class="flex flex-col items-center gap-1 text-stone-400">
+<span class="material-icons-round">inventory_2</span>
+<span class="text-[10px] font-medium">Inventario</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-icons-round">qr_code_scanner</span>
+<span class="text-[10px] font-bold">Escáner</span>
+<div class="w-1 h-1 bg-primary rounded-full"></div>
+</button>
+<button class="flex flex-col items-center gap-1 text-stone-400">
+<span class="material-icons-round">shopping_cart</span>
+<span class="text-[10px] font-medium">Lista</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-stone-400">
+<span class="material-icons-round">settings</span>
+<span class="text-[10px] font-medium">Ajustes</span>
+</button>
+</nav>
+<!-- iOS Indicator -->
+<div class="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1.5 bg-stone-300 dark:bg-stone-700 rounded-full"></div>
+</div>
+</body></html>

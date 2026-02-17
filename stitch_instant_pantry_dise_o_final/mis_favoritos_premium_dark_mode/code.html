@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ed9121",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#121212",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<!-- iOS Status Bar Placeholder -->
+<div class="h-11 w-full bg-background-light dark:bg-background-dark sticky top-0 z-50 flex items-center justify-between px-8">
+<span class="text-sm font-semibold">9:41</span>
+<div class="flex items-center gap-1.5">
+<span class="material-icons-round text-sm">signal_cellular_4_bar</span>
+<span class="material-icons-round text-sm">wifi</span>
+<span class="material-icons-round text-sm">battery_full</span>
+</div>
+</div>
+<!-- Main Content Container -->
+<main class="px-5 pb-32">
+<!-- Header -->
+<header class="py-6 flex justify-between items-center">
+<h1 class="text-3xl font-bold tracking-tight">Mis Favoritos</h1>
+<button class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-icons-round">search</span>
+</button>
+</header>
+<!-- Elegant Filters Navigation -->
+<nav class="flex overflow-x-auto gap-3 pb-8 no-scrollbar scroll-smooth">
+<button class="px-6 py-2.5 rounded-full bg-primary text-white font-medium shadow-[0_0_15px_rgba(237,145,33,0.3)] whitespace-nowrap">
+                Todos
+            </button>
+<button class="px-6 py-2.5 rounded-full border border-white/10 bg-white/5 text-slate-300 font-medium whitespace-nowrap hover:bg-white/10 transition-colors">
+                Desayunos
+            </button>
+<button class="px-6 py-2.5 rounded-full border border-white/10 bg-white/5 text-slate-300 font-medium whitespace-nowrap hover:bg-white/10 transition-colors">
+                Cenas
+            </button>
+<button class="px-6 py-2.5 rounded-full border border-white/10 bg-white/5 text-slate-300 font-medium whitespace-nowrap hover:bg-white/10 transition-colors">
+                Snacks
+            </button>
+<button class="px-6 py-2.5 rounded-full border border-white/10 bg-white/5 text-slate-300 font-medium whitespace-nowrap hover:bg-white/10 transition-colors">
+                Postres
+            </button>
+</nav>
+<!-- Premium Recipe Grid -->
+<div class="grid grid-cols-2 gap-4">
+<!-- Card 1 -->
+<div class="relative aspect-[3/4] rounded-xl overflow-hidden group">
+<img alt="Avo Toast Gourmet" class="w-full h-full object-cover" data-alt="Gourmet avocado toast with poached egg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvnohn0mr2205DvXrXM27IJfEc1LomoBw7G2JKM92uBcDaFTxWYTUWpVzoM6_yxleN7v10ix4fcEOPeEFRSzupncV800tKudq9lJA80Le8CnAFLQepTirgZ3j7E3xH18IrqaV0KDToSFtSz5j-iDQO2PRmOmzaoAfYst5_0OVe4kfiR_y0p-EpEk8IXIIzwpn-ATvMisYdNwRb1gT8JD_M87ub337e41j_cmw0HApFC8tLF4E6NyHRv4P9KkCEiMVgC1A_wtEL8o8"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+<div class="absolute top-3 right-3">
+<button class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-primary">
+<span class="material-icons-round text-lg">favorite</span>
+</button>
+</div>
+<div class="absolute bottom-4 left-4 right-4">
+<span class="text-xs uppercase tracking-widest text-primary font-bold mb-1 block">Desayuno</span>
+<h3 class="text-white font-semibold leading-tight">Avo Toast Premium</h3>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="relative aspect-[3/4] rounded-xl overflow-hidden group mt-6">
+<img alt="Salmón al Horno" class="w-full h-full object-cover" data-alt="Roasted salmon with asparagus and lemon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRSRMQJYOZtgMNna3fs4YbSBcy-xsxeYsC5JUoe_7vp6e9W6SaoZTLZU41jT0g8c6xpV8NH3wBFzRJLbkMlGLPxt_YHZfLuF0rM2ntd9vZ8o_0JcE79m8NcqYPbPcG0wF8xv__PeZjZT6AkFccKpZsV9kmDj2R9NygL2eu-V_Yu0bOp7UBMcvs7DdwlZiJL2f_4x4ehVXPMniQNwyKusrtVUL4Tq2NtXHAXobJPB7wrJQpH1_LbSl3PhVgWvaK-mWxRmgJ7R4UxK8"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+<div class="absolute top-3 right-3">
+<button class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-primary">
+<span class="material-icons-round text-lg">favorite</span>
+</button>
+</div>
+<div class="absolute bottom-4 left-4 right-4">
+<span class="text-xs uppercase tracking-widest text-primary font-bold mb-1 block">Cena</span>
+<h3 class="text-white font-semibold leading-tight">Salmón Silvestre</h3>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="relative aspect-[3/4] rounded-xl overflow-hidden group -mt-6">
+<img alt="Bowl de Acai" class="w-full h-full object-cover" data-alt="Deep purple acai bowl with berries" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCR9Dc7ISc-UdGtRlAHn-u43SNKjsO93QTTK9wUOQbpIZHvGPHsT2FxUcGYPU-rZikFB3f1kr01luURDVItb5O54_FvrkIeFY3gO4Jn60xNpW20XHM-NZ_UZFXZuKBPcfLDNATlAyYvO8iIKVdCfzBRCdGhYhHaFIpfpt6cd9A0CPPXp0hiFC7JITTqAorrcgq8EzsD3dO_WEp759pPRcjNL-wURXT-DYbjeNbpig5JqFWJumU5bHudfsX0wAXhTa42gy-SagMyhtk"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+<div class="absolute top-3 right-3">
+<button class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-primary">
+<span class="material-icons-round text-lg">favorite</span>
+</button>
+</div>
+<div class="absolute bottom-4 left-4 right-4">
+<span class="text-xs uppercase tracking-widest text-primary font-bold mb-1 block">Snack</span>
+<h3 class="text-white font-semibold leading-tight">Acai Energizante</h3>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="relative aspect-[3/4] rounded-xl overflow-hidden group">
+<img alt="Ensalada Buddha" class="w-full h-full object-cover" data-alt="Colorful buddha bowl with fresh vegetables" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnrDhblui7n2p9cwnx1twtHGAga_7TrTQy1lg8OH36xXT7Qml9p8bbndGK4Oxc1fIC-N7GgJG4NS_2k4XdMhKSucsN4B74Tvoz_dJRzHG3S552H6OnGIMoTP5Ui7kcrl6ZaHt5jORQ_-Ui5rC_3pqgrE6aiPn0d1lz3zbNIEywv_JhNIyec-fym1UJF2zS7jhvhCax1zpHGBzkQusY36ya_XemyEdxv22pIDs9GmDIC9JD_AlANcMeEuUxQaPQaYj-PzvGkZxHWU8"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+<div class="absolute top-3 right-3">
+<button class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-primary">
+<span class="material-icons-round text-lg">favorite</span>
+</button>
+</div>
+<div class="absolute bottom-4 left-4 right-4">
+<span class="text-xs uppercase tracking-widest text-primary font-bold mb-1 block">Cena</span>
+<h3 class="text-white font-semibold leading-tight">Buddha Bowl Zen</h3>
+</div>
+</div>
+<!-- Card 5 -->
+<div class="relative aspect-[3/4] rounded-xl overflow-hidden group">
+<img alt="Smoothie Verde" class="w-full h-full object-cover" data-alt="Green vitality smoothie in a glass" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnhnsy1OaTUp99-a4RiBWYJSls9gP6TD1c2xABJiYUF6KxXzXjzmxlctDuGSCFHsG5E1L3ngR4LhmFK7Yb48WnKpNrIisqA1aoUAjZSCzzDwwOrIy2z0dHlhPCk-AL8Yx-zEJxDED7BwimTAAuilO6ickukHCr5moy340VmuMs5TD2qe_X__YdhNt9tTOT32YHYt5iA_8Co8i-bKD6i_Mq_WflfDxdD7kdWkQbctE2YIHQKKDq2MfspNmCHwIhj4WPgvPFbelrtK0"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+<div class="absolute top-3 right-3">
+<button class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-primary">
+<span class="material-icons-round text-lg">favorite</span>
+</button>
+</div>
+<div class="absolute bottom-4 left-4 right-4">
+<span class="text-xs uppercase tracking-widest text-primary font-bold mb-1 block">Snack</span>
+<h3 class="text-white font-semibold leading-tight">Vitality Green</h3>
+</div>
+</div>
+<!-- Card 6 -->
+<div class="relative aspect-[3/4] rounded-xl overflow-hidden group mt-6">
+<img alt="Tacos de Camarón" class="w-full h-full object-cover" data-alt="Street style gourmet shrimp tacos" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdwLv48ZI35Pgdhkjv3CzLO7IwirKgDtQ_DoVzSMTcH4vMVfC7OW5wFXtlDGlUOpJwHY6QE2L4Flx7Xw7PY9nqu8yh82MRUkqElFh3vAuZ2q_r25sy2eGd_ogSe0QZCQ4CNR2cTEl49ilsTQeDpVUI68ouR0ActYUljiELn95r77EjhBgWGutx50pAAptxr3ELMzf9vT7Fl9aByoD4W7lMgpk4XzlisdSBkXjUhj02MFNqDR0UYyY9mgUuKG9TMtuXGLCV3sH4RF8"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+<div class="absolute top-3 right-3">
+<button class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-primary">
+<span class="material-icons-round text-lg">favorite</span>
+</button>
+</div>
+<div class="absolute bottom-4 left-4 right-4">
+<span class="text-xs uppercase tracking-widest text-primary font-bold mb-1 block">Cena</span>
+<h3 class="text-white font-semibold leading-tight">Tacos del Mar</h3>
+</div>
+</div>
+</div>
+</main>
+<!-- Navigation Bar (iOS Style) -->
+<nav class="fixed bottom-0 left-0 right-0 h-24 bg-background-dark/80 backdrop-blur-xl border-t border-white/5 px-8 flex justify-between items-center z-50">
+<div class="flex flex-col items-center gap-1 text-slate-500">
+<span class="material-icons-round text-2xl">restaurant</span>
+<span class="text-[10px] font-medium">Recetas</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-slate-500">
+<span class="material-icons-round text-2xl">inventory_2</span>
+<span class="text-[10px] font-medium">Despensa</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-primary">
+<div class="relative">
+<span class="material-icons-round text-2xl">favorite</span>
+<div class="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full ring-2 ring-background-dark"></div>
+</div>
+<span class="text-[10px] font-bold">Favoritos</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-slate-500">
+<span class="material-icons-round text-2xl">shopping_cart</span>
+<span class="text-[10px] font-medium">Lista</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-slate-500">
+<span class="material-icons-round text-2xl">person</span>
+<span class="text-[10px] font-medium">Perfil</span>
+</div>
+</nav>
+<!-- Floating Action Button Style Indicator -->
+<div class="fixed bottom-28 right-6">
+<button class="w-14 h-14 rounded-full bg-primary text-white shadow-lg shadow-primary/25 flex items-center justify-center">
+<span class="material-icons-round text-3xl">add</span>
+</button>
+</div>
+<style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        /* Premium shadow and glassmorphism touches */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</body></html>

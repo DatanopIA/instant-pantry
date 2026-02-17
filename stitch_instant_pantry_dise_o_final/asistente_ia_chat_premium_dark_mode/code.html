@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "primary": "#ed9121",
+                "background-light": "#f8f7f6",
+                "background-dark": "#121212",
+                "accent-leaf": "#4ade80"
+              },
+              fontFamily: {
+                "display": ["Space Grotesk"]
+              },
+              borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+            },
+          },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #121212;
+            background-image: 
+                radial-gradient(circle at 2px 2px, rgba(237, 145, 33, 0.03) 1px, transparent 0);
+            background-size: 32px 32px;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .message-ai {
+            background: rgba(40, 40, 40, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .glow-primary {
+            box-shadow: 0 0 20px rgba(237, 145, 33, 0.4);
+        }
+        .glow-leaf {
+            box-shadow: 0 0 15px rgba(74, 222, 128, 0.3);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-white min-h-screen flex flex-col font-display">
+<!-- Header -->
+<header class="fixed top-0 w-full z-50 glass border-b border-white/10 pt-12 pb-4 px-6">
+<div class="flex items-center justify-between">
+<button class="p-2 rounded-full hover:bg-white/10 transition-colors">
+<span class="material-icons text-white/70">chevron_left</span>
+</button>
+<div class="flex flex-col items-center">
+<div class="w-10 h-10 bg-accent-leaf/20 rounded-full flex items-center justify-center glow-leaf border border-accent-leaf/30 mb-1">
+<span class="material-icons text-accent-leaf">eco</span>
+</div>
+<h1 class="text-sm font-bold tracking-wider uppercase text-white/90">Asistente Chef</h1>
+</div>
+<button class="p-2 rounded-full hover:bg-white/10 transition-colors">
+<span class="material-icons text-white/70">more_vert</span>
+</button>
+</div>
+</header>
+<!-- Chat Area -->
+<main class="flex-1 pt-36 pb-44 px-4 space-y-6 overflow-y-auto hide-scrollbar">
+<!-- Assistant Message -->
+<div class="flex flex-col items-start max-w-[85%]">
+<div class="message-ai p-4 rounded-xl rounded-tl-none">
+<p class="text-[15px] leading-relaxed text-white/90">
+                    ¡Hola! Soy tu Asistente Chef. Tengo tu despensa lista y actualizada. ¿Qué te apetece cocinar hoy?
+                </p>
+</div>
+<span class="text-[10px] text-white/30 mt-1 ml-1 uppercase tracking-widest">Hace un momento</span>
+</div>
+<!-- User Message -->
+<div class="flex flex-col items-end self-end max-w-[85%] ml-auto">
+<div class="bg-primary p-4 rounded-xl rounded-tr-none shadow-lg">
+<p class="text-[15px] leading-relaxed text-white font-medium">
+                    Tengo pollo, brócoli y un poco de queso crema. ¿Qué puedo preparar que sea rápido?
+                </p>
+</div>
+<span class="text-[10px] text-white/30 mt-1 mr-1 uppercase tracking-widest">Leído</span>
+</div>
+<!-- Assistant Message with Cards -->
+<div class="flex flex-col items-start max-w-[90%]">
+<div class="message-ai p-4 rounded-xl rounded-tl-none mb-3">
+<p class="text-[15px] leading-relaxed text-white/90">
+                    ¡Excelente combinación! Con esos ingredientes te sugiero estas dos opciones premium:
+                </p>
+</div>
+<div class="flex gap-3 overflow-x-auto w-screen -ml-4 px-4 pb-2 hide-scrollbar">
+<div class="min-w-[260px] glass rounded-xl overflow-hidden border border-white/10">
+<img class="w-full h-32 object-cover" data-alt="Pollo cremoso con brócoli" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSfqcyG4Iw9SXF84yGy24n_L3KUgwGkkTN7cjiSQF9MJw9brVYD_9nCjh6cSRo92Bos8KGVYRlGSJZNm3nsvyrl4BtuslBFH0a1HM5I1wc2jhBepgDvt0NycC1lhYnpc3SCxce1_Trsbeg0QRnXejVwyozHwrXRRea8d91Ll_YGm_hVNoFrfa5SzLDjbNI9dD7wTEyUVzZQXU38kZ8-_qDUuyL9HMS06W1iNERMl2l_EuooF5kcjba1JsVL8h7syrZCZb2OP337c4"/>
+<div class="p-3">
+<h3 class="font-bold text-sm text-primary">Pollo Cremoso al Brócoli</h3>
+<p class="text-xs text-white/60 mt-1">15 min • Dificultad baja</p>
+</div>
+</div>
+<div class="min-w-[260px] glass rounded-xl overflow-hidden border border-white/10">
+<img class="w-full h-32 object-cover" data-alt="Bowl de pollo y vegetales" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxQI04YoY5Ft1eI5dg7uln7ZUlKt6i-Cj9JxWZj19LFhwf8apdTl3yVfs4xNGSUwD4Bxq9nTcY1-VfIntJ385CiURlXMEYu1vSJcUrURHzrMKHcIM6w0JfZHOtvvXQzOWSUvvZxHm3N_DkMvdTalCUGskOLa_MK1La3zWOssmx6HjwyAPOrm6AfrKa-qgVOHugz5kS0QGKr6mHjao18aQgoCdetl64UFo56b0af1SegL7k3S7b-1o9thtP9nJxylEfal516nOkAtE"/>
+<div class="p-3">
+<h3 class="font-bold text-sm text-primary">Bowl Fitness Instantáneo</h3>
+<p class="text-xs text-white/60 mt-1">10 min • Dificultad baja</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Typing Indicator -->
+<div class="flex items-center space-x-2 ml-2">
+<div class="w-2 h-2 bg-primary/40 rounded-full"></div>
+<div class="w-2 h-2 bg-primary/60 rounded-full"></div>
+<div class="w-2 h-2 bg-primary/80 rounded-full"></div>
+</div>
+</main>
+<!-- Bottom Interface Area -->
+<div class="fixed bottom-0 w-full z-50">
+<!-- Quick Suggestions -->
+<div class="px-4 mb-4">
+<div class="flex gap-2 overflow-x-auto hide-scrollbar">
+<button class="whitespace-nowrap px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs font-medium text-white/80 hover:bg-white/10 transition-all">
+                    📋 Ver receta completa
+                </button>
+<button class="whitespace-nowrap px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs font-medium text-white/80 hover:bg-white/10 transition-all">
+                    🥦 Sustituir brócoli
+                </button>
+<button class="whitespace-nowrap px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs font-medium text-white/80 hover:bg-white/10 transition-all">
+                    ⏰ ¿Menos de 10 min?
+                </button>
+</div>
+</div>
+<!-- Input Bar -->
+<div class="px-4 pb-4">
+<div class="glass rounded-full p-1.5 flex items-center shadow-2xl border border-white/10">
+<button class="p-2 text-white/50 hover:text-primary transition-colors">
+<span class="material-icons">add_circle_outline</span>
+</button>
+<input class="bg-transparent border-none focus:ring-0 flex-1 text-sm text-white placeholder-white/30 px-2 font-display" placeholder="Pregunta sobre tus ingredientes..." type="text"/>
+<button class="bg-primary p-2.5 rounded-full glow-primary flex items-center justify-center">
+<span class="material-icons text-white text-sm">send</span>
+</button>
+</div>
+</div>
+<!-- iOS Navigation Bar -->
+<nav class="bg-background-dark/95 backdrop-blur-xl border-t border-white/5 px-6 pt-3 pb-8 flex justify-between items-center">
+<div class="flex flex-col items-center gap-1 opacity-50">
+<span class="material-icons text-2xl">home</span>
+<span class="text-[10px] uppercase font-bold tracking-tighter">Inicio</span>
+</div>
+<div class="flex flex-col items-center gap-1 opacity-50">
+<span class="material-icons text-2xl">qr_code_scanner</span>
+<span class="text-[10px] uppercase font-bold tracking-tighter">Escáner</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-primary">
+<span class="material-icons text-2xl">chat_bubble</span>
+<span class="text-[10px] uppercase font-bold tracking-tighter">Chef</span>
+</div>
+<div class="flex flex-col items-center gap-1 opacity-50">
+<span class="material-icons text-2xl">kitchen</span>
+<span class="text-[10px] uppercase font-bold tracking-tighter">Despensa</span>
+</div>
+<div class="flex flex-col items-center gap-1 opacity-50">
+<span class="material-icons text-2xl">person_outline</span>
+<span class="text-[10px] uppercase font-bold tracking-tighter">Perfil</span>
+</div>
+</nav>
+</div>
+</body></html>
