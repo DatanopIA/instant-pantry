@@ -2,9 +2,11 @@ import express from 'express';
 import cors from 'cors';
 import db from './db.js';
 import dotenv from 'dotenv';
+import Stripe from 'stripe';
 
 dotenv.config();
 
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const app = express();
 const PORT = 3001;
 
@@ -199,6 +201,36 @@ app.post('/api/ai/analyze-image', async (req, res) => {
     } catch (error) {
         console.error('Gemini Vision Error:', error);
         res.status(500).json({ error: "Error procesando la imagen" });
+    }
+});
+
+// --- STRIPE PAYMENTS ENDPOINTS ---
+
+app.post('/api/create-checkout-session', async (req, res) => {
+    const { priceId, userEmail } = req.body;
+
+    try {
+        const session = await stripe.checkout.sessions.create({
+            payment_method_types: ['card'],
+            line_items: [
+                {
+                    price: priceId || 'price_smart_monthly_placeholder', // Reemplazar con ID real de Stripe
+                    quantity: 1,
+                },
+            ],
+            mode: 'subscription',
+            success_url: `${req.headers.origin}/?session_id={CHECKOUT_SESSION_ID}&status=success`,
+            cancel_url: `${req.headers.origin}/?status=cancel`,
+            customer_email: userEmail,
+            metadata: {
+                user_tier: 'pro'
+            }
+        });
+
+        res.json({ url: session.url });
+    } catch (error) {
+        console.error('Stripe Session Error:', error);
+        res.status(500).json({ error: error.message });
     }
 });
 

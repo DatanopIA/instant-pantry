@@ -182,6 +182,16 @@ function App() {
     fetchData()
   }, [])
 
+  // Handle Stripe Success Callback
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('status') === 'success') {
+      setUserTier('pro');
+      // Limpiar la URL sin recargar para estética "premium"
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
   const goTo = (viewName) => {
     window.scrollTo(0, 0)
     if (view !== 'add-product' && viewName === 'add-product') {
@@ -1813,10 +1823,23 @@ function App() {
             <button
               className="btn-primary"
               style={{ width: '100%', padding: '1.25rem', borderRadius: '15px', fontSize: '1.1rem', fontWeight: 800 }}
-              onClick={() => {
-                alert('Redirigiendo a Pasarela de Pago Stripe (Checkout)...');
-                setUserTier('pro');
-                setShowUpgradeModal(false);
+              onClick={async () => {
+                try {
+                  const res = await fetch(`${API_BASE}/create-checkout-session`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ priceId: 'price_smart_monthly', userEmail: user.email })
+                  });
+                  const data = await res.json();
+                  if (data.url) {
+                    window.location.href = data.url;
+                  } else {
+                    alert('Error conectando con la pasarela de pago.');
+                  }
+                } catch (err) {
+                  console.error('Checkout error:', err);
+                  alert('Error al procesar el pago. Inténtalo de nuevo.');
+                }
               }}
             >
               SUSCRIBIRSE - 4.99€/mes
