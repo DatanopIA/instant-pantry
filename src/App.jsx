@@ -9,8 +9,13 @@ function App() {
   const [theme, setTheme] = useState('light')
   const [profileImage, setProfileImage] = useState(null)
   const [userTier, setUserTier] = useState('free')
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [user] = useState({ email: 'usuario@example.com', name: 'Usuario Gourmet', id: 'usr_123' })
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return localStorage.getItem('isLoggedIn') === 'true'
+  })
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem('user_data')
+    return savedUser ? JSON.parse(savedUser) : { email: 'usuario@example.com', name: 'Usuario Gourmet', id: 'usr_123' }
+  })
   const [language, setLanguage] = useState('es')
   const [inventory, setInventory] = useState([])
   const [recipes, setRecipes] = useState([])
@@ -42,6 +47,24 @@ function App() {
   useEffect(() => {
     scrollToBottom()
   }, [messages, view, isTyping])
+
+  const handleLogin = (userData = null) => {
+    const defaultUser = { email: 'usuario@example.com', name: 'Usuario Gourmet', id: 'usr_123' }
+    const finalUser = userData || defaultUser
+    setIsLoggedIn(true)
+    setUser(finalUser)
+    localStorage.setItem('isLoggedIn', 'true')
+    localStorage.setItem('user_data', JSON.stringify(finalUser))
+  }
+
+  const handleLogout = () => {
+    setIsLoggedIn(false)
+    setUserTier('free')
+    setInventory([])
+    localStorage.removeItem('isLoggedIn')
+    localStorage.removeItem('user_data')
+    goTo('home')
+  }
 
   const toggleFavorite = async (recipe) => {
     const newStatus = recipe.is_favorite ? 0 : 1;
@@ -1231,9 +1254,7 @@ function App() {
       <button
         onClick={() => {
           if (confirm('¿Estás seguro que deseas cerrar sesión?')) {
-            setUserTier('free');
-            setInventory([]);
-            goTo('home');
+            handleLogout();
           }
         }}
         style={{ width: '100%', padding: '1.25rem', color: '#ff4d4d', fontWeight: 600, border: 'none', background: 'transparent', marginTop: '1.5rem', cursor: 'pointer' }}
@@ -1834,7 +1855,7 @@ function App() {
           </button>
 
           {step.showSocial && (
-            <button className="btn-google" style={{ border: '1px solid var(--border-color)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }} onClick={() => setIsLoggedIn(true)}>
+            <button className="btn-google" style={{ border: '1px solid var(--border-color)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }} onClick={() => handleLogin()}>
               <svg width="20" height="20" viewBox="0 0 18 18">
                 <path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.49h4.84c-.21 1.12-.84 2.07-1.79 2.7v2.25h2.9c1.69-1.55 2.66-3.85 2.66-6.6z" />
                 <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.25c-.8.54-1.83.86-3.06.86-2.35 0-4.34-1.58-5.05-3.72H.92v2.33C2.4 15.11 5.48 18 9 18z" />
@@ -1894,7 +1915,7 @@ function App() {
         <button
           className="btn-primary"
           style={{ width: '100%', padding: '1.25rem', borderRadius: '18px', fontSize: '1.1rem', fontWeight: 800, cursor: 'pointer', boxShadow: '0 10px 20px rgba(var(--primary-rgb), 0.25)', border: 'none' }}
-          onClick={() => setIsLoggedIn(true)}
+          onClick={() => handleLogin()}
         >
           ENTRAR CON EMAIL
         </button>
@@ -1905,7 +1926,7 @@ function App() {
           <div style={{ flex: 1, height: '1px', background: 'var(--border-color)' }}></div>
         </div>
 
-        <button className="btn-google" style={{ display: 'flex !important', visibility: 'visible !important' }} onClick={() => setIsLoggedIn(true)}>
+        <button className="btn-google" style={{ display: 'flex !important', visibility: 'visible !important' }} onClick={() => handleLogin()}>
           <svg width="18" height="18" viewBox="0 0 18 18">
             <path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.49h4.84c-.21 1.12-.84 2.07-1.79 2.7v2.25h2.9c1.69-1.55 2.66-3.85 2.66-6.6z" />
             <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.25c-.8.54-1.83.86-3.06.86-2.35 0-4.34-1.58-5.05-3.72H.92v2.33C2.4 15.11 5.48 18 9 18z" />
