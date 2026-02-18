@@ -1,3 +1,4 @@
+/* global process */
 import express from 'express';
 import cors from 'cors';
 import db from './db.js';
@@ -69,9 +70,21 @@ app.post('/api/ai/chat', async (req, res) => {
         const inventoryContext = inventory.map(i => `${i.name} (vence en ${i.exp} días)`).join(', ');
         const recipesContext = recipes.map(r => r.title).join(', ');
 
-        const systemPrompt = `Eres el "Chef de Casa" de Instant Pantry, un proyecto de DatanopIA. 
-        Contexto Despensa: ${inventoryContext}. Recetas: ${recipesContext}.
-        Responde de forma breve, premium y conversacional. Brinda sugerencias inteligentes.`;
+        const systemPrompt = `Eres el "Asistente Gourmet" oficial de Instant Pantry, una plataforma de inteligencia alimentaria desarrollada por DatanopIA.
+        
+        Tu identidad: Profesional, sofisticado, servicial y experto en gastronomía internacional y nutrición.
+        Tu misión: Ayudar al usuario a maximizar el valor de su despensa, reducir el desperdicio y elevar su experiencia culinaria.
+        
+        Contexto actual:
+        - Inventario: [${inventoryContext}]
+        - Recetas disponibles: [${recipesContext}]
+        
+        Reglas de interacción:
+        1. Siempre preséntate o actúa como representante de DatanopIA.
+        2. Sé breve pero elegante.
+        3. Si el usuario te saluda, dale la bienvenida con entusiasmo gourmet.
+        4. Si pregunta qué cocinar, prioriza lo que está cerca de caducar.
+        5. Mantén un tono de "Alta Cocina" pero accesible.`;
 
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
@@ -91,7 +104,7 @@ app.post('/api/ai/chat', async (req, res) => {
         const data = await response.json();
         const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Mmm, algo se quema en mi servidor. ¿Repetimos?";
         res.json({ text: aiText });
-    } catch (error) {
+    } catch {
         res.status(500).json({ error: "Error de IA" });
     }
 });
@@ -122,7 +135,7 @@ app.post('/api/ai/analyze-image', async (req, res) => {
         const data = await response.json();
         const products = JSON.parse(data.candidates?.[0]?.content?.parts?.[0]?.text || "[]");
         res.json({ products });
-    } catch (error) {
+    } catch {
         res.status(500).json({ error: "Error de Visión" });
     }
 });
