@@ -388,70 +388,7 @@ function App() {
     }
   }
 
-  const getAIResponse = (text) => {
-    const input = text.toLowerCase();
-    const invNames = inventory.map(i => i.name.toLowerCase());
 
-    // --- AGENTIC REASONING LOGIC ---
-
-    // 1. INTENCIÓN: POSTRES Y DULCES (Mejorado)
-    if (input.includes('postre') || input.includes('dulce') || input.includes('chocolate')) {
-      // Intenta usar ingredientes del inventario para el postre
-      const hasFruit = invNames.some(n => n.includes('fruta') || n.includes('manzana') || n.includes('fresa') || n.includes('aguacate'));
-      const hasDairy = invNames.some(n => n.includes('leche') || n.includes('yogur') || n.includes('queso'));
-
-      if (hasFruit && hasDairy) {
-        return "He analizado tu despensa y, para un postre gourmet rápido, te recomiendo unos 'Vasitos de Fruta Fresca con Crema de Yogur y Miel'. Es una técnica francesa muy ligera. ¿Te gustaría que te guíe con los pasos?";
-      }
-      return "Para un postre de alta cocina en 15 minutos, te sugiero un 'Mousse de Chocolate Amargo Express' o unas 'Trufas de Cacao'. Son clásicos internacionales que nunca fallan. ¿Prefieres algo con chocolate o algo más frutal?";
-    }
-
-    // 2. INTENCIÓN: BÚSQUEDA / INFORMACIÓN EXTERNA (Simulado inteligente)
-    if (input.includes('busca') || input.includes('internet') || input.includes('qué es') || input.includes('como se hace')) {
-      return `Consultando mi base de datos de gastronomía internacional... He encontrado que lo que buscas está relacionado con la técnica de 'Cocina de Ensamblaje'. Consiste en elevar productos básicos de tu despensa usando especias exóticas o técnicas de emplatado minimalista. ¿Quieres que apliquemos esto a tu ${inventory.length > 0 ? inventory[0].name : 'próximo plato'}?`;
-    }
-
-    // 3. INTENCIÓN: SUBSTITUCIÓN (Refinado)
-    if (input.includes('substituir') || input.includes('sustituir')) {
-      const match = text.match(/"([^"]+)"/g) || text.match(/«([^»]+)»/g) || [input.split(' ').pop()];
-      const ingredient = match[0].replace(/["«»]/g, '');
-      const substitutions = {
-        'leche': 'leche de almendras o yogur griego para mantener la cremosidad',
-        'huevo': 'semillas de lino hidratadas o puré de manzana',
-        'mantequilla': 'aceite de coco o aguacate maduro',
-        'harina': 'harina de avena o almendras',
-        'azúcar': 'miel, sirope de ágave o dátiles triturados',
-        'pollo': 'tofu firme marinado o seitán',
-        'queso': 'levadura nutricional o anacardos remojados',
-        'arroz': 'quinoa o coliflor rallada'
-      };
-
-      const sub = Object.keys(substitutions).find(k => ingredient.toLowerCase().includes(k));
-      if (sub) return `Para substituir "${ingredient}", la mejor opción técnica es ${substitutions[sub]}. Mantendrá la estructura gourmet de la receta original.`;
-      return `El ingrediente "${ingredient}" es complejo. Podrías probar con una base de frutos secos triturados o una emulsión de aceite de oliva si buscas textura. ¿Quieres una alternativa más específica según tu inventario?`;
-    }
-
-    // 4. INTENCIÓN: RECETAS BASADAS EN INVENTARIO (Dinámico)
-    if (input.includes('cocinar') || input.includes('hambre') || input.includes('hacer con')) {
-      const bestMatch = recipes.find(r => invNames.some(inv => r.ingredients.some(ri => ri.toLowerCase().includes(inv))));
-      if (bestMatch) {
-        return `He revisado tus ${inventory.length} productos. Con tu "${invNames[0]}" podríamos preparar "${bestMatch.title}". ¿Te parece una buena idea o buscamos algo más ligero?`;
-      }
-      return "Tengo varias ideas. Podríamos improvisar un 'Bowl de Autor' con lo que tienes o buscar una receta rápida de 15 minutos. ¿En qué estilo te sientes hoy: Mediterráneo o Asiático?";
-    }
-
-    // 5. INTENCIÓN: SALUD Y NUTRICIÓN
-    if (input.includes('caloría') || input.includes('kcal') || input.includes('sano')) {
-      return "Mi enfoque es la 'Salud Gourmet'. Todas mis sugerencias equilibran el conteo calórico con el placer culinario. Por ejemplo, siempre priorizo grasas saludables como tu aguacate. ¿Quieres un análisis detallado de tu racha nutricional?";
-    }
-
-    // 6. FALLBACK INTELIGENTE (No genérico)
-    if (input.length > 2) {
-      return `Tu consulta sobre "${text}" es muy interesante desde el punto de vista de la neurogastronomía. Sugiere un interés por sabores complejos. ¿Te gustaría que explore cómo integrar ese concepto con los productos que tienes en tu despensa ahora mismo?`;
-    }
-
-    return t('saludo_ia');
-  };
 
   const sendMessage = async (text) => {
     try {
@@ -487,10 +424,9 @@ function App() {
         setIsTyping(false)
       }
 
-      // If Real AI didn't provide text or we're in demo mode, use Local Logic
-      if (!aiText || aiText.includes("[MODO DEMO]")) {
-        const localResponse = getAIResponse(text);
-        aiText = (aiText && aiText.includes("[MODO DEMO]")) ? `${aiText}\n\n${localResponse}` : localResponse;
+      // Trust Real AI only
+      if (!aiText) {
+        aiText = "Lo siento, mi conexión con los servidores gourmet de DatanopIA ha tenido un pequeño percance. ¿Podrías repetirme tu consulta?";
       }
 
       const aiResponseObj = { text: aiText, sender: 'ai' }
@@ -1642,35 +1578,21 @@ function App() {
         <span className="material-icons-round notranslate" translate="no">close</span>
       </button>
 
-      {/* Mode Selector */}
-      <div style={{ position: 'absolute', top: '100px', display: 'flex', gap: '1rem', background: 'rgba(255,255,255,0.1)', padding: '0.5rem', borderRadius: '2rem' }}>
+      {/* Mode Selector - Hidden since only Ticket OCR is active for now to ensure stability */}
+      <div style={{ position: 'absolute', top: '100px', display: 'none' }}>
         <button
           onClick={() => setScanMode('ticket')}
           style={{
             padding: '0.6rem 1.2rem',
             borderRadius: '1.5rem',
             border: 'none',
-            background: scanMode === 'ticket' ? 'var(--primary)' : 'transparent',
+            background: 'var(--primary)',
             color: '#fff',
             fontWeight: 700,
             cursor: 'pointer'
           }}
         >
           TIQUET OCR
-        </button>
-        <button
-          onClick={() => setScanMode('fridge')}
-          style={{
-            padding: '0.6rem 1.2rem',
-            borderRadius: '1.5rem',
-            border: 'none',
-            background: scanMode === 'fridge' ? 'var(--primary)' : 'transparent',
-            color: '#fff',
-            fontWeight: 700,
-            cursor: 'pointer'
-          }}
-        >
-          NEVERA VISION
         </button>
       </div>
 
