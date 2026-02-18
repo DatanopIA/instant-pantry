@@ -1847,7 +1847,12 @@ function App() {
     );
   };
 
-  if (isLoading) return <div className="flex-center" style={{ height: '100vh', background: 'var(--bg-color)', color: 'var(--text-main)' }}>Cargando Pantry Gourmet...</div>
+  if (isLoading) return (
+    <div className="flex-center" style={{ height: '100vh', background: 'var(--bg-color)', color: 'var(--text-main)', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <div className="animate-spin" style={{ width: '40px', height: '40px', border: '4px solid var(--primary)', borderTopColor: 'transparent', borderRadius: '50%' }}></div>
+      <p style={{ fontWeight: 600 }}>Cargando Pantry Gourmet...</p>
+    </div>
+  )
 
   const renderOnboarding = () => {
     const steps = [
@@ -1875,7 +1880,8 @@ function App() {
       }
     ]
 
-    const step = steps[onboardingStep]
+    const step = steps[onboardingStep] || steps[0]
+    if (!step) return null;
 
     return (
       <div className="container animate-fade-in" style={{ height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: '2rem', background: 'var(--bg-color)', overflow: 'hidden' }}>
