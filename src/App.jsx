@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import './index.css'
+import { supabase } from './lib/supabase'
 
 const API_BASE = '/api'
 
@@ -52,11 +53,42 @@ function App() {
     scrollToBottom()
   }, [messages, view, isTyping])
 
+  // Listen for Supabase Auth changes
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        const userData = {
+          email: session.user.email,
+          name: session.user.user_metadata.full_name || session.user.email.split('@')[0],
+          id: session.user.id
+        }
+        setIsLoggedIn(true)
+        setUser(userData)
+        localStorage.setItem('isLoggedIn', 'true')
+        localStorage.setItem('user_data', JSON.stringify(userData))
+      } else if (event === 'SIGNED_OUT') {
+        setIsLoggedIn(false)
+        setUserTier('free')
+        setInventory([])
+        localStorage.removeItem('isLoggedIn')
+        localStorage.removeItem('user_data')
+        localStorage.removeItem('onboarding_seen')
+        setShowOnboarding(true)
+        setOnboardingStep(0)
+        setEmail('')
+        setPassword('')
+        goTo('home')
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [goTo])
+
   const handleLogin = (userData = null) => {
     setIsAuthenticating(true)
     setShowGoogleAccounts(false)
 
-    // Simular verificación segura (Premium feel)
+    // Simular verificación segura para Email (Premium feel)
     setTimeout(() => {
       const defaultUser = {
         email: email || 'usuario@example.com',
@@ -70,6 +102,24 @@ function App() {
       localStorage.setItem('isLoggedIn', 'true')
       localStorage.setItem('user_data', JSON.stringify(finalUser))
     }, 1500)
+  }
+
+  const handleLoginGoogle = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'select_account',
+          },
+        },
+      })
+      if (error) throw error
+    } catch (error) {
+      console.error('Error logging in with Google:', error.message)
+      alert('Error al conectar con Google. Por favor, verifica la configuración en Supabase.')
+    }
   }
 
   const handleLogout = () => {
@@ -242,13 +292,13 @@ function App() {
     }
   }, []);
 
-  const goTo = (viewName) => {
+  const goTo = useCallback((viewName) => {
     window.scrollTo(0, 0)
     if (view !== 'add-product' && viewName === 'add-product') {
       setPrevView(view)
     }
     setView(viewName)
-  }
+  }, [view])
 
   const addProductToInventory = async (product) => {
     // Audit Check: 15 items limit for Free users
@@ -1875,7 +1925,7 @@ function App() {
           </button>
 
           {step.showSocial && (
-            <button className="btn-google" style={{ border: '1px solid var(--border-color)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }} onClick={() => setShowGoogleAccounts(true)}>
+            <button className="btn-google" style={{ border: '1px solid var(--border-color)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }} onClick={() => handleLoginGoogle()}>
               <svg width="20" height="20" viewBox="0 0 18 18">
                 <path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.49h4.84c-.21 1.12-.84 2.07-1.79 2.7v2.25h2.9c1.69-1.55 2.66-3.85 2.66-6.6z" />
                 <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.25c-.8.54-1.83.86-3.06.86-2.35 0-4.34-1.58-5.05-3.72H.92v2.33C2.4 15.11 5.48 18 9 18z" />
@@ -1960,7 +2010,7 @@ function App() {
           <div style={{ flex: 1, height: '1px', background: 'var(--border-color)' }}></div>
         </div>
 
-        <button className="btn-google" style={{ display: 'flex !important', visibility: 'visible !important' }} onClick={() => setShowGoogleAccounts(true)}>
+        <button className="btn-google" style={{ display: 'flex !important', visibility: 'visible !important' }} onClick={() => handleLoginGoogle()}>
           <svg width="18" height="18" viewBox="0 0 18 18">
             <path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.49h4.84c-.21 1.12-.84 2.07-1.79 2.7v2.25h2.9c1.69-1.55 2.66-3.85 2.66-6.6z" />
             <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.25c-.8.54-1.83.86-3.06.86-2.35 0-4.34-1.58-5.05-3.72H.92v2.33C2.4 15.11 5.48 18 9 18z" />
