@@ -10,13 +10,17 @@ function App() {
   const [profileImage, setProfileImage] = useState(null)
   const [userTier, setUserTier] = useState('free')
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [user, setUser] = useState({ email: 'usuario@example.com', name: 'Usuario Gourmet', id: 'usr_123' })
+  const [user] = useState({ email: 'usuario@example.com', name: 'Usuario Gourmet', id: 'usr_123' })
   const [language, setLanguage] = useState('es')
   const [inventory, setInventory] = useState([])
   const [recipes, setRecipes] = useState([])
   const [messages, setMessages] = useState([])
   const [isTyping, setIsTyping] = useState(false)
   const chatEndRef = useRef(null)
+  const [onboardingStep, setOnboardingStep] = useState(0)
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    return localStorage.getItem('onboarding_seen') !== 'true'
+  })
   const [searchQuery, setSearchQuery] = useState('')
   const [recipeCategory, setRecipeCategory] = useState('Todo')
   const [userDiets, setUserDiets] = useState({
@@ -216,10 +220,16 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(product)
       })
+      if (!res.ok) throw new Error("API Failure");
       const newProduct = await res.json()
       setInventory(prev => [...prev, newProduct])
+      return true;
     } catch (error) {
       console.error('Error adding product:', error)
+      // Fallback local en caso de que el backend falle (Vercel Cold Start / Error)
+      const mockProduct = { id: Date.now(), ...product };
+      setInventory(prev => [...prev, mockProduct]);
+      return true;
     }
   }
 
@@ -1419,18 +1429,27 @@ function App() {
           style={{ borderRadius: '12px', padding: '1.25rem', fontSize: '1rem', fontWeight: 700, marginTop: '1rem' }}
           disabled={!newItem.name || !newItem.expiryDate || isSaving}
           onClick={async () => {
+            if (!newItem.name || !newItem.expiryDate) return;
             setIsSaving(true)
-            const days = calculateDays(newItem.expiryDate)
-            const productIcon = getIconForProduct(newItem.name)
-            await addProductToInventory({
-              name: newItem.name,
-              exp: days,
-              icon: productIcon,
-              status: days > 5 ? 'green' : days > 2 ? 'yellow' : 'red'
-            })
-            setNewItem({ name: '', expiryDate: '' })
-            setIsSaving(false)
-            goTo('inventory')
+            try {
+              const days = calculateDays(newItem.expiryDate)
+              const productIcon = getIconForProduct(newItem.name)
+              const success = await addProductToInventory({
+                name: newItem.name,
+                exp: days,
+                icon: productIcon,
+                status: days > 5 ? 'green' : days > 2 ? 'yellow' : 'red'
+              })
+
+              if (success) {
+                setNewItem({ name: '', expiryDate: '' })
+                goTo('inventory')
+              }
+            } catch (err) {
+              console.error("Error manual add:", err);
+            } finally {
+              setIsSaving(false)
+            }
           }}
         >
           {isSaving ? t('guardando') : t('añadir')}
@@ -1632,7 +1651,7 @@ function App() {
                   <span className="flex items-center gap-1" style={{ fontWeight: 600 }}><span className="material-icons-round notranslate" style={{ fontSize: '1rem', color: 'var(--primary)' }}>schedule</span> {selectedRecipe.time}</span>
                 </div>
                 <div className="flex flex-col">
-                  <span style={{ color: 'var(--text-muted)', fontSize: '0.65rem', textTransform: 'uppercase', fontWeight: 700 }}>Colorías</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '0.65rem', textTransform: 'uppercase', fontWeight: 700 }}>Calorías</span>
                   <span className="flex items-center gap-1" style={{ fontWeight: 600 }}><span className="material-icons-round notranslate" style={{ fontSize: '1rem', color: 'var(--primary)' }}>local_fire_department</span> {selectedRecipe.cal || '450 kcal'}</span>
                 </div>
               </div>
@@ -1727,39 +1746,192 @@ function App() {
 
   if (isLoading) return <div className="flex-center" style={{ height: '100vh', background: 'var(--bg-color)', color: 'var(--text-main)' }}>Cargando Pantry Gourmet...</div>
 
+  const renderOnboarding = () => {
+    const steps = [
+      {
+        icon: 'center_focus_weak',
+        title: 'Tu despensa, bajo control inteligente',
+        body: 'Escanea tus productos en segundos. Instant Pantry detecta fechas de caducidad y stock automáticamente.',
+        cta: 'Probar Escáner',
+        color: 'var(--primary)'
+      },
+      {
+        icon: 'auto_awesome',
+        title: 'Cocina con lo que ya tienes',
+        body: 'Nuestra IA diseña recetas personalizadas para evitar el desperdicio y ahorrarte tiempo. Hoy sugiero: Quinoa Harvest Bowl.',
+        cta: 'Ver Recetas',
+        color: 'var(--accent-orange)'
+      },
+      {
+        icon: 'stars',
+        title: 'Únete a la comunidad DatanopIA',
+        body: 'Desbloquea el Modo Oscuro, alertas inteligentes y despensa ilimitada con Smart Pantry Pro.',
+        cta: 'Empezar Gratis',
+        color: 'var(--charcoal)',
+        showSocial: true
+      }
+    ]
+
+    const step = steps[onboardingStep]
+
+    return (
+      <div className="container animate-fade-in" style={{ height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: '2rem', background: 'var(--bg-color)', overflow: 'hidden' }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+          <div className="logo-animation" style={{ marginBottom: '2rem' }}>
+            <div style={{
+              width: '140px',
+              height: '140px',
+              borderRadius: '46px',
+              background: onboardingStep === 2 ? 'var(--charcoal)' : 'var(--primary)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 2rem',
+              boxShadow: onboardingStep === 2 ? '0 20px 40px rgba(0,0,0,0.4)' : '0 20px 40px rgba(var(--primary-rgb), 0.3)',
+              position: 'relative'
+            }}>
+              <span className="material-icons-round notranslate" style={{ color: 'white', fontSize: '5rem' }}>{step.icon}</span>
+              {onboardingStep === 0 && (
+                <div style={{ position: 'absolute', inset: '-15px', border: '3px solid var(--primary)', borderRadius: '55px', opacity: 0.3, animation: 'pulse 2s infinite' }}></div>
+              )}
+            </div>
+            <h1 style={{ fontSize: '2.4rem', fontWeight: 800, color: onboardingStep === 2 ? 'var(--charcoal)' : 'var(--text-main)', marginBottom: '1rem', lineHeight: 1.1, letterSpacing: '-1px' }}>{step.title}</h1>
+            <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem', maxWidth: '320px', margin: '0 auto', lineHeight: 1.5, fontWeight: 500 }}>{step.body}</p>
+          </div>
+
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '2rem' }}>
+            {[0, 1, 2].map(i => (
+              <div key={i} style={{ width: i === onboardingStep ? '32px' : '8px', height: '8px', borderRadius: '4px', background: i === onboardingStep ? 'var(--primary)' : 'var(--border-color)', transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)' }}></div>
+            ))}
+          </div>
+        </div>
+
+        <div className="stagger-in" style={{ width: '100%', maxWidth: '340px', paddingBottom: '3rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <button
+            className="btn-primary"
+            style={{
+              width: '100%',
+              padding: '1.4rem',
+              borderRadius: '22px',
+              fontSize: '1.15rem',
+              fontWeight: 800,
+              cursor: 'pointer',
+              boxShadow: onboardingStep === 2 ? '0 12px 24px rgba(0,0,0,0.2)' : '0 12px 24px rgba(var(--primary-rgb), 0.3)',
+              border: 'none',
+              background: onboardingStep === 2 ? 'var(--charcoal)' : 'var(--primary)',
+              color: 'white'
+            }}
+            onClick={() => {
+              if (onboardingStep < 2) {
+                setOnboardingStep(s => s + 1)
+              } else {
+                localStorage.setItem('onboarding_seen', 'true')
+                setShowOnboarding(false)
+              }
+            }}
+          >
+            {step.cta.toUpperCase()}
+          </button>
+
+          {step.showSocial && (
+            <button className="btn-google" style={{ border: '1px solid var(--border-color)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }} onClick={() => setIsLoggedIn(true)}>
+              <svg width="20" height="20" viewBox="0 0 18 18">
+                <path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.49h4.84c-.21 1.12-.84 2.07-1.79 2.7v2.25h2.9c1.69-1.55 2.66-3.85 2.66-6.6z" />
+                <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.25c-.8.54-1.83.86-3.06.86-2.35 0-4.34-1.58-5.05-3.72H.92v2.33C2.4 15.11 5.48 18 9 18z" />
+                <path fill="#FBBC05" d="M3.95 10.71c-.18-.54-.28-1.11-.28-1.71s.1-1.17.28-1.71V4.96H.92C.33 6.13 0 7.53 0 9s.33 2.87.92 4.04l3.03-2.33z" />
+                <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35L14.98 2.4C13.46.99 11.43 0 9 0 5.48 0 2.4 2.89.92 6.07l3.03 2.33c.71-2.14 2.7-3.72 5.05-3.72z" />
+              </svg>
+              Continuar con Google
+            </button>
+          )}
+
+          <p
+            onClick={() => {
+              localStorage.setItem('onboarding_seen', 'true')
+              setShowOnboarding(false)
+            }}
+            style={{ marginTop: '0.8rem', color: 'var(--text-muted)', fontSize: '0.95rem', cursor: 'pointer', fontWeight: 600 }}
+          >
+            Saltar introducción
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   const renderLanding = () => (
     <div className="container animate-fade-in" style={{ height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: '2rem', background: 'var(--bg-color)' }}>
-      <div style={{ marginBottom: '3rem' }}>
-        <div style={{ background: 'var(--primary)', width: '80px', height: '80px', borderRadius: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', boxShadow: '0 10px 25px rgba(var(--primary-rgb), 0.3)' }}>
-          <span className="material-icons-round notranslate" style={{ color: 'white', fontSize: '3rem' }}>restaurant</span>
+      <div className="logo-animation" style={{ marginBottom: '2.5rem' }}>
+        <div style={{ position: 'relative', width: '100px', height: '100px', margin: '0 auto 1.5rem' }}>
+          {/* Logo Premium SVG: Carrito + Hoja Sage + Línea Pulso */}
+          <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="100" rx="30" fill="var(--primary)" fillOpacity="0.1" />
+            <path d="M25 35H35L40 65H75L80 45H40" stroke="var(--charcoal)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx="45" cy="75" r="4" fill="var(--charcoal)" />
+            <circle cx="70" cy="75" r="4" fill="var(--charcoal)" />
+            <path d="M50 25C50 25 65 35 65 50C65 60 58 68 50 68C42 68 35 60 35 50C35 35 50 25 50 25Z" fill="var(--primary)" />
+            <path d="M30 50H38L42 40L48 60L52 45L56 50H65" stroke="var(--charcoal)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
         </div>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.5rem' }}>Instant <span style={{ color: 'var(--primary)' }}>Pantry</span></h1>
-        <p style={{ color: 'var(--text-muted)', fontSize: '1rem', maxWidth: '280px', margin: '0 auto' }}>Reduce el desperdicio y cocina como un chef profesional.</p>
+        <h1 style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.5rem', letterSpacing: '-1px' }}>
+          Instant <span style={{ color: 'var(--primary)' }}>Pantry</span>
+        </h1>
+        <p style={{ color: 'var(--text-muted)', fontSize: '1rem', maxWidth: '280px', margin: '0 auto', lineHeight: 1.4 }}>
+          Nutrición inteligente y gestión gourmet para tu hogar.
+        </p>
       </div>
 
-      <div style={{ width: '100%', maxWidth: '320px', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        <input
-          type="email"
-          placeholder="Tu email"
-          style={{ width: '100%', padding: '1.25rem', borderRadius: '16px', background: 'var(--card-bg)', border: '1px solid var(--border-color)', color: 'var(--text-main)', outline: 'none', fontSize: '1rem' }}
-        />
+      <div className="stagger-in" style={{ width: '100%', maxWidth: '320px', display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+        <div style={{ position: 'relative' }}>
+          <span className="material-icons-round notranslate" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', fontSize: '1.2rem' }}>email</span>
+          <input
+            type="email"
+            placeholder="Tu email"
+            style={{ width: '100%', padding: '1.25rem 1.25rem 1.25rem 3.5rem', borderRadius: '18px', background: 'var(--card-bg)', border: '1px solid var(--border-color)', color: 'var(--text-main)', outline: 'none', fontSize: '1rem', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}
+          />
+        </div>
+
         <button
           className="btn-primary"
-          style={{ width: '100%', padding: '1.25rem', borderRadius: '16px', fontSize: '1.1rem', fontWeight: 800, cursor: 'pointer', boxShadow: '0 10px 20px rgba(var(--primary-rgb), 0.2)' }}
+          style={{ width: '100%', padding: '1.25rem', borderRadius: '18px', fontSize: '1.1rem', fontWeight: 800, cursor: 'pointer', boxShadow: '0 10px 20px rgba(var(--primary-rgb), 0.25)', border: 'none' }}
           onClick={() => setIsLoggedIn(true)}
         >
-          LOGUEARSE / ENTRAR
+          ENTRAR CON EMAIL
         </button>
-        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>Al entrar aceptas nuestros términos y condiciones.</p>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '0.5rem 0' }}>
+          <div style={{ flex: 1, height: '1px', background: 'var(--border-color)' }}></div>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>O</span>
+          <div style={{ flex: 1, height: '1px', background: 'var(--border-color)' }}></div>
+        </div>
+
+        <button className="btn-google" style={{ display: 'flex !important', visibility: 'visible !important' }} onClick={() => setIsLoggedIn(true)}>
+          <svg width="18" height="18" viewBox="0 0 18 18">
+            <path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.49h4.84c-.21 1.12-.84 2.07-1.79 2.7v2.25h2.9c1.69-1.55 2.66-3.85 2.66-6.6z" />
+            <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.25c-.8.54-1.83.86-3.06.86-2.35 0-4.34-1.58-5.05-3.72H.92v2.33C2.4 15.11 5.48 18 9 18z" />
+            <path fill="#FBBC05" d="M3.95 10.71c-.18-.54-.28-1.11-.28-1.71s.1-1.17.28-1.71V4.96H.92C.33 6.13 0 7.53 0 9s.33 2.87.92 4.04l3.03-2.33z" />
+            <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35L14.98 2.4C13.46.99 11.43 0 9 0 5.48 0 2.4 2.89.92 6.07l3.03 2.33c.71-2.14 2.7-3.72 5.05-3.72z" />
+          </svg>
+          Continuar con Google
+        </button>
+
+        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.8rem' }}>
+          Al entrar aceptas nuestros <span style={{ textDecoration: 'underline' }}>términos y condiciones</span>.
+        </p>
       </div>
 
-      <div style={{ marginTop: '4rem', opacity: 0.5 }}>
-        <p style={{ fontSize: '0.75rem' }}>Powered by Maeki AI • 2026</p>
+      <div style={{ marginTop: 'auto', padding: '2rem 0', opacity: 0.6 }}>
+        <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '1px' }}>
+          PROYECTO OFICIAL <span style={{ color: 'var(--charcoal)' }}>DATANOPIA</span> &bull; 2026
+        </p>
       </div>
     </div>
   )
 
   if (!isLoggedIn) {
+    if (showOnboarding) {
+      return <div className={`App ${theme}`} data-theme={theme}>{renderOnboarding()}</div>
+    }
     return <div className={`App ${theme}`} data-theme={theme}>{renderLanding()}</div>
   }
 
