@@ -63,6 +63,9 @@ function App() {
     setInventory([])
     localStorage.removeItem('isLoggedIn')
     localStorage.removeItem('user_data')
+    localStorage.removeItem('onboarding_seen')
+    setShowOnboarding(true)
+    setOnboardingStep(0)
     goTo('home')
   }
 
