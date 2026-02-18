@@ -52,6 +52,115 @@ function App() {
   const [password, setPassword] = useState('')
   const [email, setEmail] = useState('')
 
+  const translations = {
+    es: {
+      inicio: 'INICIO', despensa: 'DESPENSA', recetas: 'RECETAS', iachef: 'IA CHEF',
+      bienvenido: 'BIENVENIDO A', perfil: 'Perfil', dieta: 'Ajustes de Dieta', idioma: 'Idioma',
+      logros: 'Logros', tema: 'Tema', cerrar_sesion: 'Cerrar Sesión', guardar: 'Guardar',
+      volver: 'Volver', premium: 'Miembro Premium', racha: 'Racha', recetas_completadas: 'Recetas',
+      sugerencia_dia: 'Sugerencia del Día', ver_todas: 'Ver todas', estado_despensa: 'Estado de Despensa',
+      articulos: 'Artículos', por_comprar: 'Por comprar', buscar_recetas: 'Buscar recetas...',
+      sin_recetas: 'No se encontraron recetas.', cargando: 'Cargando Pantry Gourmet...',
+      ingredientes: 'Ingredientes', nutricion_inteligente: 'NutricIÓN Inteligente',
+      despensa_status_msg: 'Tienes {count} productos cerca de caducar',
+      vence_pronto: 'Vence pronto', lista_compra: 'Lista de Compra', inventario_title: 'Inventario',
+      total: 'Total', vence: 'Vence', agotado: 'Agotado', buscar_alimentos: 'Buscar alimentos...',
+      todo: 'Todo', no_articulos: 'No hay artículos en esta lista', ver_toda_despensa: 'Ver toda la despensa',
+      recetario: 'Recetario', inspiracion: 'Inspiración Gourmet', recomendado: 'Recomendaciones para ti',
+      ia_asistente: 'Asistente IA', chef_virtual: 'Chef Virtual', hoy: 'HOY',
+      preguntar_ia: 'Pregunta sobre tu despensa...', pref_alimentarias: 'Preferencias Alimentarias',
+      nuevo_producto: 'Nuevo Producto', nombre_producto: 'Nombre del Producto', fecha_vencimiento: 'Fecha de Caducidad',
+      caduca_en: 'Caduca en {count} días', añadir: 'Añadir a la Despensa', guardando: 'Guardando...',
+      footer_add: 'El producto se añadirá automáticamente a tu lista.', procesando: 'Procesando Ticket...',
+      encuadra: 'Encuadra tu ticket',
+      logro1_title: 'Chef Principiante', logro1_desc: 'Cocina tus primeras 5 recetas',
+      logro2_title: 'Cero Desperdicio', logro2_desc: 'Usa 10 productos antes de caducar',
+      logro3_title: 'Explorador Gourmet', logro3_desc: 'Prueba recetas de 3 países distintos',
+      oscuro: 'Oscuro', claro: 'Claro',
+      vegano: 'Vegano', sin_gluten: 'Sin Gluten', keto: 'Keto', sin_lactosa: 'Sin Lactosa',
+      favoritos: 'Favoritos', favorito: 'Favorito', restablecer: 'Restablecer Sugerencias',
+      exclusive_pro: 'Función exclusiva para usuarios Smart Pantry',
+      cargando_pantry: 'Cargando Pantry Gourmet...',
+      tienes_todo: 'Tienes todos los ingredientes',
+      falta_uno: 'Falta 1 ingrediente',
+      faltan_varios: 'Faltan {count} ingredientes'
+    },
+    en: {
+      inicio: 'HOME', despensa: 'PANTRY', recetas: 'RECIPES', iachef: 'AI CHEF',
+      bienvenido: 'WELCOME TO', perfil: 'Profile', dieta: 'Diet Settings', idioma: 'Language',
+      logros: 'Achievements', tema: 'Theme', cerrar_sesion: 'Log Out', guardar: 'Save',
+      volver: 'Back', premium: 'Premium Member', racha: 'Streak', recetas_completadas: 'Recipes',
+      sugerencia_dia: 'Suggestion of the Day', ver_todas: 'See all', estado_despensa: 'Pantry Status',
+      articulos: 'Items', por_comprar: 'To buy', buscar_recetas: 'Search recipes...',
+      sin_recetas: 'No recipes found.', cargando: 'Loading Gourmet Pantry...',
+      ingredientes: 'Ingredients', nutricion_inteligente: 'Smart Nutrition',
+      despensa_status_msg: 'You have {count} items nearing expiry',
+      vence_pronto: 'Expiring soon', lista_compra: 'Shopping List', inventario_title: 'Inventory',
+      total: 'Total', vence: 'Expiring', agotado: 'Out of Stock', buscar_alimentos: 'Search food...',
+      todo: 'All', no_articulos: 'No items in this list', ver_toda_despensa: 'View all pantry',
+      recetario: 'Recipe Book', inspiracion: 'Gourmet Inspiration', recomendado: 'Recommendations for you',
+      ia_asistente: 'AI Assistant', chef_virtual: 'Virtual Chef', hoy: 'TODAY',
+      preguntar_ia: 'Ask about your pantry...', pref_alimentarias: 'Dietary Preferences',
+      nuevo_producto: 'New Product', nombre_producto: 'Product Name', fecha_vencimiento: 'Expiry Date',
+      caduca_en: 'Expires in {count} days', añadir: 'Add to Pantry', guardando: 'Saving...',
+      footer_add: 'Product will be added automatically to your list.', procesando: 'Processing Receipt...',
+      encuadra: 'Frame your receipt',
+      logro1_title: 'Beginner Chef', logro1_desc: 'Cook your first 5 recipes',
+      logro2_title: 'Zero Waste', logro2_desc: 'Use 10 products before they expire',
+      logro3_title: 'Gourmet Explorer', logro3_desc: 'Try recipes from 3 different countries',
+      oscuro: 'Dark', claro: 'Light',
+      vegano: 'Vegan', sin_gluten: 'Gluten Free', keto: 'Keto', sin_lactosa: 'Lactose Free',
+      favoritos: 'Favorites', favorito: 'Favorite', restablecer: 'Reset Suggestions',
+      exclusive_pro: 'Exclusive feature for Smart Pantry users',
+      cargando_pantry: 'Loading Gourmet Pantry...',
+      tienes_todo: 'You have all the ingredients',
+      falta_uno: '1 ingredient missing',
+      faltan_varios: '{count} ingredients missing'
+    },
+    ca: {
+      inicio: 'INICI', despensa: 'REPOST', recetas: 'RECEPTES', iachef: 'IA CHEF',
+      bienvenido: 'BENVINGUT A', perfil: 'Perfil', dieta: 'Ajustos de Dieta', idioma: 'Idioma',
+      logros: 'Assoliments', tema: 'Tema', cerrar_sesion: 'Tancar Sessió', guardar: 'Desar',
+      volver: 'Tornar', premium: 'Membre Premium', racha: 'Ratxa', recetas_completadas: 'Receptes',
+      sugerencia_dia: 'Suggeriment del Dia', ver_todas: 'Veure totes', estado_despensa: 'Estat del Repost',
+      articulos: 'Articles', por_comprar: 'Per comprar', buscar_recetas: 'Cercar receptes...',
+      sin_recetas: 'No s\'han trobat receptes.', cargando: 'Carregant Repost Gourmet...',
+      ingredientes: 'Ingredients', nutricion_inteligente: 'Nutrició Intel·ligent',
+      despensa_status_msg: 'Tens {count} productes a punt de caducar',
+      vence_pronto: 'Caduca aviat', lista_compra: 'Llista de Compra', inventario_title: 'Inventari',
+      total: 'Total', vence: 'Caduca', agotado: 'Esgotat', buscar_alimentos: 'Cercar aliments...',
+      todo: 'Tot', no_articulos: 'No hi ha articles en aquesta llista', ver_toda_despensa: 'Veure tot el repost',
+      recetario: 'Receptari', inspiracion: 'Inspiració Gourmet', recomendado: 'Recomanacions per a tu',
+      ia_asistente: 'Assistent IA', chef_virtual: 'Xef Virtual', hoy: 'AVUI',
+      preguntar_ia: 'Pregunta sobre el teu repost...', pref_alimentarias: 'Preferències Alimentàries',
+      nuevo_producto: 'Nou Producte', nombre_producto: 'Nom del Producte', fecha_vencimiento: 'Data de Caducitat',
+      caduca_en: 'Caduca en {count} dies', añadir: 'Afegir al Repost', guardando: 'Desant...',
+      footer_add: 'El producte s\'afegirà automàticament a la teva llista.', procesando: 'Processant Tiquet...',
+      encuadra: 'Enquadra el teu tiquet',
+      logro1_title: 'Xef Començant', logro1_desc: 'Cuina les teves primeres 5 receptes',
+      logro2_title: 'Zero Deixalles', logro2_desc: 'Usa 10 productes abans de caducar',
+      logro3_title: 'Explorador Gourmet', logro3_desc: 'Prova receptes de 3 països diferents',
+      oscuro: 'Fosc', claro: 'Clar',
+      vegano: 'Vegà', sin_gluten: 'Sense Gluten', keto: 'Keto', sin_lactosa: 'Sense Lactosa',
+      favoritos: 'Favorits', favorito: 'Preferit', restablecer: 'Restablir Suggeriments',
+      exclusive_pro: 'Funció exclusiva per a usuaris Smart Pantry',
+      cargando_pantry: 'Carregant Pantry Gourmet...',
+      tienes_todo: 'Tens tots els ingredients',
+      falta_uno: 'Falta 1 ingredient',
+      faltan_varios: 'Falten {count} ingredients'
+    }
+  }
+
+  const t = (key) => translations[language][key] || key;
+
+  const goTo = useCallback((viewName) => {
+    window.scrollTo(0, 0)
+    if (view !== 'add-product' && viewName === 'add-product') {
+      setPrevView(view)
+    }
+    setView(viewName)
+  }, [view])
+
   const scrollToBottom = () => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
@@ -161,106 +270,6 @@ function App() {
       console.error('Error toggling favorite:', error);
     }
   };
-  const translations = {
-    es: {
-      inicio: 'INICIO', despensa: 'DESPENSA', recetas: 'RECETAS', iachef: 'IA CHEF',
-      bienvenido: 'BIENVENIDO A', perfil: 'Perfil', dieta: 'Ajustes de Dieta', idioma: 'Idioma',
-      logros: 'Logros', tema: 'Tema', cerrar_sesion: 'Cerrar Sesión', guardar: 'Guardar',
-      volver: 'Volver', premium: 'Miembro Premium', racha: 'Racha', recetas_completadas: 'Recetas',
-      sugerencia_dia: 'Sugerencia del Día', ver_todas: 'Ver todas', estado_despensa: 'Estado de Despensa',
-      articulos: 'Artículos', por_comprar: 'Por comprar', buscar_recetas: 'Buscar recetas...',
-      sin_recetas: 'No se encontraron recetas.', cargando: 'Cargando Pantry Gourmet...',
-      ingredientes: 'Ingredientes', nutricion_inteligente: 'Nutrición Inteligente',
-      despensa_status_msg: 'Tienes {count} productos cerca de caducar',
-      vence_pronto: 'Vence pronto', lista_compra: 'Lista de Compra', inventario_title: 'Inventario',
-      total: 'Total', vence: 'Vence', agotado: 'Agotado', buscar_alimentos: 'Buscar alimentos...',
-      todo: 'Todo', no_articulos: 'No hay artículos en esta lista', ver_toda_despensa: 'Ver toda la despensa',
-      recetario: 'Recetario', inspiracion: 'Inspiración Gourmet', recomendado: 'Recomendaciones para ti',
-      ia_asistente: 'Asistente IA', chef_virtual: 'Chef Virtual', hoy: 'HOY',
-      preguntar_ia: 'Pregunta sobre tu despensa...', pref_alimentarias: 'Preferencias Alimentarias',
-      nuevo_producto: 'Nuevo Producto', nombre_producto: 'Nombre del Producto', fecha_vencimiento: 'Fecha de Caducidad',
-      caduca_en: 'Caduca en {count} días', añadir: 'Añadir a la Despensa', guardando: 'Guardando...',
-      footer_add: 'El producto se añadirá automáticamente a tu lista.', procesando: 'Procesando Ticket...',
-      encuadra: 'Encuadra tu ticket',
-      logro1_title: 'Chef Principiante', logro1_desc: 'Cocina tus primeras 5 recetas',
-      logro2_title: 'Cero Desperdicio', logro2_desc: 'Usa 10 productos antes de caducar',
-      logro3_title: 'Explorador Gourmet', logro3_desc: 'Prueba recetas de 3 países distintos',
-      oscuro: 'Oscuro', claro: 'Claro',
-      vegano: 'Vegano', sin_gluten: 'Sin Gluten', keto: 'Keto', sin_lactosa: 'Sin Lactosa',
-      favoritos: 'Favoritos', favorito: 'Favorito', restablecer: 'Restablecer Sugerencias',
-      exclusive_pro: 'Función exclusiva para usuarios Smart Pantry',
-      cargando_pantry: 'Cargando Pantry Gourmet...',
-      tienes_todo: 'Tienes todos los ingredientes',
-      falta_uno: 'Falta 1 ingrediente',
-      faltan_varios: 'Faltan {count} ingredientes'
-    },
-    en: {
-      inicio: 'HOME', despensa: 'PANTRY', recetas: 'RECIPES', iachef: 'AI CHEF',
-      bienvenido: 'WELCOME TO', perfil: 'Profile', dieta: 'Diet Settings', idioma: 'Language',
-      logros: 'Achievements', tema: 'Theme', cerrar_sesion: 'Log Out', guardar: 'Save',
-      volver: 'Back', premium: 'Premium Member', racha: 'Streak', recetas_completadas: 'Recipes',
-      sugerencia_dia: 'Suggestion of the Day', ver_todas: 'See all', estado_despensa: 'Pantry Status',
-      articulos: 'Items', por_comprar: 'To buy', buscar_recetas: 'Search recipes...',
-      sin_recetas: 'No recipes found.', cargando: 'Loading Gourmet Pantry...',
-      ingredientes: 'Ingredients', nutricion_inteligente: 'Smart Nutrition',
-      despensa_status_msg: 'You have {count} items nearing expiry',
-      vence_pronto: 'Expiring soon', lista_compra: 'Shopping List', inventario_title: 'Inventory',
-      total: 'Total', vence: 'Expiring', agotado: 'Out of Stock', buscar_alimentos: 'Search food...',
-      todo: 'All', no_articulos: 'No items in this list', ver_toda_despensa: 'View all pantry',
-      recetario: 'Recipe Book', inspiracion: 'Gourmet Inspiration', recomendado: 'Recommendations for you',
-      ia_asistente: 'AI Assistant', chef_virtual: 'Virtual Chef', hoy: 'TODAY',
-      preguntar_ia: 'Ask about your pantry...', pref_alimentarias: 'Dietary Preferences',
-      nuevo_producto: 'New Product', nombre_producto: 'Product Name', fecha_vencimiento: 'Expiry Date',
-      caduca_en: 'Expires in {count} days', añadir: 'Add to Pantry', guardando: 'Saving...',
-      footer_add: 'Product will be added automatically to your list.', procesando: 'Processing Receipt...',
-      encuadra: 'Frame your receipt',
-      logro1_title: 'Beginner Chef', logro1_desc: 'Cook your first 5 recipes',
-      logro2_title: 'Zero Waste', logro2_desc: 'Use 10 products before they expire',
-      logro3_title: 'Gourmet Explorer', logro3_desc: 'Try recipes from 3 different countries',
-      oscuro: 'Dark', claro: 'Light',
-      vegano: 'Vegan', sin_gluten: 'Gluten Free', keto: 'Keto', sin_lactosa: 'Lactose Free',
-      favoritos: 'Favorites', favorito: 'Favorite', restablecer: 'Reset Suggestions',
-      exclusive_pro: 'Exclusive feature for Smart Pantry users',
-      cargando_pantry: 'Loading Gourmet Pantry...',
-      tienes_todo: 'You have all the ingredients',
-      falta_uno: '1 ingredient missing',
-      faltan_varios: '{count} ingredients missing'
-    },
-    ca: {
-      inicio: 'INICI', despensa: 'REPOST', recetas: 'RECEPTES', iachef: 'IA CHEF',
-      bienvenido: 'BENVINGUT A', perfil: 'Perfil', dieta: 'Ajustos de Dieta', idioma: 'Idioma',
-      logros: 'Assoliments', tema: 'Tema', cerrar_sesion: 'Tancar Sessió', guardar: 'Desar',
-      volver: 'Tornar', premium: 'Membre Premium', racha: 'Ratxa', recetas_completadas: 'Receptes',
-      sugerencia_dia: 'Suggeriment del Dia', ver_todas: 'Veure totes', estado_despensa: 'Estat del Repost',
-      articulos: 'Articles', por_comprar: 'Per comprar', buscar_recetas: 'Cercar receptes...',
-      sin_recetas: 'No s\'han trobat receptes.', cargando: 'Carregant Repost Gourmet...',
-      ingredientes: 'Ingredients', nutricion_inteligente: 'Nutrició Intel·ligent',
-      despensa_status_msg: 'Tens {count} productes a punt de caducar',
-      vence_pronto: 'Caduca aviat', lista_compra: 'Llista de Compra', inventario_title: 'Inventari',
-      total: 'Total', vence: 'Caduca', agotado: 'Esgotat', buscar_alimentos: 'Cercar aliments...',
-      todo: 'Tot', no_articulos: 'No hi ha articles en aquesta llista', ver_toda_despensa: 'Veure tot el repost',
-      recetario: 'Receptari', inspiracion: 'Inspiració Gourmet', recomendado: 'Recomanacions per a tu',
-      ia_asistente: 'Assistent IA', chef_virtual: 'Xef Virtual', hoy: 'AVUI',
-      preguntar_ia: 'Pregunta sobre el teu repost...', pref_alimentarias: 'Preferències Alimentàries',
-      nuevo_producto: 'Nou Producte', nombre_producto: 'Nom del Producte', fecha_vencimiento: 'Data de Caducitat',
-      caduca_en: 'Caduca en {count} dies', añadir: 'Afegir al Repost', guardando: 'Desant...',
-      footer_add: 'El producte s\'afegirà automàticament a la teva llista.', procesando: 'Processant Tiquet...',
-      encuadra: 'Enquadra el teu tiquet',
-      logro1_title: 'Xef Començant', logro1_desc: 'Cuina les teves primeres 5 receptes',
-      logro2_title: 'Zero Deixalles', logro2_desc: 'Usa 10 productes abans de caducar',
-      logro3_title: 'Explorador Gourmet', logro3_desc: 'Prova receptes de 3 països diferents',
-      oscuro: 'Fosc', claro: 'Clar',
-      vegano: 'Vegà', sin_gluten: 'Sense Gluten', keto: 'Keto', sin_lactosa: 'Sense Lactosa',
-      favoritos: 'Favorits', favorito: 'Preferit', restablecer: 'Restablir Suggeriments',
-      exclusive_pro: 'Funció exclusiva per a usuaris Smart Pantry',
-      cargando_pantry: 'Carregant Pantry Gourmet...',
-      tienes_todo: 'Tens tots els ingredients',
-      falta_uno: 'Falta 1 ingredient',
-      faltan_varios: 'Falten {count} ingredients'
-    }
-  }
-
-  const t = (key) => translations[language][key] || key;
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
@@ -304,13 +313,6 @@ function App() {
     }
   }, []);
 
-  const goTo = useCallback((viewName) => {
-    window.scrollTo(0, 0)
-    if (view !== 'add-product' && viewName === 'add-product') {
-      setPrevView(view)
-    }
-    setView(viewName)
-  }, [view])
 
   const addProductToInventory = async (product) => {
     // Audit Check: 15 items limit for Free users
