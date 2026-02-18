@@ -73,7 +73,7 @@ app.post('/api/ai/chat', async (req, res) => {
         Contexto Despensa: ${inventoryContext}. Recetas: ${recipesContext}.
         Responde de forma breve, premium y conversacional. Brinda sugerencias inteligentes.`;
 
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${GEMINI_API_KEY}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
