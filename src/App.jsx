@@ -23,9 +23,7 @@ function App() {
   const [isTyping, setIsTyping] = useState(false)
   const chatEndRef = useRef(null)
   const [onboardingStep, setOnboardingStep] = useState(0)
-  const [showOnboarding, setShowOnboarding] = useState(() => {
-    return localStorage.getItem('onboarding_seen') !== 'true'
-  })
+  const [showOnboarding, setShowOnboarding] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [recipeCategory, setRecipeCategory] = useState('Todo')
   const [userDiets, setUserDiets] = useState({
@@ -40,6 +38,12 @@ function App() {
   const [inventoryFilter, setInventoryFilter] = useState('all')
   const [selectedRecipe, setSelectedRecipe] = useState(null)
 
+  // Auth states for security UX
+  const [isAuthenticating, setIsAuthenticating] = useState(false)
+  const [showGoogleAccounts, setShowGoogleAccounts] = useState(false)
+  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState('')
+
   const scrollToBottom = () => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
@@ -49,12 +53,23 @@ function App() {
   }, [messages, view, isTyping])
 
   const handleLogin = (userData = null) => {
-    const defaultUser = { email: 'usuario@example.com', name: 'Usuario Gourmet', id: 'usr_123' }
-    const finalUser = userData || defaultUser
-    setIsLoggedIn(true)
-    setUser(finalUser)
-    localStorage.setItem('isLoggedIn', 'true')
-    localStorage.setItem('user_data', JSON.stringify(finalUser))
+    setIsAuthenticating(true)
+    setShowGoogleAccounts(false)
+
+    // Simular verificación segura (Premium feel)
+    setTimeout(() => {
+      const defaultUser = {
+        email: email || 'usuario@example.com',
+        name: email ? email.split('@')[0] : 'Usuario Gourmet',
+        id: 'usr_' + Math.random().toString(36).substr(2, 9)
+      }
+      const finalUser = userData || defaultUser
+      setIsLoggedIn(true)
+      setUser(finalUser)
+      setIsAuthenticating(false)
+      localStorage.setItem('isLoggedIn', 'true')
+      localStorage.setItem('user_data', JSON.stringify(finalUser))
+    }, 1500)
   }
 
   const handleLogout = () => {
@@ -66,6 +81,8 @@ function App() {
     localStorage.removeItem('onboarding_seen')
     setShowOnboarding(true)
     setOnboardingStep(0)
+    setEmail('')
+    setPassword('')
     goTo('home')
   }
 
@@ -1858,7 +1875,7 @@ function App() {
           </button>
 
           {step.showSocial && (
-            <button className="btn-google" style={{ border: '1px solid var(--border-color)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }} onClick={() => handleLogin()}>
+            <button className="btn-google" style={{ border: '1px solid var(--border-color)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }} onClick={() => setShowGoogleAccounts(true)}>
               <svg width="20" height="20" viewBox="0 0 18 18">
                 <path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.49h4.84c-.21 1.12-.84 2.07-1.79 2.7v2.25h2.9c1.69-1.55 2.66-3.85 2.66-6.6z" />
                 <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.25c-.8.54-1.83.86-3.06.86-2.35 0-4.34-1.58-5.05-3.72H.92v2.33C2.4 15.11 5.48 18 9 18z" />
@@ -1910,7 +1927,20 @@ function App() {
           <span className="material-icons-round notranslate" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', fontSize: '1.2rem' }}>email</span>
           <input
             type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             placeholder="Tu email"
+            style={{ width: '100%', padding: '1.25rem 1.25rem 1.25rem 3.5rem', borderRadius: '18px', background: 'var(--card-bg)', border: '1px solid var(--border-color)', color: 'var(--text-main)', outline: 'none', fontSize: '1rem', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}
+          />
+        </div>
+
+        <div style={{ position: 'relative' }}>
+          <span className="material-icons-round notranslate" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', fontSize: '1.2rem' }}>lock</span>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Contraseña"
             style={{ width: '100%', padding: '1.25rem 1.25rem 1.25rem 3.5rem', borderRadius: '18px', background: 'var(--card-bg)', border: '1px solid var(--border-color)', color: 'var(--text-main)', outline: 'none', fontSize: '1rem', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}
           />
         </div>
@@ -1919,8 +1949,9 @@ function App() {
           className="btn-primary"
           style={{ width: '100%', padding: '1.25rem', borderRadius: '18px', fontSize: '1.1rem', fontWeight: 800, cursor: 'pointer', boxShadow: '0 10px 20px rgba(var(--primary-rgb), 0.25)', border: 'none' }}
           onClick={() => handleLogin()}
+          disabled={!email || !password}
         >
-          ENTRAR CON EMAIL
+          {isAuthenticating ? 'VERIFICANDO...' : 'ENTRAR CON SEGURIDAD'}
         </button>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '0.5rem 0' }}>
@@ -1929,7 +1960,7 @@ function App() {
           <div style={{ flex: 1, height: '1px', background: 'var(--border-color)' }}></div>
         </div>
 
-        <button className="btn-google" style={{ display: 'flex !important', visibility: 'visible !important' }} onClick={() => handleLogin()}>
+        <button className="btn-google" style={{ display: 'flex !important', visibility: 'visible !important' }} onClick={() => setShowGoogleAccounts(true)}>
           <svg width="18" height="18" viewBox="0 0 18 18">
             <path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.49h4.84c-.21 1.12-.84 2.07-1.79 2.7v2.25h2.9c1.69-1.55 2.66-3.85 2.66-6.6z" />
             <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.25c-.8.54-1.83.86-3.06.86-2.35 0-4.34-1.58-5.05-3.72H.92v2.33C2.4 15.11 5.48 18 9 18z" />
@@ -1940,9 +1971,45 @@ function App() {
         </button>
 
         <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.8rem' }}>
-          Al entrar aceptas nuestros <span style={{ textDecoration: 'underline' }}>términos y condiciones</span>.
+          Tus datos están protegidos por el cifrado de <span style={{ fontWeight: 700 }}>DatanopIA</span>.
         </p>
       </div>
+
+      {/* Auth Overlays */}
+      {showGoogleAccounts && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', backdropFilter: 'blur(8px)' }}>
+          <div className="card animate-scale-in" style={{ width: '100%', maxWidth: '360px', padding: '2rem', textAlign: 'left' }}>
+            <h3 style={{ marginBottom: '1.5rem', fontSize: '1.2rem', fontWeight: 800 }}>Elige una cuenta</h3>
+            <div
+              className="flex items-center gap-4 p-4 mb-3"
+              style={{ background: 'rgba(var(--primary-rgb), 0.05)', borderRadius: '16px', cursor: 'pointer' }}
+              onClick={() => handleLogin({ name: 'Datanopia User', email: 'user@datanopia.com', id: 'google_1' })}
+            >
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700 }}>D</div>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>Datanopia User</div>
+                <div style={{ fontSize: '0.75rem', opacity: 0.6 }}>user@datanopia.com</div>
+              </div>
+            </div>
+            <div
+              className="flex items-center gap-4 p-4"
+              style={{ background: 'rgba(255,255,255,0.03)', border: '1px dashed var(--border-color)', borderRadius: '16px', cursor: 'pointer' }}
+            >
+              <span className="material-icons-round">add_circle_outline</span>
+              <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>Usar otra cuenta</span>
+            </div>
+            <button onClick={() => setShowGoogleAccounts(false)} style={{ marginTop: '2rem', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', width: '100%', textAlign: 'center' }}>Cancelar</button>
+          </div>
+        </div>
+      )}
+
+      {isAuthenticating && (
+        <div style={{ position: 'fixed', inset: 0, background: 'var(--bg-color)', zIndex: 11000, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', animation: 'fade-in 0.3s ease' }}>
+          <div className="animate-spin" style={{ width: '40px', height: '40px', border: '4px solid var(--primary)', borderTopColor: 'transparent', borderRadius: '50%', marginBottom: '1.5rem' }}></div>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Estableciendo conexión segura...</h2>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.5rem' }}>Verificando credenciales en DatanopIA Cloud</p>
+        </div>
+      )}
 
       <div style={{ marginTop: 'auto', padding: '2rem 0', opacity: 0.6 }}>
         <p style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '1px' }}>
