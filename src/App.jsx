@@ -14,8 +14,15 @@ function App() {
     return localStorage.getItem('isLoggedIn') === 'true'
   })
   const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem('user_data')
-    return savedUser ? JSON.parse(savedUser) : { email: 'usuario@example.com', name: 'Usuario Gourmet', id: 'usr_123' }
+    try {
+      const savedUser = localStorage.getItem('user_data')
+      if (savedUser && savedUser !== 'undefined') {
+        return JSON.parse(savedUser)
+      }
+    } catch (e) {
+      console.error('Error parsing user data:', e)
+    }
+    return { email: 'usuario@example.com', name: 'Usuario Gourmet', id: 'usr_123' }
   })
   const [language, setLanguage] = useState('es')
   const [inventory, setInventory] = useState([])
@@ -55,33 +62,38 @@ function App() {
 
   // Listen for Supabase Auth changes
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        const userData = {
-          email: session.user.email,
-          name: session.user.user_metadata.full_name || session.user.email.split('@')[0],
-          id: session.user.id
-        }
-        setIsLoggedIn(true)
-        setUser(userData)
-        localStorage.setItem('isLoggedIn', 'true')
-        localStorage.setItem('user_data', JSON.stringify(userData))
-      } else if (event === 'SIGNED_OUT') {
-        setIsLoggedIn(false)
-        setUserTier('free')
-        setInventory([])
-        localStorage.removeItem('isLoggedIn')
-        localStorage.removeItem('user_data')
-        localStorage.removeItem('onboarding_seen')
-        setShowOnboarding(true)
-        setOnboardingStep(0)
-        setEmail('')
-        setPassword('')
-        goTo('home')
-      }
-    })
+    if (!supabase || !supabase.auth) return;
 
-    return () => subscription.unsubscribe()
+    try {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        if (session) {
+          const userData = {
+            email: session.user.email,
+            name: session.user.user_metadata.full_name || session.user.email.split('@')[0],
+            id: session.user.id
+          }
+          setIsLoggedIn(true)
+          setUser(userData)
+          localStorage.setItem('isLoggedIn', 'true')
+          localStorage.setItem('user_data', JSON.stringify(userData))
+        } else if (event === 'SIGNED_OUT') {
+          setIsLoggedIn(false)
+          setUserTier('free')
+          setInventory([])
+          localStorage.removeItem('isLoggedIn')
+          localStorage.removeItem('user_data')
+          localStorage.removeItem('onboarding_seen')
+          setShowOnboarding(true)
+          setOnboardingStep(0)
+          setEmail('')
+          setPassword('')
+          if (typeof goTo === 'function') goTo('home')
+        }
+      })
+      return () => subscription.unsubscribe()
+    } catch (err) {
+      console.error('Supabase Auth connection error:', err)
+    }
   }, [goTo])
 
   const handleLogin = (userData = null) => {
