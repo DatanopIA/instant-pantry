@@ -87,7 +87,7 @@ app.post('/api/ai/chat', async (req, res) => {
         4. CREATIVIDAD: Si no hay ingredientes que coincidan perfectamente, sugiere sustituciones inteligentes basadas en ciencia culinaria.
         5. BREVEDAD ELEGANTE: Respuestas concisas pero cargadas de valor.`;
 
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -119,7 +119,7 @@ app.post('/api/ai/analyze-image', async (req, res) => {
             ? "OCR Ticket: Extrae productos alimentarios. Devuelve SOLO JSON: [{name, exp, icon}]"
             : "Fridge AI: Identifica alimentos. Devuelve SOLO JSON: [{name, exp, icon}]";
 
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
