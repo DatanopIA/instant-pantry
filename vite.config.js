@@ -5,12 +5,17 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   build: {
+    // Explicitly set outDir to dist (default)
+    outDir: 'dist',
+    // Ensure assets are placed in assets folder
+    assetsDir: 'assets',
+    // Prevent any translation of the entry point name
     rollupOptions: {
       output: {
-        entryFileNames: `assets/index-[hash].js`,
-        chunkFileNames: `assets/index-[hash].js`,
-        assetFileNames: `assets/index-[hash].[ext]`
-      }
-    }
-  }
+        entryFileNames: 'assets/[name]-[hash].js',
+        chunkFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]',
+      },
+    },
+  },
 })
