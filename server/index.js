@@ -4,13 +4,58 @@ import db from './db.js';
 import dotenv from 'dotenv';
 import Stripe from 'stripe';
 
-dotenv.config();
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.join(__dirname, '.env') });
+
+const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
 const app = express();
 const PORT = 3001;
 
 app.use(cors());
+
+// Webhook endpoint must stay ABOVE express.json() to get raw body
+app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+    const sig = req.headers['stripe-signature'];
+    const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+    let event;
+
+    try {
+        if (stripe && endpointSecret && sig) {
+            event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+        } else {
+            // Mock or Manual update if keys are missing
+            console.log("⚠️ No Stripe Webhook Secret or Signature - Using manual test mode");
+            const body = JSON.parse(req.body.toString());
+            event = { type: body.type, data: body.data };
+        }
+    } catch (err) {
+        console.error(`Webhook Error: ${err.message}`);
+        return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
+    if (event.type === 'checkout.session.completed') {
+        const session = event.data.object;
+        const email = session.customer_email;
+        const tier = session.metadata?.user_tier || 'pro';
+
+        console.log(`💰 Payment confirmed for ${email}. Upgrading to ${tier}.`);
+
+        try {
+            db.prepare('INSERT OR REPLACE INTO users (email, tier) VALUES (?, ?)').run(email, tier);
+        } catch (error) {
+            console.error('Database update error:', error);
+        }
+    }
+
+    res.json({ received: true });
+});
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
@@ -202,6 +247,18 @@ app.post('/api/ai/analyze-image', async (req, res) => {
     } catch (error) {
         console.error('Gemini Vision Error:', error);
         res.status(500).json({ error: "Error procesando la imagen" });
+    }
+});
+
+// --- USER & SUBSCRIPTION ENDPOINTS ---
+
+app.get('/api/subscription/:email', (req, res) => {
+    const { email } = req.params;
+    try {
+        const user = db.prepare('SELECT tier FROM users WHERE email = ?').get(email);
+        res.json({ tier: user ? user.tier : 'free' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 });
 

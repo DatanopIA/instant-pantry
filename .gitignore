@@ -25,3 +25,8 @@ dist-ssr
 .env
 .vercel
 .env*.local
+server/pantry.db
+.agent/
+*.db-journal
+*.db-shm
+*.db-wal

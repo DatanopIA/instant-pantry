@@ -36,6 +36,12 @@ db.exec(`
     sender TEXT NOT NULL,
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
   );
+
+  CREATE TABLE IF NOT EXISTS users (
+    email TEXT PRIMARY KEY,
+    tier TEXT DEFAULT 'free',
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
 `);
 
 // Insertar datos iniciales si la tabla está vacía
