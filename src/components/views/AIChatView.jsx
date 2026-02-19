@@ -4,7 +4,7 @@ import { usePantry } from '../../lib/PantryContext';
 import { Send, Sparkles, Trash2, User, Bot } from 'lucide-react';
 
 const AIChatView = () => {
-    const { t, inventory, recipes, language } = usePantry();
+    const { t, inventory, recipes } = usePantry();
     const [messages, setMessages] = useState([
         { id: 1, sender: 'bot', text: t('saludo_ia'), time: new Date() }
     ]);
@@ -34,10 +34,13 @@ const AIChatView = () => {
                 body: JSON.stringify({
                     text,
                     history: messages.map(m => ({ sender: m.sender, text: m.text })),
-                    inventory,
-                    recipes
+                    inventory: inventory || [],
+                    recipes: recipes || []
                 })
             });
+
+            if (!response.ok) throw new Error('Servidor no responde');
+
             const data = await response.json();
 
             setMessages(prev => [...prev, {
@@ -48,6 +51,12 @@ const AIChatView = () => {
             }]);
         } catch (err) {
             console.error('Chat error:', err);
+            setMessages(prev => [...prev, {
+                id: Date.now() + 1,
+                sender: 'bot',
+                text: "⚠️ Vaya, parece que he perdido la conexión con la cocina. ¿Puedes intentarlo de nuevo?",
+                time: new Date()
+            }]);
         } finally {
             setIsTyping(false);
         }

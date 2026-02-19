@@ -159,7 +159,7 @@ const HomeView = () => {
                                         alt={recipe.title}
                                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                         onError={(e) => {
-                                            e.target.src = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80\u0026w=1000\u0026auto=format\u0026fit=crop";
+                                            e.target.src = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1000&auto=format&fit=crop";
                                         }}
                                     />
                                     <div style={{ position: 'absolute', top: '15px', left: '15px', background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(10px)', color: 'white', padding: '5px 12px', borderRadius: '20px', fontSize: '0.65rem', fontWeight: 800, letterSpacing: '1px' }}>

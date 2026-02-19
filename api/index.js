@@ -60,6 +60,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+console.log('API Status: Gemini Key', GEMINI_API_KEY ? 'is present' : 'is missing');
 
 // --- INVENTORY ENDPOINTS ---
 
@@ -141,11 +142,13 @@ app.post('/api/messages', (req, res) => {
 
 // Real AI Chat Endpoint with Gemini
 app.post('/api/ai/chat', async (req, res) => {
-    const { text, history, inventory, recipes } = req.body;
+    const { text, history, inventory = [], recipes = [] } = req.body;
+    console.log('Chat request received:', text);
 
     if (!GEMINI_API_KEY || GEMINI_API_KEY === 'TU_API_KEY_AQUI_GEMINI') {
+        console.warn('GEMINI_API_KEY not configured. Returning demo response.');
         return res.json({
-            text: "⚠️ [MODO DEMO] Hola, para activar mi inteligencia completa, por favor introduce una GEMINI_API_KEY válida en el archivo .env del servidor. Por ahora, responderé con mi lógica local mejorada."
+            text: "⚠️ [MODO DEMO] Hola, para activar mi inteligencia completa, por favor introduce una GEMINI_API_KEY válida. Por ahora, responderé con mi lógica local mejorada."
         });
     }
 

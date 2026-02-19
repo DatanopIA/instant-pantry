@@ -29,7 +29,7 @@ export const translations = {
         cargando_pantry: 'Cargando Pantry Gourmet...',
         tienes_todo: 'Tienes todos los ingredientes',
         falta_uno: 'Falta 1 ingrediente',
-        faltan_varios: 'Faltan {count} ingredientes',
+        faltan_varios: 'Falten {count} ingredientes',
         saludo_ia: '¡Hola! Soy tu Asistente de Instant Pantry, desarrollado por DatanopIA. ¿En qué puedo ayudarte con tu despensa hoy?'
     },
     en: {
@@ -64,5 +64,38 @@ export const translations = {
         falta_uno: '1 ingredient missing',
         faltan_varios: '{count} ingredients missing',
         saludo_ia: 'Hello! I am your Instant Pantry Assistant, developed by DatanopIA. How can I help you with your pantry today?'
+    },
+    ca: {
+        inicio: 'INICI', despensa: 'REPOST', recetas: 'RECEPTES', iachef: 'IA XEF',
+        bienvenido: 'BENVINGUT A', perfil: 'Perfil', dieta: 'Ajustos de Dieta', idioma: 'Idioma',
+        logros: 'Assoliments', tema: 'Tema', cerrar_sesion: 'Tancar Sessió', guardar: 'Desar',
+        volver: 'Tornar', premium: 'Membre Premium', racha: 'Ratxa', recetas_completadas: 'Receptes',
+        sugerencia_dia: 'Suggeriment del Dia', ver_todas: 'Veure totes', estado_despensa: 'Estat del Repost',
+        articulos: 'Articles', por_comprar: 'Per comprar', buscar_recetas: 'Cercar receptes...',
+        sin_recetas: 'No s\'han trobat receptes.', cargando: 'Carregant Repost Gourmet...',
+        ingredientes: 'Ingredients', nutricion_inteligente: 'NutricIÓ Intel·ligent',
+        despensa_status_msg: 'Tens {count} productes a punt de caducar',
+        vence_pronto: 'Caduca aviat', lista_compra: 'Llista de Compra', inventario_title: 'Inventari',
+        total: 'Total', vence: 'Caduca', agotado: 'Esgotat', buscar_alimentos: 'Cercar aliments...',
+        todo: 'Tot', no_articulos: 'No hi ha articles en aquesta llista', ver_toda_despensa: 'Veure tot el repost',
+        recetario: 'Receptari', inspiracion: 'Inspiració Gourmet', recomendado: 'Recomanacions per a tu',
+        ia_asistente: 'Assistent IA', chef_virtual: 'Chef Virtual', hoy: 'AVUI',
+        preguntar_ia: 'Pregunta sobre el teu repost...', pref_alimentarias: 'Preferències Alimentàries',
+        nuevo_producto: 'Nou Producte', nombre_producto: 'Nom del Producte', fecha_vencimiento: 'Data de Caducitat',
+        caduca_en: 'Caduca en {count} dies', añadir: 'Afegir al Repost', guardando: 'Desant...',
+        footer_add: 'El producte s\'afegirà automàticament a la teva llista.', procesando: 'Processant Tiquet...',
+        encuadra: 'Enquadra el teu tiquet',
+        logro1_title: 'Chef Principiant', logro1_desc: 'Cuina les teves primeres 5 receptes',
+        logro2_title: 'Zero Desperdici', logro2_desc: 'Usa 10 productes abans de caducar',
+        logro3_title: 'Explorador Gourmet', logro3_desc: 'Prova receptes de 3 països diferents',
+        oscuro: 'Fosc', claro: 'Clar',
+        vegano: 'Vegà', sin_gluten: 'Sense Gluten', keto: 'Keto', sin_lactosa: 'Sense Lactosa',
+        favoritos: 'Preferits', favorito: 'Preferit', restablecer: 'Restablir Suggeriments',
+        exclusive_pro: 'Funció exclusiva per a usuaris Smart Pantry',
+        cargando_pantry: 'Carregant Repost Gourmet...',
+        tienes_todo: 'Tens tots els ingredients',
+        falta_uno: 'Falta 1 ingredient',
+        faltan_varios: 'Falten {count} ingredients',
+        saludo_ia: 'Hola! Soc el teu Assistent d\'Instant Pantry, desenvolupat per DatanopIA. En què et puc ajudar avui?'
     }
 };

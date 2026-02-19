@@ -1,16 +1,40 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { usePantry } from '../../lib/PantryContext';
-import { User, Settings, Shield, HelpCircle, LogOut, ChevronRight, Gem, Globe, Moon } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
+import {
+    Settings,
+    Moon,
+    Globe,
+    LogOut,
+    User,
+    ChevronRight,
+    Camera,
+    Award,
+    Star,
+    ArrowLeft,
+    Gem,
+    Shield,
+    HelpCircle
+} from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const ProfileView = () => {
-    const { t, user, profileImage, updateProfileImage, theme, setTheme, language, setLanguage, isPro, upgradeToPro, goTo } = usePantry();
+    const {
+        user,
+        logout,
+        language,
+        setLanguage,
+        theme,
+        setTheme,
+        profileImage,
+        updateProfileImage,
+        isPro,
+        upgradeToPro,
+        goTo
+    } = usePantry();
     const fileInputRef = React.useRef(null);
 
     const handleLogout = async () => {
-        await supabase.auth.signOut();
-        localStorage.clear();
+        await logout();
         window.location.reload();
     };
 
@@ -44,7 +68,7 @@ const ProfileView = () => {
                         )}
                     </div>
                     <div style={{ position: 'absolute', bottom: '0', right: '0', background: 'var(--primary)', color: 'white', width: '30px', height: '30px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--bg-color)' }}>
-                        <Settings size={14} />
+                        <Camera size={14} />
                     </div>
                     {isPro && (
                         <div style={{ position: 'absolute', top: '0', left: '0', background: 'var(--terrakotta)', color: 'white', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--bg-color)', boxShadow: '0 4px 8px rgba(0,0,0,0.2)' }}>
@@ -61,7 +85,7 @@ const ProfileView = () => {
                     style={{ display: 'none' }}
                 />
 
-                <h1 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '0.25rem' }}>{user?.user_metadata?.full_name || 'Chef Gourmet'}</h1>
+                <h1 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '0.25rem' }}>{user?.name || 'Chef Gourmet'}</h1>
                 <p style={{ fontSize: '0.85rem', opacity: 0.6, fontWeight: 600 }}>{user?.email || 'usuario@pantry.ia'}</p>
 
                 {isPro ? (
@@ -88,20 +112,25 @@ const ProfileView = () => {
                     <MenuItem
                         icon={<Globe size={20} />}
                         label="Idioma"
-                        value={language === 'es' ? 'Español (ES)' : 'English (EN)'}
-                        onClick={() => setLanguage(language === 'es' ? 'en' : 'es')}
+                        value={language === 'es' ? 'Español' : language === 'en' ? 'English' : 'Català'}
+                        onClick={() => {
+                            const nextLang = language === 'es' ? 'en' : language === 'en' ? 'ca' : 'es';
+                            setLanguage(nextLang);
+                        }}
                     />
                     <MenuItem
                         icon={<Moon size={20} />}
                         label="Modo Oscuro"
                         toggle
                         checked={theme === 'dark'}
-                        onChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                        onChange={() => {
+                            setTheme(theme === 'dark' ? 'light' : 'dark');
+                        }}
                     />
                 </Section>
 
                 <Section title="CUENTA">
-                    <MenuItem icon={<Shield size={20} />} label="Privacidad y Seguridad" onClick={() => alert('Tu privacidad es nuestra prioridad. No compartimos tus datos con terceros.')} />
+                    <MenuItem icon={<Shield size={20} />} label="Privacidad y Seguridad" onClick={() => alert('Tu privacidad es nuestra prioridad.')} />
                     <MenuItem icon={<HelpCircle size={20} />} label="Centro de Ayuda" onClick={() => alert('Soporte: soporte@instantpantry.ia')} />
                     <MenuItem icon={<LogOut size={20} />} label="Cerrar Sesión" danger onClick={handleLogout} />
                 </Section>

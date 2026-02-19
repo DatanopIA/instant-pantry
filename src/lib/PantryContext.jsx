@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from './supabase';
+import { translations } from './translations';
 
 const PantryContext = createContext();
 
@@ -35,25 +36,96 @@ const FEATURED_RECIPES = [
 ];
 
 export const PantryProvider = ({ children }) => {
-    const [view, setView] = useState('landing');
+    // Lazy initializers for state
+    const [user, setUser] = useState(() => {
+        const saved = localStorage.getItem('pantry_user');
+        if (saved) {
+            try {
+                return JSON.parse(saved);
+            } catch (e) {
+                return null;
+            }
+        }
+        return null;
+    });
+
+    const [view, setView] = useState(user ? 'home' : 'landing');
     const [prevView, setPrevView] = useState('home');
-    const [user, setUser] = useState(null);
-    const [inventory, setInventory] = useState([]);
+
+    const [inventory, setInventory] = useState(() => {
+        const saved = localStorage.getItem('pantry_inventory');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (e) {
+                return [];
+            }
+        }
+        return [];
+    });
+
     const [recipes, setRecipes] = useState(FEATURED_RECIPES);
     const [selectedRecipe, setSelectedRecipe] = useState(null);
-    const [language, setLanguage] = useState('es');
-    const [theme, setTheme] = useState('light');
-    const [profileImage, setProfileImage] = useState(null);
+    const [language, setLanguage] = useState(() => localStorage.getItem('pantry_lang') || 'es');
+    const [theme, setTheme] = useState(() => localStorage.getItem('pantry_theme') || 'light');
+    const [profileImage, setProfileImage] = useState(() => localStorage.getItem('pantry_profile_image'));
     const [isPro, setIsPro] = useState(false);
-    const [dietSettings, setDietSettings] = useState({
-        vegetarian: false,
-        vegan: false,
-        glutenFree: false,
-        keto: false
+    const [dietSettings, setDietSettings] = useState(() => {
+        const saved = localStorage.getItem('pantry_diet');
+        if (saved) {
+            try {
+                return JSON.parse(saved);
+            } catch (e) {
+                return { vegetarian: false, vegan: false, glutenFree: false, keto: false };
+            }
+        }
+        return { vegetarian: false, vegan: false, glutenFree: false, keto: false };
     });
+
+    const checkSubscription = useCallback(async (email) => {
+        if (!email) return;
+        try {
+            const res = await fetch(`/api/subscription-status?email=${encodeURIComponent(email)}`);
+            if (res.ok) {
+                const data = await res.json();
+                setIsPro(data.isPro);
+            }
+        } catch (err) {
+            console.error('Sub status error:', err);
+        }
+    }, []);
+
+    const login = useCallback((userData) => {
+        console.log('Context: Logging in user', userData.email);
+        setUser(userData);
+        localStorage.setItem('pantry_user', JSON.stringify(userData));
+        setView('home');
+        checkSubscription(userData.email);
+    }, [checkSubscription]);
+
+    const logout = useCallback(async () => {
+        await supabase.auth.signOut();
+        setUser(null);
+        localStorage.removeItem('pantry_user');
+        setView('landing');
+    }, []);
 
     // Escuchar cambios de autenticación de Supabase
     useEffect(() => {
+        const checkSession = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session?.user) {
+                const userData = {
+                    email: session.user.email,
+                    name: session.user.user_metadata.full_name || session.user.email.split('@')[0],
+                    id: session.user.id
+                };
+                login(userData);
+            }
+        };
+        checkSession();
+
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
             if (session?.user) {
                 const userData = {
@@ -66,83 +138,32 @@ export const PantryProvider = ({ children }) => {
         });
 
         return () => subscription?.unsubscribe();
-    }, []);
+    }, [login]);
 
-    // Cargar datos al iniciar
+    // Check subscription on mount if user exists
     useEffect(() => {
-        const savedInventory = localStorage.getItem('pantry_inventory');
-        if (savedInventory) {
-            try {
-                const parsed = JSON.parse(savedInventory);
-                if (Array.isArray(parsed)) setInventory(parsed);
-            } catch (e) {
-                console.error("Error loading inventory", e);
-            }
+        if (user?.email) {
+            checkSubscription(user.email);
         }
+    }, [user?.email, checkSubscription]);
 
-        const savedUser = localStorage.getItem('pantry_user');
-        if (savedUser) {
-            try {
-                const parsed = JSON.parse(savedUser);
-                setUser(parsed);
-                setView('home');
-                checkSubscription(parsed.email);
-            } catch (e) {
-                console.error("Error loading user", e);
-            }
-        }
-
-        const savedProfileImage = localStorage.getItem('pantry_profile_image');
-        if (savedProfileImage) setProfileImage(savedProfileImage);
-
-        const savedDiet = localStorage.getItem('pantry_diet');
-        if (savedDiet) {
-            try {
-                setDietSettings(JSON.parse(savedDiet));
-            } catch (e) {
-                console.error("Error loading diet settings", e);
-            }
-        }
-    }, []);
-
-    // Guardar inventario cuando cambie
+    // Persistence to localStorage
     useEffect(() => {
-        if (inventory.length > 0) {
-            localStorage.setItem('pantry_inventory', JSON.stringify(inventory));
-        }
+        localStorage.setItem('pantry_inventory', JSON.stringify(inventory));
     }, [inventory]);
 
-    // Guardar dieta cuando cambie
+    useEffect(() => {
+        localStorage.setItem('pantry_lang', language);
+    }, [language]);
+
+    useEffect(() => {
+        localStorage.setItem('pantry_theme', theme);
+        document.documentElement.setAttribute('data-theme', theme);
+    }, [theme]);
+
     useEffect(() => {
         localStorage.setItem('pantry_diet', JSON.stringify(dietSettings));
     }, [dietSettings]);
-
-    const checkSubscription = async (email) => {
-        if (!email) return;
-        try {
-            const res = await fetch(`/api/subscription-status?email=${encodeURIComponent(email)}`);
-            if (res.ok) {
-                const data = await res.json();
-                setIsPro(data.isPro);
-            }
-        } catch (err) {
-            console.error('Sub status error:', err);
-        }
-    };
-
-    const login = (userData) => {
-        setUser(userData);
-        localStorage.setItem('pantry_user', JSON.stringify(userData));
-        setView('home');
-        checkSubscription(userData.email);
-    };
-
-    const logout = async () => {
-        await supabase.auth.signOut();
-        setUser(null);
-        localStorage.removeItem('pantry_user');
-        setView('landing');
-    };
 
     const goTo = (newView) => {
         setPrevView(view);
@@ -197,32 +218,12 @@ export const PantryProvider = ({ children }) => {
         }
     };
 
-    const t = (key) => {
-        const translations = {
-            'es': {
-                'bienvenido': 'HOLA,',
-                'hoy': 'Hoy',
-                'despensa': 'Despensa',
-                'recetas': 'Recetas',
-                'IA': 'Chat Chef',
-                'perfil': 'Mi Perfil',
-                'escanear': 'Escanear',
-                'cocinar_ahora': 'COCINAR AHORA',
-                'saludo_ia': '¡Hola! Soy tu Chef de Casa. He analizado tu despensa y estoy listo para ayudarte a cocinar algo delicioso y no desperdiciar nada. ¿Por dónde empezamos hoy?'
-            },
-            'en': {
-                'bienvenido': 'HELLO,',
-                'hoy': 'Today',
-                'despensa': 'Pantry',
-                'recetas': 'Recipes',
-                'IA': 'AI Chef',
-                'perfil': 'Profile',
-                'escanear': 'Scan',
-                'cocinar_ahora': 'COOK NOW',
-                'saludo_ia': 'Hello! I am your House Chef. I have analyzed your pantry and I am ready to help you cook something delicious. Where do we start?'
-            }
-        };
-        return translations[language]?.[key] || key;
+    const t = (key, params = {}) => {
+        let text = translations[language]?.[key] || key;
+        Object.keys(params).forEach(p => {
+            text = text.replace(`{${p}}`, params[p]);
+        });
+        return text;
     };
 
     return (
