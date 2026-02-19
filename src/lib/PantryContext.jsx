@@ -112,6 +112,17 @@ export const PantryProvider = ({ children }) => {
         }
     };
 
+    const deleteProduct = async (id) => {
+        try {
+            await fetch(`/api/inventory/${id}`, { method: 'DELETE' });
+            setInventory(prev => prev.filter(item => item.id !== id));
+            return true;
+        } catch (err) {
+            console.error('Error deleting product:', err);
+            return false;
+        }
+    };
+
     const upgradeToPro = async () => {
         if (!user) {
             alert("Inicia sesión para mejorar tu cuenta.");
