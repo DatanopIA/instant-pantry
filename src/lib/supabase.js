@@ -14,7 +14,8 @@ try {
         supabaseInstance = {
             auth: {
                 onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => { } } } }),
-                signInWithOAuth: () => Promise.resolve({ error: new Error('Supabase not configured') }),
+                signInWithOTP: () => Promise.resolve({ error: new Error('Supabase no está configurado localmente. Asegúrate de añadir VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY a tu archivo .env o a las variables de entorno de Vercel.') }),
+                signInWithOAuth: () => Promise.resolve({ error: new Error('Supabase no está configurado localmente. Asegúrate de añadir VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY a tu archivo .env o a las variables de entorno de Vercel.') }),
                 signOut: () => Promise.resolve({ error: null })
             }
         }
