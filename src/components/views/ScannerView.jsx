@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { usePantry } from '../../lib/PantryContext';
 import { X, Camera, Receipt, Box, Sparkles } from 'lucide-react';
 

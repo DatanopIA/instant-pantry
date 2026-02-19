@@ -142,6 +142,38 @@ const AIChatView = () => {
                 )}
             </div>
 
+            {/* Sugerencias Rápidas */}
+            <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', padding: '0.5rem 0', marginBottom: '0.5rem' }} className="hide-scrollbar">
+                {[
+                    { text: "¿Qué cocino hoy?", icon: "🍳" },
+                    { text: "¿Qué va a caducar?", icon: "⏰" },
+                    { text: "Dime una receta rápida", icon: "⚡" },
+                    { text: "Planifica mi semana", icon: "📅" }
+                ].map((chip) => (
+                    <motion.button
+                        key={chip.text}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => sendMessage(chip.text)}
+                        style={{
+                            flexShrink: 0,
+                            padding: '0.6rem 1rem',
+                            borderRadius: '1rem',
+                            background: 'var(--glass)',
+                            border: '1px solid var(--border-color)',
+                            color: 'var(--text-main)',
+                            fontSize: '0.75rem',
+                            fontWeight: 700,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px'
+                        }}
+                    >
+                        <span>{chip.icon}</span> {chip.text}
+                    </motion.button>
+                ))}
+            </div>
+
             {/* Input Area */}
             <div style={{ padding: '1rem 0 2rem 0' }}>
                 <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>

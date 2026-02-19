@@ -5,11 +5,24 @@ import { User, Settings, Shield, HelpCircle, LogOut, ChevronRight, Gem, Globe, M
 import { supabase } from '../../lib/supabase';
 
 const ProfileView = () => {
-    const { t, user, profileImage, theme, setTheme, isPro, goTo } = usePantry();
+    const { t, user, profileImage, updateProfileImage, theme, setTheme, language, setLanguage, isPro, upgradeToPro, goTo } = usePantry();
+    const fileInputRef = React.useRef(null);
 
     const handleLogout = async () => {
         await supabase.auth.signOut();
+        localStorage.clear();
         window.location.reload();
+    };
+
+    const handleImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                updateProfileImage(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     return (
@@ -18,7 +31,8 @@ const ProfileView = () => {
                 <motion.div
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    style={{ position: 'relative', width: '120px', height: '120px', margin: '0 auto 1.5rem' }}
+                    style={{ position: 'relative', width: '120px', height: '120px', margin: '0 auto 1.5rem', cursor: 'pointer' }}
+                    onClick={() => fileInputRef.current?.click()}
                 >
                     <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'var(--glass)', border: '2px solid var(--primary)', padding: '4px', overflow: 'hidden' }}>
                         {profileImage ? (
@@ -29,19 +43,30 @@ const ProfileView = () => {
                             </div>
                         )}
                     </div>
+                    <div style={{ position: 'absolute', bottom: '0', right: '0', background: 'var(--primary)', color: 'white', width: '30px', height: '30px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--bg-color)' }}>
+                        <Settings size={14} />
+                    </div>
                     {isPro && (
-                        <div style={{ position: 'absolute', bottom: '5px', right: '5px', background: 'var(--terrakotta)', color: 'white', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--bg-color)', boxShadow: '0 4px 8px rgba(0,0,0,0.2)' }}>
+                        <div style={{ position: 'absolute', top: '0', left: '0', background: 'var(--terrakotta)', color: 'white', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--bg-color)', boxShadow: '0 4px 8px rgba(0,0,0,0.2)' }}>
                             <Gem size={16} />
                         </div>
                     )}
                 </motion.div>
 
-                <h1 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '0.25rem' }}>{user?.user_metadata?.full_name || 'Gourmet User'}</h1>
-                <p style={{ fontSize: '0.85rem', opacity: 0.6, fontWeight: 600 }}>{user?.email || 'user@datanopia.com'}</p>
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleImageUpload}
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                />
+
+                <h1 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '0.25rem' }}>{user?.user_metadata?.full_name || 'Chef Gourmet'}</h1>
+                <p style={{ fontSize: '0.85rem', opacity: 0.6, fontWeight: 600 }}>{user?.email || 'usuario@pantry.ia'}</p>
 
                 {isPro ? (
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(216, 140, 81, 0.1)', color: 'var(--terrakotta)', padding: '6px 16px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800, marginTop: '1rem', border: '1px solid rgba(216, 140, 81, 0.2)' }}>
-                        TIER FAMILY PRO
+                        TIER FAMILY PRO ACTIVO
                     </div>
                 ) : (
                     <motion.button
@@ -59,22 +84,26 @@ const ProfileView = () => {
             {/* Menu Sections */}
             <div style={{ display: 'grid', gap: '1rem' }}>
                 <Section title="CONFIGURACIÓN">
-                    <MenuItem icon={<Settings size={20} />} label={t('dieta')} onClick={() => goTo('diet-settings')} />
-                    <MenuItem icon={<Globe size={20} />} label={t('idioma')} value="Español (ES)" />
+                    <MenuItem icon={<Settings size={20} />} label="Preferencia de Dieta" onClick={() => goTo('diet-settings')} />
+                    <MenuItem
+                        icon={<Globe size={20} />}
+                        label="Idioma"
+                        value={language === 'es' ? 'Español (ES)' : 'English (EN)'}
+                        onClick={() => setLanguage(language === 'es' ? 'en' : 'es')}
+                    />
                     <MenuItem
                         icon={<Moon size={20} />}
                         label="Modo Oscuro"
                         toggle
                         checked={theme === 'dark'}
                         onChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                        lock={!isPro}
                     />
                 </Section>
 
                 <Section title="CUENTA">
-                    <MenuItem icon={<Shield size={20} />} label={t('privacidad')} />
-                    <MenuItem icon={<HelpCircle size={20} />} label={t('ayuda')} />
-                    <MenuItem icon={<LogOut size={20} />} label={t('salir')} danger onClick={handleLogout} />
+                    <MenuItem icon={<Shield size={20} />} label="Privacidad y Seguridad" onClick={() => alert('Tu privacidad es nuestra prioridad. No compartimos tus datos con terceros.')} />
+                    <MenuItem icon={<HelpCircle size={20} />} label="Centro de Ayuda" onClick={() => alert('Soporte: soporte@instantpantry.ia')} />
+                    <MenuItem icon={<LogOut size={20} />} label="Cerrar Sesión" danger onClick={handleLogout} />
                 </Section>
 
                 <div style={{ textAlign: 'center', padding: '2rem 0', opacity: 0.3 }}>

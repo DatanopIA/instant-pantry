@@ -1,11 +1,14 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { usePantry } from '../../lib/PantryContext';
-import { ArrowLeft, Save, Heart, Zap } from 'lucide-react';
+import { ArrowLeft, Save } from 'lucide-react';
 
 const DietView = () => {
     const { t, goTo, dietSettings, setDietSettings } = usePantry();
 
     const dietaryTypes = ['Omnívora', 'Vegetariana', 'Vegana', 'Keto', 'Paleo', 'Gluten Free'];
+    const currentType = dietSettings.type || 'Omnívora';
+    const currentCalories = dietSettings.dailyCalories || 2000;
 
     return (
         <div className="container" style={{ paddingBottom: '40px' }}>
@@ -28,8 +31,8 @@ const DietView = () => {
                                 style={{
                                     padding: '1.25rem',
                                     borderRadius: '1.25rem',
-                                    background: dietSettings.type === type ? 'var(--primary)' : 'var(--glass)',
-                                    color: dietSettings.type === type ? 'white' : 'var(--text-main)',
+                                    background: currentType === type ? 'var(--primary)' : 'var(--glass)',
+                                    color: currentType === type ? 'white' : 'var(--text-main)',
                                     border: '1px solid var(--border-color)',
                                     fontWeight: 700,
                                     fontSize: '0.85rem'
@@ -44,7 +47,7 @@ const DietView = () => {
                 <Section title="OBJETIVO CALÓRICO DIARIO">
                     <div style={{ display: 'grid', gap: '1rem', padding: '1.5rem', background: 'var(--glass)', borderRadius: '1.5rem', border: '1px solid var(--border-color)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--primary)' }}>{dietSettings.dailyCalories}</span>
+                            <span style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--primary)' }}>{currentCalories}</span>
                             <span style={{ fontSize: '0.85rem', fontWeight: 700, opacity: 0.5 }}>kcal / día</span>
                         </div>
                         <input
@@ -52,7 +55,7 @@ const DietView = () => {
                             min="1200"
                             max="4000"
                             step="50"
-                            value={dietSettings.dailyCalories}
+                            value={currentCalories}
                             onChange={(e) => setDietSettings({ ...dietSettings, dailyCalories: parseInt(e.target.value) })}
                             style={{ width: '100%', accentColor: 'var(--primary)' }}
                         />

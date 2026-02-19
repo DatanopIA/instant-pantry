@@ -55,18 +55,21 @@ const AddProductView = () => {
                     />
                 </Section>
 
-                <Section label="DÍAS HASTA CADUCAR">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                        <input
-                            type="range"
-                            min="1"
-                            max="30"
-                            value={exp}
-                            onChange={(e) => setExp(e.target.value)}
-                            style={{ flex: 1, accentColor: 'var(--primary)' }}
-                        />
-                        <span style={{ fontWeight: 800, fontSize: '1.2rem', color: 'var(--primary)', width: '60px' }}>{exp}d</span>
-                    </div>
+                <Section label="FECHA DE CADUCIDAD">
+                    <input
+                        type="date"
+                        value={new Date(Date.now() + exp * 86400000).toISOString().split('T')[0]}
+                        onChange={(e) => {
+                            const selectedDate = new Date(e.target.value);
+                            const today = new Date();
+                            const diffTime = Math.abs(selectedDate - today);
+                            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                            setExp(diffDays);
+                        }}
+                        className="premium-input"
+                        style={{ color: 'var(--primary)', fontWeight: 800 }}
+                    />
+                    <p style={{ fontSize: '0.7rem', opacity: 0.6, marginTop: '5px' }}>Faltan {exp} días para caducar</p>
                 </Section>
 
                 <motion.button
