@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Instant Pantry - Confirmar Productos</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ed9121",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#121212",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #121212;
+            font-family: 'Space Grotesk', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .ios-blur {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .orange-glow {
+            box-shadow: 0 0 20px rgba(237, 145, 33, 0.25);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-dark text-white font-display antialiased">
+<!-- Status Bar Spacer (iOS) -->
+<div class="h-12 w-full"></div>
+<main class="max-w-md mx-auto px-6 flex flex-col min-h-[calc(100vh-3rem)]">
+<!-- Header -->
+<header class="flex items-center justify-between py-6">
+<button class="text-primary hover:opacity-80 transition-opacity">
+<span class="material-icons-outlined text-2xl">arrow_back_ios_new</span>
+</button>
+<h1 class="text-xl font-bold tracking-tight">Confirmar Productos</h1>
+<div class="w-6"></div> <!-- Spacer for centering title -->
+</header>
+<!-- Instruction Section -->
+<div class="mb-8">
+<p class="text-white/60 text-sm font-medium">ESCANEADO COMPLETADO</p>
+<h2 class="text-2xl font-bold mt-1">Revisa tu lista</h2>
+<p class="text-white/40 text-sm mt-2">Asegúrate de que los productos detectados sean correctos antes de guardarlos.</p>
+</div>
+<!-- Scan Result List -->
+<section class="flex-grow space-y-px bg-white/5 rounded-xl overflow-hidden border border-white/10">
+<!-- Item 1: Salmón Noruego -->
+<div class="flex items-center p-4 bg-background-dark/40 border-b border-white/5 group active:bg-white/10 transition-colors">
+<div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-icons-outlined">restaurant</span>
+</div>
+<div class="ml-4 flex-grow">
+<h3 class="text-white font-medium text-lg leading-tight">Salmón Noruego</h3>
+<p class="text-white/40 text-xs">Proteínas • Pescado</p>
+</div>
+<div class="flex items-center space-x-4">
+<button class="p-2 text-white/30 hover:text-primary transition-colors">
+<span class="material-icons-outlined text-xl">edit</span>
+</button>
+<button class="p-2 text-white/30 hover:text-red-500 transition-colors">
+<span class="material-icons-outlined text-xl">close</span>
+</button>
+</div>
+</div>
+<!-- Item 2: Aguacate -->
+<div class="flex items-center p-4 bg-background-dark/40 border-b border-white/5 group active:bg-white/10 transition-colors">
+<div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-icons-outlined">eco</span>
+</div>
+<div class="ml-4 flex-grow">
+<h3 class="text-white font-medium text-lg leading-tight">Aguacate</h3>
+<p class="text-white/40 text-xs">Frutas • Vegetal</p>
+</div>
+<div class="flex items-center space-x-4">
+<button class="p-2 text-white/30 hover:text-primary transition-colors">
+<span class="material-icons-outlined text-xl">edit</span>
+</button>
+<button class="p-2 text-white/30 hover:text-red-500 transition-colors">
+<span class="material-icons-outlined text-xl">close</span>
+</button>
+</div>
+</div>
+<!-- Item 3: Leche -->
+<div class="flex items-center p-4 bg-background-dark/40 group active:bg-white/10 transition-colors">
+<div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-icons-outlined">water_drop</span>
+</div>
+<div class="ml-4 flex-grow">
+<h3 class="text-white font-medium text-lg leading-tight">Leche</h3>
+<p class="text-white/40 text-xs">Lácteos • Bebida</p>
+</div>
+<div class="flex items-center space-x-4">
+<button class="p-2 text-white/30 hover:text-primary transition-colors">
+<span class="material-icons-outlined text-xl">edit</span>
+</button>
+<button class="p-2 text-white/30 hover:text-red-500 transition-colors">
+<span class="material-icons-outlined text-xl">close</span>
+</button>
+</div>
+</div>
+<!-- Add More Button (Placeholder) -->
+<button class="w-full flex items-center justify-center p-4 text-primary text-sm font-semibold border-t border-white/10 hover:bg-white/5 transition-colors">
+<span class="material-icons-outlined text-sm mr-2">add</span>
+                Añadir otro producto
+            </button>
+</section>
+<!-- Footer / Action Area -->
+<footer class="sticky bottom-0 pb-10 pt-6 bg-gradient-to-t from-background-dark via-background-dark to-transparent">
+<button class="w-full bg-primary text-white font-bold py-5 rounded-xl orange-glow active:scale-[0.98] transition-all flex items-center justify-center space-x-2">
+<span class="material-icons-outlined">inventory_2</span>
+<span class="text-lg">Añadir a la Despensa</span>
+</button>
+<div class="mt-4 flex justify-center">
+<div class="h-1 w-32 bg-white/20 rounded-full"></div> <!-- iOS Home Indicator Mimic -->
+</div>
+</footer>
+</main>
+<!-- Background Subtle Glow Decoration -->
+<div class="fixed top-[-10%] right-[-10%] w-[50%] h-[50%] bg-primary/5 blur-[120px] rounded-full -z-10"></div>
+<div class="fixed bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[100px] rounded-full -z-10"></div>
+</body></html>

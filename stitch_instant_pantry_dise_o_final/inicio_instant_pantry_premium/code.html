@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Instant Pantry Premium</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec13",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102210",
+                        "surface-dark": "#121212",
+                        "accent-orange": "#ff8a00"
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #121212;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: white;
+        }
+        .glass-overlay {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .ios-tab-bar {
+            background: rgba(18, 18, 18, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .premium-border {
+            border: 1px solid rgba(19, 236, 19, 0.15);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display antialiased">
+<!-- Mobile Container (Simulating Phone Viewport) -->
+<div class="max-w-md mx-auto min-h-screen bg-surface-dark relative pb-24">
+<!-- Header Section -->
+<header class="pt-12 pb-6 px-6 flex justify-center items-center relative">
+<div class="w-12 h-12 flex items-center justify-center rounded-full bg-primary/10">
+<span class="material-icons-round text-primary text-3xl">eco</span>
+</div>
+</header>
+<!-- Welcome Message -->
+<section class="px-6 mb-8">
+<h2 class="text-white/60 text-lg font-light tracking-wide">¡Hola,</h2>
+<h1 class="text-white text-4xl font-bold tracking-tight">Gourmet!</h1>
+</section>
+<!-- Pantry Alert Card -->
+<section class="px-6 mb-10">
+<div class="premium-border bg-primary/5 rounded-xl p-5 flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-white/50 text-xs uppercase tracking-widest mb-1">Estado de Despensa</span>
+<p class="text-white text-base">
+                        Tienes <span class="text-accent-orange font-bold">3 productos</span> cerca de caducar
+                    </p>
+</div>
+<div class="flex items-center justify-center w-10 h-10 rounded-lg bg-accent-orange/20">
+<span class="material-icons-round text-accent-orange">priority_high</span>
+</div>
+</div>
+</section>
+<!-- Featured Suggestion Section -->
+<section class="px-6 mb-10">
+<div class="flex justify-between items-end mb-4">
+<h3 class="text-white text-xl font-semibold">Sugerencia del Día</h3>
+<span class="text-primary text-sm font-medium">Ver todas</span>
+</div>
+<!-- Recipe Hero Card -->
+<div class="relative w-full aspect-[4/5] rounded-xl overflow-hidden group">
+<img alt="Gourmet Dish" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Gourmet wild mushroom risotto with truffle oil" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD70W8NbSLBc0b1o6lspm_TlCLS6XN9cgKpGiBzsikGTeEdWmX1-dsWRLeIXJqrWgVsKDcadzah_F-Xo9sZaKjRQ1adwBhLhCakZGCN99q9vuHCZZu5cS89UDeFLYs7_SrxcOj_nNzl3GJsD_mI-RGasMsFMkAFWIULZgf9Bk5Gu__7IKebqtX6A8H5ls-92tBKaKLFv8WXPHMAq6ejJsnqOxnYAUxu2HumHymWgpfQjuwSAZ34EQuEPzR3ZpucvPsrZar3uM02pKw"/>
+<!-- Subtle Gradient Overlay -->
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+<!-- Glass-morphism Label -->
+<div class="absolute bottom-6 left-6 right-6">
+<div class="glass-overlay p-5 rounded-lg">
+<div class="flex items-center gap-2 mb-2">
+<span class="bg-primary px-2 py-0.5 rounded text-[10px] font-bold text-background-dark uppercase">Nivel Pro</span>
+<span class="text-white/70 text-xs flex items-center gap-1">
+<span class="material-icons-round text-sm">schedule</span> 45 min
+                            </span>
+</div>
+<h4 class="text-white text-2xl font-bold mb-1 leading-tight">Risotto de Setas Silvestres y Trufa</h4>
+<p class="text-white/60 text-sm line-clamp-1">Una experiencia umami con ingredientes de tu despensa.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Quick Stats Grid -->
+<section class="px-6 grid grid-cols-2 gap-4">
+<div class="bg-white/5 p-4 rounded-lg flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary/20 flex items-center justify-center">
+<span class="material-icons-round text-primary text-lg">inventory_2</span>
+</div>
+<div>
+<span class="block text-white font-bold text-lg">42</span>
+<span class="block text-white/40 text-[10px] uppercase">Artículos</span>
+</div>
+</div>
+<div class="bg-white/5 p-4 rounded-lg flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary/20 flex items-center justify-center">
+<span class="material-icons-round text-primary text-lg">shopping_basket</span>
+</div>
+<div>
+<span class="block text-white font-bold text-lg">12</span>
+<span class="block text-white/40 text-[10px] uppercase">Por comprar</span>
+</div>
+</div>
+</section>
+<!-- iOS Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto h-20 ios-tab-bar flex items-center justify-around px-8 border-t border-white/5 rounded-t-xl">
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-icons-round">home</span>
+<span class="text-[10px] font-medium">Inicio</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-white/40">
+<span class="material-icons-round">restaurant_menu</span>
+<span class="text-[10px] font-medium">Recetas</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-white/40">
+<span class="material-icons-round">kitchen</span>
+<span class="text-[10px] font-medium">Pantry</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-white/40">
+<span class="material-icons-round">person</span>
+<span class="text-[10px] font-medium">Perfil</span>
+</button>
+</nav>
+<!-- iOS Home Indicator -->
+<div class="fixed bottom-1 left-1/2 -translate-x-1/2 w-32 h-1 bg-white/20 rounded-full"></div>
+</div>
+</body></html>

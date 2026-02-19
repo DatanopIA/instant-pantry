@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ed9121",
+                        "background-light": "#f5f5f5",
+                        "background-dark": "#221a10",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-100 font-display min-h-screen">
+<!-- Top Status Bar (iOS Style) -->
+<div class="fixed top-0 w-full bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md z-50 px-6 pt-12 pb-4">
+<div class="flex justify-between items-center mb-6">
+<h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Mis Favoritos</h1>
+<button class="w-10 h-10 rounded-full bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center border border-slate-100 dark:border-slate-700">
+<span class="material-icons text-slate-600 dark:text-slate-300">search</span>
+</button>
+</div>
+<!-- Horizontal Filter Bar -->
+<div class="flex gap-3 overflow-x-auto hide-scrollbar pb-2">
+<button class="px-5 py-2.5 bg-primary text-white rounded-full font-medium text-sm whitespace-nowrap shadow-md shadow-primary/20">
+                Todos
+            </button>
+<button class="px-5 py-2.5 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-full font-medium text-sm whitespace-nowrap shadow-sm border border-slate-100 dark:border-slate-700">
+                Desayunos
+            </button>
+<button class="px-5 py-2.5 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-full font-medium text-sm whitespace-nowrap shadow-sm border border-slate-100 dark:border-slate-700">
+                Almuerzos
+            </button>
+<button class="px-5 py-2.5 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-full font-medium text-sm whitespace-nowrap shadow-sm border border-slate-100 dark:border-slate-700">
+                Cenas
+            </button>
+<button class="px-5 py-2.5 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-full font-medium text-sm whitespace-nowrap shadow-sm border border-slate-100 dark:border-slate-700">
+                Snacks
+            </button>
+<button class="px-5 py-2.5 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-full font-medium text-sm whitespace-nowrap shadow-sm border border-slate-100 dark:border-slate-700">
+                Postres
+            </button>
+</div>
+</div>
+<!-- Content Grid -->
+<main class="pt-44 pb-32 px-4">
+<div class="grid grid-cols-2 gap-4">
+<!-- Recipe Card 1 -->
+<div class="flex flex-col gap-2">
+<div class="relative aspect-[4/5] rounded-2xl overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Healthy colorful vegetable salad bowl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXEhAqcz_lCn9b-qyqUNE0IvPLbVm1Ed4ssyylXFe5kaHbPii4_6Mi2kz_VBQ8IVUDZRVElJI7qEOgS9YiCiTaMaIVBQtsTF1pNM4kq1bJbk1Ucdt_wYPFGuoT9W9BJe6IucN1PH8fQfkzEhj1HVpETfVc2Ai_uaanaEalr2AdjTugEc6eKn7phIPdtT2Q188Pp8trr2BIumiMpw2qCZJpVdsfekOl9IKA45tV-kQnSZR7ycSBkcBxh3L0z3RIYutDRbEpvQAyydg"/>
+<button class="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-primary shadow-sm">
+<span class="material-icons text-xl">favorite</span>
+</button>
+<div class="absolute bottom-0 left-0 w-full h-1/3 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
+</div>
+<div class="px-1">
+<h3 class="font-semibold text-slate-800 dark:text-slate-100 leading-tight">Ensalada Mediterránea</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1">
+<span class="material-icons text-[12px]">schedule</span> 15 min
+                    </p>
+</div>
+</div>
+<!-- Recipe Card 2 -->
+<div class="flex flex-col gap-2">
+<div class="relative aspect-[4/5] rounded-2xl overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Avocado toast with poached egg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlyTX6dXjB7Z4kY825X0Z0L8QNAxkIaoo1r8ie1I4rrGQcOMAPLEcI9y79vj-yxziHTzlhN8Bw7m5FjrtBDaQ8wpmCg_8qbXSz94r8GmDr5b3YU8J1kEHRO2ZFgeeij-j0hdsP_j8FI4GEwbe3aYS4zPJ8NZ5_grnhtNeBRpKLYcMbZmokYE8qjYb1imDED0s4Box9CNGR6GOlPuYJCg0ev35XWqssPSQ8_Huis0aLrZ1J1PBjku3AcFraHuqYt14sHwjH-WSHYQ8"/>
+<button class="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-primary shadow-sm">
+<span class="material-icons text-xl">favorite</span>
+</button>
+<div class="absolute bottom-0 left-0 w-full h-1/3 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
+</div>
+<div class="px-1">
+<h3 class="font-semibold text-slate-800 dark:text-slate-100 leading-tight">Tostadas de Aguacate</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1">
+<span class="material-icons text-[12px]">schedule</span> 10 min
+                    </p>
+</div>
+</div>
+<!-- Recipe Card 3 -->
+<div class="flex flex-col gap-2">
+<div class="relative aspect-[4/5] rounded-2xl overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Refreshing berry smoothie in a glass" src="https://lh3.googleusercontent.com/aida-public/AB6AXuChhGlTkjUJsnklcPOFOdjLYj0nHQ5bfiMLmFh2sGliufKUEQvx-SB9SYrTIBam9WrIot9y0pdiywqRhcq-rsGJwPNCAUO4ddIN5es_sG0q9-B1n-B0_C2Yki3Y_p8ssD0hJg5TMNUwYP-IOYvl_eAinBfpTNpCibdTXTHim2z7i4pyOPGqy2krINuFJ41No6-KyjulSRMhbXGdRucV5Ev_A9VQlV3IW4u-oO6dky8R7gL_nkXfqbtYvsc6oltaooUPsDbLUbZ__0g"/>
+<button class="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-primary shadow-sm">
+<span class="material-icons text-xl">favorite</span>
+</button>
+<div class="absolute bottom-0 left-0 w-full h-1/3 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
+</div>
+<div class="px-1">
+<h3 class="font-semibold text-slate-800 dark:text-slate-100 leading-tight">Smoothie de Bayas</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1">
+<span class="material-icons text-[12px]">schedule</span> 5 min
+                    </p>
+</div>
+</div>
+<!-- Recipe Card 4 -->
+<div class="flex flex-col gap-2">
+<div class="relative aspect-[4/5] rounded-2xl overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Grilled lemon chicken with herbs" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCipRAMwwXabA2E7P6ERI1KLpg2Td_zozTtkXp3C3KlzC6zyJWTKgV9kbReGx4J-zHwwIreeuYQaE0LL1B7x7a8n6b_BECF8cSAzDMHF2ySnOe3Mi_qJT-33umdI6Q2ZqdgTAUz8QsMBnGQTbb1sjiq7yDo5em3UFX9UBpsERrhyt5yr6w6436NX_zcj3ESUNbiELvihJ0XmQmyQTZlw1MJ-5skgqfbzNo1Cmmokb65vtIwq3ocqjqatW1LncBOCMfo7CGq37iOdY0"/>
+<button class="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-primary shadow-sm">
+<span class="material-icons text-xl">favorite</span>
+</button>
+<div class="absolute bottom-0 left-0 w-full h-1/3 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
+</div>
+<div class="px-1">
+<h3 class="font-semibold text-slate-800 dark:text-slate-100 leading-tight">Pollo al Limón</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1">
+<span class="material-icons text-[12px]">schedule</span> 35 min
+                    </p>
+</div>
+</div>
+<!-- Recipe Card 5 -->
+<div class="flex flex-col gap-2">
+<div class="relative aspect-[4/5] rounded-2xl overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Delicious chocolate protein pancakes" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFX-sriVA26V6GVWFu5GkHJODrtnKeWn1IkmN2D2X8S-bC0nYypjlwnRFD8vHS7B8qucYxR74otl0pvHM10l0OFk08FhrL1gsWA0kAIWA2tU6M8h2Sf3inKmbC2zqeHgBfZfNa5wWRWN0XgcGEoRPK1BrKmYc9w1djcdv3p5TCI9D7c_ObLgjGuvN87eKatrnBVEDOLpLkLhinIKrYD_UQ4YnS2qyzYc3FR6pPATEG4C64E_JGn7OJl7MSSmOtehppxldBHZIkZgI"/>
+<button class="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-primary shadow-sm">
+<span class="material-icons text-xl">favorite</span>
+</button>
+<div class="absolute bottom-0 left-0 w-full h-1/3 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
+</div>
+<div class="px-1">
+<h3 class="font-semibold text-slate-800 dark:text-slate-100 leading-tight">Pancakes de Proteína</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1">
+<span class="material-icons text-[12px]">schedule</span> 20 min
+                    </p>
+</div>
+</div>
+<!-- Recipe Card 6 -->
+<div class="flex flex-col gap-2">
+<div class="relative aspect-[4/5] rounded-2xl overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Fresh salmon poke bowl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuASl6h760iJkdgTv8sYTdfEAPk-t31tVlUiVNIXcH9Uo3crznM44pg1zDAG1CR5G2h2HEix7WviJ6kimx6_UNz8OMhUci49HuM5x4HBEDQjxectz1C3Fug7rdeHOMUXJf7sqTlau1G_BMfYcTQqlr_lQNVX-4L2r1KEwY5OK-Mp-Zt2SKWpQJQgDeg4V1ZrUUamgkoTOYgEz9buXkA0z2m7ONdkkKUS-8cI5G33IrDDr4h7QG6bw_s6p-DyxUObe9Ie6Y2PTB7rS3I"/>
+<button class="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-primary shadow-sm">
+<span class="material-icons text-xl">favorite</span>
+</button>
+<div class="absolute bottom-0 left-0 w-full h-1/3 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
+</div>
+<div class="px-1">
+<h3 class="font-semibold text-slate-800 dark:text-slate-100 leading-tight">Poke de Salmón</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1">
+<span class="material-icons text-[12px]">schedule</span> 25 min
+                    </p>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 w-full bg-white dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800 px-6 pt-3 pb-8 z-50">
+<div class="flex justify-between items-center max-w-md mx-auto">
+<button class="flex flex-col items-center gap-1 group">
+<span class="material-icons text-slate-400 dark:text-slate-500 group-hover:text-primary">home</span>
+<span class="text-[10px] font-medium text-slate-400 dark:text-slate-500 group-hover:text-primary">Inicio</span>
+</button>
+<button class="flex flex-col items-center gap-1 group">
+<span class="material-icons text-slate-400 dark:text-slate-500 group-hover:text-primary">restaurant_menu</span>
+<span class="text-[10px] font-medium text-slate-400 dark:text-slate-500 group-hover:text-primary">Recetas</span>
+</button>
+<button class="flex flex-col items-center gap-1">
+<span class="material-icons text-primary">favorite</span>
+<span class="text-[10px] font-medium text-primary">Favoritos</span>
+</button>
+<button class="flex flex-col items-center gap-1 group">
+<span class="material-icons text-slate-400 dark:text-slate-500 group-hover:text-primary">shopping_basket</span>
+<span class="text-[10px] font-medium text-slate-400 dark:text-slate-500 group-hover:text-primary">Despensa</span>
+</button>
+<button class="flex flex-col items-center gap-1 group">
+<span class="material-icons text-slate-400 dark:text-slate-500 group-hover:text-primary">person</span>
+<span class="text-[10px] font-medium text-slate-400 dark:text-slate-500 group-hover:text-primary">Perfil</span>
+</button>
+</div>
+</nav>
+</body></html>
