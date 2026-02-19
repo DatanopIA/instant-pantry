@@ -42,7 +42,7 @@ const LandingView = () => {
         if (e) e.preventDefault();
         setLoading(true);
         try {
-            const { error } = await supabase.auth.signInWithOtp({
+            const { error } = await supabase.auth.signInWithOTP({
                 email,
                 options: { emailRedirectTo: window.location.origin },
             });

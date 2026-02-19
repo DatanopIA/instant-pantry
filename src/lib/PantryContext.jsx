@@ -52,6 +52,22 @@ export const PantryProvider = ({ children }) => {
         keto: false
     });
 
+    // Escuchar cambios de autenticación de Supabase
+    useEffect(() => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            if (session?.user) {
+                const userData = {
+                    email: session.user.email,
+                    name: session.user.user_metadata.full_name || session.user.email.split('@')[0],
+                    id: session.user.id
+                };
+                login(userData);
+            }
+        });
+
+        return () => subscription?.unsubscribe();
+    }, []);
+
     // Cargar datos al iniciar
     useEffect(() => {
         const savedInventory = localStorage.getItem('pantry_inventory');
