@@ -10,7 +10,7 @@ export const PantryProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [language, setLanguage] = useState(() => localStorage.getItem('pantry_lang') || 'es');
-    const [theme, setTheme] = useState(() => localStorage.getItem('pantry_theme') || 'dark');
+    const [theme, setTheme] = useState(() => localStorage.getItem('pantry_theme') || 'light');
     const [inventory, setInventory] = useState(() => {
         const saved = localStorage.getItem('pantry_inventory');
         return saved ? JSON.parse(saved) : [];
