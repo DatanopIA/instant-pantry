@@ -4,17 +4,18 @@
 
 ### 🔴 CRÍTICOS (Funcionalidad)
 
-- [ ] **IA Chef Offline**: El backend falla al conectar con Gemini 2.0. Mensaje de error genérico en UI.
-- [ ] **Escáner Ciego**: La visión artificial (tickets/alimentos) no procesa imágenes por fallo en el motor de IA.
-- [ ] **Desconexión Stripe/Auth**: El usuario paga pero el Tier Pro no se actualiza automáticamente (Falta Webhook).
-- [ ] **Monolito Técnico**: `App.jsx` (+2000 líneas) es inmanejable y propenso a errores colaterales.
+- [x] **IA Chef Offline**: El backend ya conecta con Gemini 1.5 Flash. Verificado en producción.
+- [ ] **Escáner Ciego**: La visión artificial (tickets/alimentos) requiere testeo final con imágenes reales.
+- [x] **Desconexión Stripe/Auth**: Redirecciones de Supabase corregidas. El flujo de login con Google ya no da 404.
+- [ ] **Monolito Técnico**: App.jsx refactorizada parcialmente. Vistas independientes creadas.
 
 ### 🟡 ESTÉTICOS (Premium Branding)
 
-- [ ] **Diseño Plano**: Falta el estilo "Liquid Glass" y profundidad táctil.
-- [ ] **Carrusel Básico**: La navegación de sugerencias no es fluida ni parece de "revista".
-- [ ] **Imágenes Rofas**: Uso de placeholders feos si falla la imagen de la receta.
-- [ ] **Tipografía de Sistema**: La marca no se siente premium (Fallo en carga de fuentes Outfit).
+- [x] **Diseño Plano**: Estilo "Liquid Glass" aplicado en Home y Perfil.
+- [ ] **Carrusel Básico**: Pendiente de pulir animaciones de revista.
+- [ ] **Imágenes Rofas**: Pendiente de mejorar fallback de imágenes.
+- [ ] **Tipografía de Sistema**: Verificada pero pendiente de optimización final en móviles.
+- [x] **Modo Claro por Defecto**: Implementado y forzado en PantryContext.
 
 ---
 
@@ -33,8 +34,8 @@
 | :--- | :--- | :--- |
 | **Integrity Auditor** | Escaneo de errores, Refactorización del Monolito y Test de 0 errores. | 🔄 En progreso |
 | **UX Orchestrator** | Diseño de UI "Revista", Animaciones Carrusel y Tipografía. | 🔄 En progreso |
-| **Stability Architect** | Integración Stripe, Webhooks y Estabilidad de la IA. | ✅ Corregido (Backend) |
-| **Execution Deployer** | Implementación del código y Despliegue en Vercel. | ⏳ Pendiente |
+| **Stability Architect** | Integración Stripe, Webhooks y Estabilidad de la IA. | ✅ Corregido (Backend & Auth) |
+| **Execution Deployer** | Implementación del código y Despliegue en Vercel. | ✅ Realizado (CI/CD Activo) |
 
 ---
 
