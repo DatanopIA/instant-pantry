@@ -30,7 +30,18 @@ export const translations = {
         tienes_todo: 'Tienes todos los ingredientes',
         falta_uno: 'Falta 1 ingrediente',
         faltan_varios: 'Falten {count} ingredientes',
-        saludo_ia: '¡Hola! Soy tu Asistente de Instant Pantry, desarrollado por DatanopIA. ¿En qué puedo ayudarte con tu despensa hoy?'
+        saludo_ia: '¡Hola! Soy tu Asistente de Instant Pantry, desarrollado por DatanopIA. ¿En qué puedo ayudarte con tu despensa hoy?',
+        configuracion: 'CONFIGURACIÓN', cuenta: 'CUENTA', privacidad: 'Privacidad y Seguridad',
+        ayuda: 'Centro de Ayuda', mejorar_pro: 'MEJORAR A PRO', pro_activo: 'TIER FAMILY PRO ACTIVO',
+        modo_oscuro: 'Modo Oscuro', preferencia_dieta: 'Preferencia de Dieta',
+        analisis_vanguard: 'SISTEMA DE ANÁLISIS VANGUARD',
+        protocolo_rescate: 'Protocolo de rescate: {count} ingredientes críticos.',
+        ecosistema_equilibrio: 'Tu ecosistema gourmet está en equilibrio.',
+        inspeccionar_despensa: 'INSPECCIONAR DESPENSA', caducidad: 'Caducidad',
+        alertas_hoy: '{count} alertas hoy', eficiencia: 'Eficiencia', zero_waste: '92% Zero Waste',
+        cocinar_ahora: 'Cocinar Ahora', explorar: 'EXPLORAR', ver_todo: 'VER TODO',
+        pregunta_chef: 'Pregunta al Chef IA', optimiza_ingredientes: 'Optimiza tus ingredientes hoy',
+        preparacion: 'Preparación'
     },
     en: {
         inicio: 'HOME', despensa: 'PANTRY', recetas: 'RECIPES', iachef: 'AI CHEF',
@@ -63,7 +74,18 @@ export const translations = {
         tienes_todo: 'You have all the ingredients',
         falta_uno: '1 ingredient missing',
         faltan_varios: '{count} ingredients missing',
-        saludo_ia: 'Hello! I am your Instant Pantry Assistant, developed by DatanopIA. How can I help you with your pantry today?'
+        saludo_ia: 'Hello! I am your Instant Pantry Assistant, developed by DatanopIA. How can I help you with your pantry today?',
+        configuracion: 'CONFIGURATION', cuenta: 'ACCOUNT', privacidad: 'Privacy & Security',
+        ayuda: 'Help Center', mejorar_pro: 'UPGRADE TO PRO', pro_activo: 'TIER FAMILY PRO ACTIVE',
+        modo_oscuro: 'Dark Mode', preferencia_dieta: 'Diet Preference',
+        analisis_vanguard: 'VANGUARD ANALYSIS SYSTEM',
+        protocolo_rescate: 'Rescue protocol: {count} critical ingredients.',
+        ecosistema_equilibrio: 'Your gourmet ecosystem is in balance.',
+        inspeccionar_despensa: 'INSPECT PANTRY', caducidad: 'Expiry',
+        alertas_hoy: '{count} alerts today', eficiencia: 'Efficiency', zero_waste: '92% Zero Waste',
+        cocinar_ahora: 'Cook Now', explorar: 'EXPLORE', ver_todo: 'VIEW ALL',
+        pregunta_chef: 'Ask the AI Chef', optimiza_ingredientes: 'Optimize your ingredients today',
+        preparacion: 'Preparation'
     },
     ca: {
         inicio: 'INICI', despensa: 'REPOST', recetas: 'RECEPTES', iachef: 'IA XEF',
@@ -96,6 +118,18 @@ export const translations = {
         tienes_todo: 'Tens tots els ingredients',
         falta_uno: 'Falta 1 ingredient',
         faltan_varios: 'Falten {count} ingredients',
-        saludo_ia: 'Hola! Soc el teu Assistent d\'Instant Pantry, desenvolupat per DatanopIA. En què et puc ajudar avui?'
+        saludo_ia: 'Hola! Soc el teu Assistent d\'Instant Pantry, desenvolupat per DatanopIA. En què et puc ajudar avui?',
+        configuracion: 'CONFIGURACIÓ', cuenta: 'COMPTE', privacidad: 'Privadesa i Seguretat',
+        ayuda: 'Centre d\'Ajuda', mejorar_pro: 'MILLORAR A PRO', pro_activo: 'TIER FAMILY PRO ACTIU',
+        modo_oscuro: 'Mode Fosc', preferencia_dieta: 'Preferència de Dieta',
+        analisis_vanguard: 'SISTEMA D\'ANÀLISI VANGUARD',
+        protocolo_rescate: 'Protocol de rescat: {count} ingredients crítics.',
+        ecosistema_equilibrio: 'El teu ecosistema gourmet està en equilibri.',
+        inspeccionar_despensa: 'INSPECCIONAR REPOST', caducidad: 'Caducitat',
+        alertas_hoy: '{count} alertes avui', eficiencia: 'Eficiència', zero_waste: '92% Zero Waste',
+        cocinar_ahora: 'Cuinar Ara', explorar: 'EXPLORAR', ver_todo: 'VEURE TOT',
+        pregunta_chef: 'Pregunta al Xef IA', optimiza_ingredientes: 'Optimitza els teus ingredients avui',
+        preparacion: 'Preparació'
     }
 };
+

@@ -142,31 +142,38 @@ app.post('/api/messages', (req, res) => {
 
 // Real AI Chat Endpoint with Gemini
 app.post('/api/ai/chat', async (req, res) => {
-    const { text, history, inventory = [], recipes = [] } = req.body;
-    console.log('Chat request received:', text);
+    const { text, history, inventory = [], recipes = [], dietSettings = {}, language = 'es' } = req.body;
+    console.log('Chat request received:', text, 'Language:', language);
 
     if (!GEMINI_API_KEY || GEMINI_API_KEY === 'TU_API_KEY_AQUI_GEMINI') {
-        console.warn('GEMINI_API_KEY not configured. Returning demo response.');
         return res.json({
-            text: "⚠️ [MODO DEMO] Hola, para activar mi inteligencia completa, por favor introduce una GEMINI_API_KEY válida. Por ahora, responderé con mi lógica local mejorada."
+            text: language === 'es'
+                ? "⚠️ [MODO DEMO] Hola, para activar mi inteligencia completa, por favor introduce una GEMINI_API_KEY válida."
+                : language === 'en'
+                    ? "⚠️ [DEMO MODE] Hello, to activate my full intelligence, please provide a valid GEMINI_API_KEY."
+                    : "⚠️ [MODE DEMO] Hola, per activar la meva intel·ligència completa, si us plau introdueix una GEMINI_API_KEY vàlida."
         });
     }
 
     try {
         const inventoryContext = inventory.map(i => `${i.name} (vence en ${i.exp} días)`).join(', ');
         const recipesContext = recipes.map(r => r.title).join(', ');
+        const dietType = dietSettings.type || 'Omnívora';
 
-        const systemPrompt = `Eres el "Chef de Casa" de Instant Pantry, tu asistente inteligente para una cocina sin desperdicios. Tu personalidad es cálida, entusiasta y muy humana. No respondas como una máquina, sino como un experto en cocina que quiere ayudar a no desperdiciar comida.
-
-        REGLAS DE ORO DE TU PERSONALIDAD:
-        1. NO SEAS ROBÓTICO: Usa expresiones naturales como "¡Vaya!", "¡Qué buena pinta!", "Déjame ver qué tienes por aquí...".
-        2. EL PROTAGONISTA ES EL USUARIO: No lances recetas largas sin preguntar. Di algo como: "He visto que tienes tomates y queso. ¿Te apetece una ensalada fresca o algo al horno para cenar?".
-        3. BREVEDAD Y DIÁLOGO: Tus respuestas iniciales deben ser cortas (máximo 2-3 frases). Termina SIEMPRE con una pregunta abierta para mantener el diálogo.
-        4. ZERO WASTE: Tu misión principal es que no se tire nada. Si algo va a caducar pronto, menciónalo con cariño: "Oye, he visto que ese salmón caduca en 2 días, ¿buscamos cómo aprovecharlo hoy?".
-        5. CONTEXTO REAL:
-           - DESPENSA ACTUAL: ${inventoryContext}
-           - RECETAS DISPONIBLES: ${recipesContext}
-        6. Si el usuario te saluda, no solo digas "Hola". Dile: "¡Hola! Qué alegría verte. He estado echando un ojo a tu nevera y tienes cosas interesantes. ¿Cocinamos algo rico o quieres que te ayude a organizar la compra?".`;
+        const systemPrompt = `Eres el "Chef de Casa" de Instant Pantry. Tu personalidad es cálida, entusiasta y muy humana.
+        
+        Sigue estas instrucciones estrictamente:
+        1. RESPONDE SIEMPRE EN EL IDIOMA: ${language === 'es' ? 'Español' : language === 'en' ? 'Inglés' : 'Catalán'}.
+        2. Tienes en cuenta las PREFERENCIAS DIETÉTICAS del usuario: ${dietType}. 
+           - Si el usuario es vegetariano o vegano, no sugieras carne.
+           - Si el usuario tiene alergias o dietas especiales (Keto, Gluten Free), tómalas en cuenta.
+        3. NO SEAS ROBÓTICO: Usa expresiones naturales como "¡Vaya!", "¡Qué buena pinta!".
+        4. BREVEDAD Y DIÁLOGO: Tus respuestas iniciales deben ser cortas (máximo 2-3 frases). Termina SIEMPRE con una pregunta abierta.
+        5. ZERO WASTE: Tu misión es que no se tire nada. Menciona productos próximos a caducar.
+        6. CONTEXTO ACTUAL:
+           - DESPENSA: ${inventoryContext}
+           - RECETAS PERSONALIZADAS: ${recipesContext}
+        7. Si el usuario te saluda, dile algo como: "¡Hola! Qué alegría verte. He estado echando un ojo a tu nevera y tienes cosas interesantes. ¿Cocinamos algo rico?".`;
 
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
@@ -186,7 +193,7 @@ app.post('/api/ai/chat', async (req, res) => {
         const data = await response.json();
         if (data.error) {
             console.error('Gemini API Error details:', data.error);
-            return res.json({ text: `⚠️ Error de la API de Google: ${data.error.message}. Por favor, verifica tu API Key.` });
+            return res.json({ text: `⚠️ Error: ${data.error.message}` });
         }
         const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Lo siento, mi conexión culinaria ha fallado un momento. ¿Podemos intentarlo de nuevo?";
 

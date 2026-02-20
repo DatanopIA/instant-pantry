@@ -4,7 +4,7 @@ import { usePantry } from '../../lib/PantryContext';
 import { Send, Sparkles, Trash2, User, Bot } from 'lucide-react';
 
 const AIChatView = () => {
-    const { t, inventory, recipes } = usePantry();
+    const { t, inventory, recipes, dietSettings, language } = usePantry();
     const [messages, setMessages] = useState([
         { id: 1, sender: 'bot', text: t('saludo_ia'), time: new Date() }
     ]);
@@ -35,7 +35,9 @@ const AIChatView = () => {
                     text,
                     history: messages.map(m => ({ sender: m.sender, text: m.text })),
                     inventory: inventory || [],
-                    recipes: recipes || []
+                    recipes: recipes || [],
+                    dietSettings: dietSettings,
+                    language: language
                 })
             });
 

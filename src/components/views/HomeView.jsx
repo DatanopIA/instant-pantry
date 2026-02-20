@@ -74,12 +74,12 @@ const HomeView = () => {
                                 transition={{ duration: 2, repeat: Infinity }}
                                 style={{ width: '10px', height: '10px', borderRadius: '50%', background: urgentItems.length > 0 ? 'var(--status-red)' : 'var(--status-green)', boxShadow: `0 0 10px ${urgentItems.length > 0 ? 'var(--status-red)' : 'var(--status-green)'}` }}
                             ></motion.div>
-                            <span style={{ fontSize: '0.75rem', fontWeight: 900, letterSpacing: '2px', opacity: 0.8, color: 'var(--primary)' }}>SISTEMA DE ANÁLISIS VANGUARD</span>
+                            <span style={{ fontSize: '0.75rem', fontWeight: 900, letterSpacing: '2px', opacity: 0.8, color: 'var(--primary)' }}>{t('analisis_vanguard')}</span>
                         </div>
                         <h3 style={{ fontSize: '1.6rem', marginBottom: '1.5rem', fontWeight: 900, lineHeight: 1.1 }}>
                             {urgentItems.length > 0
-                                ? `Protocolo de rescate: ${urgentItems.length} ingredientes críticos.`
-                                : 'Tu ecosistema gourmet está en equilibrio.'}
+                                ? t('protocolo_rescate', { count: urgentItems.length })
+                                : t('ecosistema_equilibrio')}
                         </h3>
                         <motion.button
                             whileHover={{ scale: 1.05, boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}
@@ -88,7 +88,7 @@ const HomeView = () => {
                             style={{ fontSize: '0.85rem', padding: '0.8rem 1.5rem', borderRadius: '1rem', border: 'none' }}
                             onClick={() => goTo('inventory')}
                         >
-                            INSPECCIONAR DESPENSA
+                            {t('inspeccionar_despensa')}
                         </motion.button>
                     </div>
                     {/* Animated background shape */}
@@ -108,8 +108,8 @@ const HomeView = () => {
                     style={{ padding: '1.5rem', borderRadius: '1.75rem', background: 'rgba(248, 113, 113, 0.05)' }}
                 >
                     <Clock size={20} style={{ color: 'var(--status-red)', marginBottom: '1rem' }} />
-                    <h4 style={{ fontSize: '1rem', marginBottom: '0.25rem', fontWeight: 800 }}>Caducidad</h4>
-                    <p style={{ fontSize: '0.8rem', opacity: 0.6, fontWeight: 600 }}>{urgentItems.length} alertas hoy</p>
+                    <h4 style={{ fontSize: '1rem', marginBottom: '0.25rem', fontWeight: 800 }}>{t('caducidad')}</h4>
+                    <p style={{ fontSize: '0.8rem', opacity: 0.6, fontWeight: 600 }}>{t('alertas_hoy', { count: urgentItems.length })}</p>
                 </motion.div>
 
                 {/* Efficiency Card */}
@@ -121,8 +121,8 @@ const HomeView = () => {
                     style={{ padding: '1.5rem', borderRadius: '1.75rem', background: 'rgba(var(--primary-rgb), 0.05)' }}
                 >
                     <Zap size={20} style={{ color: 'var(--primary)', marginBottom: '1rem' }} />
-                    <h4 style={{ fontSize: '1rem', marginBottom: '0.25rem', fontWeight: 800 }}>Eficiencia</h4>
-                    <p style={{ fontSize: '0.8rem', opacity: 0.6, fontWeight: 600 }}>92% Zero Waste</p>
+                    <h4 style={{ fontSize: '1rem', marginBottom: '0.25rem', fontWeight: 800 }}>{t('eficiencia')}</h4>
+                    <p style={{ fontSize: '0.8rem', opacity: 0.6, fontWeight: 600 }}>{t('zero_waste')}</p>
                 </motion.div>
             </div>
 
@@ -135,7 +135,7 @@ const HomeView = () => {
                         style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', color: 'var(--primary)', fontSize: '0.85rem', fontWeight: 800 }}
                         onClick={() => goTo('recipes')}
                     >
-                        EXPLORAR <ChevronRight size={16} />
+                        {t('explorar')} <ChevronRight size={16} />
                     </motion.div>
                 </div>
 
@@ -190,7 +190,7 @@ const HomeView = () => {
                             <div style={{ width: '50px', height: '50px', borderRadius: '50%', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem', color: 'white' }}>
                                 <ChevronRight size={24} />
                             </div>
-                            <span style={{ fontWeight: 800, fontSize: '0.9rem', opacity: 0.6 }}>VER TODO</span>
+                            <span style={{ fontWeight: 800, fontSize: '0.9rem', opacity: 0.6 }}>{t('ver_todo')}</span>
                         </div>
                     </motion.div>
                 </div>
@@ -213,8 +213,8 @@ const HomeView = () => {
                 }}
             >
                 <div>
-                    <h3 style={{ color: 'white', fontSize: '1.1rem', marginBottom: '4px' }}>Pregunta al Chef IA</h3>
-                    <p style={{ fontSize: '0.8rem', opacity: 0.7 }}>Optimiza tus ingredientes hoy</p>
+                    <h3 style={{ color: 'white', fontSize: '1.1rem', marginBottom: '4px' }}>{t('pregunta_chef')}</h3>
+                    <p style={{ fontSize: '0.8rem', opacity: 0.7 }}>{t('optimiza_ingredientes')}</p>
                 </div>
                 <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Sparkles size={24} color="#84A98C" />

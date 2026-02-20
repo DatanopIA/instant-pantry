@@ -1,39 +1,9 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from './supabase';
 import { translations } from './translations';
+import { ALL_RECIPES } from './recipes';
 
 const PantryContext = createContext();
-
-// Recetas de ejemplo para que la app no se vea vacía
-const FEATURED_RECIPES = [
-    {
-        id: 'feat-1',
-        title: 'Pasta al Pesto de Albahaca',
-        time: '20 min',
-        cal: '450 kcal',
-        img: 'https://images.unsplash.com/photo-1591986122435-01bd9b101662?q=80&w=1000&auto=format&fit=crop',
-        tags: ['Vegetariano', 'Rápido'],
-        ingredients: ['Pasta', 'Albahaca', 'Piñones', 'Queso Parmesano', 'Aceite de Oliva']
-    },
-    {
-        id: 'feat-2',
-        title: 'Bowl de Pollo y Aguacate',
-        time: '25 min',
-        cal: '520 kcal',
-        img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1000&auto=format&fit=crop',
-        tags: ['Saludable', 'Proteína'],
-        ingredients: ['Pollo', 'Aguacate', 'Arroz', 'Tomates', 'Espinacas']
-    },
-    {
-        id: 'feat-3',
-        title: 'Salmón con Verduras',
-        time: '30 min',
-        cal: '480 kcal',
-        img: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?q=80&w=1000&auto=format&fit=crop',
-        tags: ['Gourmet', 'Omega-3'],
-        ingredients: ['Salmón', 'Brócoli', 'Zanahorias', 'Limón', 'Mantequilla']
-    }
-];
 
 export const PantryProvider = ({ children }) => {
     // Lazy initializers for state
@@ -65,23 +35,67 @@ export const PantryProvider = ({ children }) => {
         return [];
     });
 
-    const [recipes, setRecipes] = useState(FEATURED_RECIPES);
-    const [selectedRecipe, setSelectedRecipe] = useState(null);
     const [language, setLanguage] = useState(() => localStorage.getItem('pantry_lang') || 'es');
     const [theme, setTheme] = useState(() => localStorage.getItem('pantry_theme') || 'light');
     const [profileImage, setProfileImage] = useState(() => localStorage.getItem('pantry_profile_image'));
     const [isPro, setIsPro] = useState(false);
+
     const [dietSettings, setDietSettings] = useState(() => {
         const saved = localStorage.getItem('pantry_diet');
         if (saved) {
             try {
-                return JSON.parse(saved);
+                const parsed = JSON.parse(saved);
+                return {
+                    type: parsed.type || 'Omnívora',
+                    dailyCalories: parsed.dailyCalories || 2000,
+                    vegetarian: parsed.vegetarian || false,
+                    vegan: parsed.vegan || false,
+                    glutenFree: parsed.glutenFree || false,
+                    keto: parsed.keto || false
+                };
             } catch (e) {
-                return { vegetarian: false, vegan: false, glutenFree: false, keto: false };
+                return { type: 'Omnívora', dailyCalories: 2000, vegetarian: false, vegan: false, glutenFree: false, keto: false };
             }
         }
-        return { vegetarian: false, vegan: false, glutenFree: false, keto: false };
+        return { type: 'Omnívora', dailyCalories: 2000, vegetarian: false, vegan: false, glutenFree: false, keto: false };
     });
+
+    // Recipes logic
+    const [recipes, setRecipes] = useState([]);
+    const [selectedRecipe, setSelectedRecipe] = useState(null);
+
+    // Filter recipes based on language and diet
+    useEffect(() => {
+        console.log(`Filtering recipes for lang: ${language}, diet: ${dietSettings.type}`);
+
+        // 1. Get recipes for current language (fallback to 'es')
+        const langRecipes = ALL_RECIPES[language] || ALL_RECIPES['es'];
+
+        // 2. Filter by diet type
+        const filtered = langRecipes.filter(recipe => {
+            const dietType = dietSettings.type;
+
+            // If Omnivore, show everything
+            if (dietType === 'Omnívora' || dietType === 'Omnivore') return true;
+
+            // Map tags to match diet types
+            const tags = recipe.tags.map(t => t.toLowerCase());
+
+            if ((dietType === 'Vegetariana' || dietType === 'Vegetarian') && tags.includes('vegetariana') || tags.includes('vegetarian')) return true;
+            if ((dietType === 'Vegana' || dietType === 'Vegan') && tags.includes('vegana') || tags.includes('vegan')) return true;
+            if ((dietType === 'Gluten Free' || dietType === 'Sin Gluten') && tags.includes('gluten free') || tags.includes('sin gluten')) return true;
+            if (dietType === 'Keto' && tags.includes('keto')) return true;
+            if (dietType === 'Paleo' && tags.includes('paleo')) return true;
+
+            // If it's a specific vegan recipe but user is vegetarian, it's also okay
+            if ((dietType === 'Vegetariana' || dietType === 'Vegetarian') && (tags.includes('vegana') || tags.includes('vegan'))) return true;
+
+            return false;
+        });
+
+        // If no recipes matches, at least show the first few of that language so it's not empty
+        setRecipes(filtered.length > 0 ? filtered : langRecipes.slice(0, 3));
+    }, [language, dietSettings.type]);
 
     const checkSubscription = useCallback(async (email) => {
         if (!email) return;
@@ -97,7 +111,6 @@ export const PantryProvider = ({ children }) => {
     }, []);
 
     const login = useCallback((userData) => {
-        console.log('Context: Logging in user', userData.email);
         setUser(userData);
         localStorage.setItem('pantry_user', JSON.stringify(userData));
         setView('home');
@@ -111,7 +124,6 @@ export const PantryProvider = ({ children }) => {
         setView('landing');
     }, []);
 
-    // Escuchar cambios de autenticación de Supabase
     useEffect(() => {
         const checkSession = async () => {
             const { data: { session } } = await supabase.auth.getSession();
@@ -140,14 +152,12 @@ export const PantryProvider = ({ children }) => {
         return () => subscription?.unsubscribe();
     }, [login]);
 
-    // Check subscription on mount if user exists
     useEffect(() => {
         if (user?.email) {
             checkSubscription(user.email);
         }
     }, [user?.email, checkSubscription]);
 
-    // Persistence to localStorage
     useEffect(() => {
         localStorage.setItem('pantry_inventory', JSON.stringify(inventory));
     }, [inventory]);
@@ -231,7 +241,7 @@ export const PantryProvider = ({ children }) => {
             view, goTo, prevView,
             user, login, logout,
             inventory, addProductToInventory, removeProduct, updateProduct,
-            recipes, setRecipes, featuredRecipes: FEATURED_RECIPES,
+            recipes, setRecipes, featuredRecipes: recipes,
             selectedRecipe, setSelectedRecipe,
             language, setLanguage,
             theme, setTheme,

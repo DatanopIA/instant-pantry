@@ -90,7 +90,7 @@ const ProfileView = () => {
 
                 {isPro ? (
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(216, 140, 81, 0.1)', color: 'var(--terrakotta)', padding: '6px 16px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800, marginTop: '1rem', border: '1px solid rgba(216, 140, 81, 0.2)' }}>
-                        TIER FAMILY PRO ACTIVO
+                        {t('pro_activo')}
                     </div>
                 ) : (
                     <motion.button
@@ -100,18 +100,18 @@ const ProfileView = () => {
                         onClick={upgradeToPro}
                         style={{ marginTop: '1.25rem', padding: '0.8rem 1.5rem', borderRadius: '12px', fontSize: '0.8rem', border: 'none' }}
                     >
-                        MEJORAR A PRO
+                        {t('mejorar_pro')}
                     </motion.button>
                 )}
             </header>
 
             {/* Menu Sections */}
             <div style={{ display: 'grid', gap: '1rem' }}>
-                <Section title="CONFIGURACIÓN">
-                    <MenuItem icon={<Settings size={20} />} label="Preferencia de Dieta" onClick={() => goTo('diet-settings')} />
+                <Section title={t('configuracion')}>
+                    <MenuItem icon={<Settings size={20} />} label={t('preferencia_dieta')} onClick={() => goTo('diet-settings')} />
                     <MenuItem
                         icon={<Globe size={20} />}
-                        label="Idioma"
+                        label={t('idioma')}
                         value={language === 'es' ? 'Español' : language === 'en' ? 'English' : 'Català'}
                         onClick={() => {
                             const nextLang = language === 'es' ? 'en' : language === 'en' ? 'ca' : 'es';
@@ -120,7 +120,7 @@ const ProfileView = () => {
                     />
                     <MenuItem
                         icon={<Moon size={20} />}
-                        label="Modo Oscuro"
+                        label={t('modo_oscuro')}
                         toggle
                         checked={theme === 'dark'}
                         onChange={() => {
@@ -129,10 +129,10 @@ const ProfileView = () => {
                     />
                 </Section>
 
-                <Section title="CUENTA">
-                    <MenuItem icon={<Shield size={20} />} label="Privacidad y Seguridad" onClick={() => alert('Tu privacidad es nuestra prioridad.')} />
-                    <MenuItem icon={<HelpCircle size={20} />} label="Centro de Ayuda" onClick={() => alert('Soporte: soporte@instantpantry.ia')} />
-                    <MenuItem icon={<LogOut size={20} />} label="Cerrar Sesión" danger onClick={handleLogout} />
+                <Section title={t('cuenta')}>
+                    <MenuItem icon={<Shield size={20} />} label={t('privacidad')} onClick={() => alert('Tu privacidad es nuestra prioridad.')} />
+                    <MenuItem icon={<HelpCircle size={20} />} label={t('ayuda')} onClick={() => alert('Soporte: soporte@instantpantry.ia')} />
+                    <MenuItem icon={<LogOut size={20} />} label={t('cerrar_sesion')} danger onClick={handleLogout} />
                 </Section>
 
                 <div style={{ textAlign: 'center', padding: '2rem 0', opacity: 0.3 }}>

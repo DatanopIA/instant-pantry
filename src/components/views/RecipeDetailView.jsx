@@ -123,7 +123,7 @@ const RecipeDetailView = () => {
 
                     {/* Steps Section */}
                     <div>
-                        <h3 style={{ fontSize: '1.2rem', marginBottom: '1.5rem' }}>Preparación Pasivo/Gourmet</h3>
+                        <h3 style={{ fontSize: '1.2rem', marginBottom: '1.5rem' }}>{t('preparacion')}</h3>
                         <div style={{ display: 'grid', gap: '1.5rem' }}>
                             {selectedRecipe.steps?.map((step, i) => (
                                 <div key={i} style={{ display: 'flex', gap: '1rem' }}>

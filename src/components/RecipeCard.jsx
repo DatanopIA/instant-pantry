@@ -1,6 +1,8 @@
 import React from 'react';
+import { usePantry } from '../lib/PantryContext';
 
-const RecipeCard = ({ recipe, onClick, language }) => {
+const RecipeCard = ({ recipe, onClick }) => {
+    const { t } = usePantry();
     const missingCount = recipe.missingIngredients?.length || 0;
 
     return (
@@ -56,8 +58,10 @@ const RecipeCard = ({ recipe, onClick, language }) => {
                             {missingCount === 0 ? 'check_circle' : 'inventory_2'}
                         </span>
                         {missingCount === 0
-                            ? (language === 'es' ? 'Tienes todo' : 'All set')
-                            : (language === 'es' ? `Faltan ${missingCount}` : `${missingCount} missing`)
+                            ? t('tienes_todo')
+                            : missingCount === 1
+                                ? t('falta_uno')
+                                : t('faltan_varios', { count: missingCount })
                         }
                     </div>
                 </div>
@@ -65,5 +69,6 @@ const RecipeCard = ({ recipe, onClick, language }) => {
         </div>
     );
 };
+
 
 export default RecipeCard;
