@@ -175,7 +175,7 @@ app.post('/api/ai/chat', async (req, res) => {
            - RECETAS PERSONALIZADAS: ${recipesContext}
         7. Si el usuario te saluda, dile algo como: "¡Hola! Qué alegría verte. He estado echando un ojo a tu nevera y tienes cosas interesantes. ¿Cocinamos algo rico?".`;
 
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -233,7 +233,7 @@ app.post('/api/ai/analyze-image', async (req, res) => {
             ? "Eres un sistema OCR experto en tickets de supermercado. Extrae una lista de productos alimentarios de este ticket. Devuelve SOLO un array JSON de objetos con {name: string, exp: number (estimado de días para vencer), icon: string (emoji)}. Ejemplo: [{\"name\": \"Leche\", \"exp\": 7, \"icon\": \"🥛\"}]"
             : "Eres un experto en visión artificial para cocina. Analiza esta imagen de una nevera o despensa e identifica los alimentos visibles. Devuelve SOLO un array JSON de objetos con {name: string, exp: number (estimado de días para vencer), icon: string (emoji)}. Ejemplo: [{\"name\": \"Manzanas\", \"exp\": 14, \"icon\": \"🍎\"}]";
 
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
