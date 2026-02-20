@@ -1,13 +1,13 @@
 export const translations = {
     es: {
-        inicio: 'INICIO', despensa: 'DESPENSA', recetas: 'RECETAS', iachef: 'IA CHEF',
-        bienvenido: 'BIENVENIDO A', perfil: 'Perfil', dieta: 'Ajustes de Dieta', idioma: 'Idioma',
+        home: 'Inicio', inventory: 'Despensa', recipes: 'Recetas', iachef: 'IA Chef', profile: 'Perfil',
+        bienvenido: 'BIENVENIDO A', dieta: 'Ajustes de Dieta', idioma: 'Idioma',
         logros: 'Logros', tema: 'Tema', cerrar_sesion: 'Cerrar Sesión', guardar: 'Guardar',
         volver: 'Volver', premium: 'Miembro Premium', racha: 'Racha', recetas_completadas: 'Recetas',
         sugerencia_dia: 'Sugerencia del Día', ver_todas: 'Ver todas', estado_despensa: 'Estado de Despensa',
         articulos: 'Artículos', por_comprar: 'Por comprar', buscar_recetas: 'Buscar recetas...',
         sin_recetas: 'No se encontraron recetas.', cargando: 'Cargando Pantry Gourmet...',
-        ingredientes: 'Ingredientes', nutricion_inteligente: 'NutricIÓN Inteligente',
+        ingredientes: 'Ingredientes', nutricion_inteligente: 'NUTRICIÓN Inteligente',
         despensa_status_msg: 'Tienes {count} productos cerca de caducar',
         vence_pronto: 'Vence pronto', lista_compra: 'Lista de Compra', inventario_title: 'Inventario',
         total: 'Total', vence: 'Vence', agotado: 'Agotado', buscar_alimentos: 'Buscar alimentos...',
@@ -41,11 +41,11 @@ export const translations = {
         alertas_hoy: '{count} alertas hoy', eficiencia: 'Eficiencia', zero_waste: '92% Zero Waste',
         cocinar_ahora: 'Cocinar Ahora', explorar: 'EXPLORAR', ver_todo: 'VER TODO',
         pregunta_chef: 'Pregunta al Chef IA', optimiza_ingredientes: 'Optimiza tus ingredientes hoy',
-        preparacion: 'Preparación'
+        preparacion: 'Preparación', filtrar: 'FILTRAR', items: 'ITEMS', moderno: 'MODERNO'
     },
     en: {
-        inicio: 'HOME', despensa: 'PANTRY', recetas: 'RECIPES', iachef: 'AI CHEF',
-        bienvenido: 'WELCOME TO', perfil: 'Profile', dieta: 'Diet Settings', idioma: 'Language',
+        home: 'Home', inventory: 'Pantry', recipes: 'Recipes', iachef: 'AI Chef', profile: 'Profile',
+        bienvenido: 'WELCOME TO', dieta: 'Diet Settings', idioma: 'Language',
         logros: 'Achievements', tema: 'Theme', cerrar_sesion: 'Log Out', guardar: 'Save',
         volver: 'Back', premium: 'Premium Member', racha: 'Streak', recetas_completadas: 'Recipes',
         sugerencia_dia: 'Suggestion of the Day', ver_todas: 'See all', estado_despensa: 'Pantry Status',
@@ -85,11 +85,11 @@ export const translations = {
         alertas_hoy: '{count} alerts today', eficiencia: 'Efficiency', zero_waste: '92% Zero Waste',
         cocinar_ahora: 'Cook Now', explorar: 'EXPLORE', ver_todo: 'VIEW ALL',
         pregunta_chef: 'Ask the AI Chef', optimiza_ingredientes: 'Optimize your ingredients today',
-        preparacion: 'Preparation'
+        preparacion: 'Preparation', filtrar: 'FILTER', items: 'ITEMS', moderno: 'MODERN'
     },
     ca: {
-        inicio: 'INICI', despensa: 'REPOST', recetas: 'RECEPTES', iachef: 'IA XEF',
-        bienvenido: 'BENVINGUT A', perfil: 'Perfil', dieta: 'Ajustos de Dieta', idioma: 'Idioma',
+        home: 'Inici', inventory: 'Repost', recipes: 'Receptes', iachef: 'IA Xef', profile: 'Perfil',
+        bienvenido: 'BENVINGUT A', dieta: 'Ajustos de Dieta', idioma: 'Idioma',
         logros: 'Assoliments', tema: 'Tema', cerrar_sesion: 'Tancar Sessió', guardar: 'Desar',
         volver: 'Tornar', premium: 'Membre Premium', racha: 'Ratxa', recetas_completadas: 'Receptes',
         sugerencia_dia: 'Suggeriment del Dia', ver_todas: 'Veure totes', estado_despensa: 'Estat del Repost',
@@ -118,18 +118,17 @@ export const translations = {
         tienes_todo: 'Tens tots els ingredients',
         falta_uno: 'Falta 1 ingredient',
         faltan_varios: 'Falten {count} ingredients',
-        saludo_ia: 'Hola! Soc el teu Assistent d\'Instant Pantry, desenvolupat per DatanopIA. En què et puc ajudar avui?',
+        saludo_ia: 'Hola! Soc el teu Assistent d\'Instant Pantry, desenvolupat por DatanopIA. En què et puc ajudar avui?',
         configuracion: 'CONFIGURACIÓ', cuenta: 'COMPTE', privacidad: 'Privadesa i Seguretat',
         ayuda: 'Centre d\'Ajuda', mejorar_pro: 'MILLORAR A PRO', pro_activo: 'TIER FAMILY PRO ACTIU',
         modo_oscuro: 'Mode Fosc', preferencia_dieta: 'Preferència de Dieta',
         analisis_vanguard: 'SISTEMA D\'ANÀLISI VANGUARD',
         protocolo_rescate: 'Protocol de rescat: {count} ingredients crítics.',
-        ecosistema_equilibrio: 'El teu ecosistema gourmet està en equilibri.',
+        ecosistema_equilibrio: 'El teu ecosistema gourmet está en equilibri.',
         inspeccionar_despensa: 'INSPECCIONAR REPOST', caducidad: 'Caducitat',
         alertas_hoy: '{count} alertes avui', eficiencia: 'Eficiència', zero_waste: '92% Zero Waste',
         cocinar_ahora: 'Cuinar Ara', explorar: 'EXPLORAR', ver_todo: 'VEURE TOT',
         pregunta_chef: 'Pregunta al Xef IA', optimiza_ingredientes: 'Optimitza els teus ingredients avui',
-        preparacion: 'Preparació'
+        preparacion: 'Preparació', filtrar: 'FILTRAR', items: 'ITEMS', moderno: 'MODERN'
     }
 };
-

@@ -191,11 +191,27 @@ app.post('/api/ai/chat', async (req, res) => {
         });
 
         const data = await response.json();
+
         if (data.error) {
             console.error('Gemini API Error details:', data.error);
+
+            // Handle leaked API key error specifically
+            if (data.error.message && data.error.message.includes('leaked')) {
+                const leakedMsg = {
+                    es: "⚠️ [ERROR CRÍTICO] Tu clave de API de Gemini ha sido filtrada y bloqueada por seguridad. Por favor, genera una nueva en Google AI Studio (https://aistudio.google.com/) y actualiza el archivo .env.",
+                    en: "⚠️ [CRITICAL ERROR] Your Gemini API key has been leaked and blocked for security. Please generate a new one at Google AI Studio (https://aistudio.google.com/) and update your .env file.",
+                    ca: "⚠️ [ERROR CRÍTIC] La teva clau d'API de Gemini ha estat filtrada i bloquejada per seguretat. Si us plau, genera una de nova a Google AI Studio (https://aistudio.google.com/) i actualitza el fitxer .env."
+                };
+                return res.json({ text: leakedMsg[language] || leakedMsg['es'] });
+            }
+
             return res.json({ text: `⚠️ Error: ${data.error.message}` });
         }
-        const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Lo siento, mi conexión culinaria ha fallado un momento. ¿Podemos intentarlo de nuevo?";
+
+        const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text ||
+            (language === 'en' ? "Sorry, my culinary connection failed. Shall we try again?" :
+                language === 'ca' ? "Ho sento, la meva connexió culinària ha fallat. Ho provem de nou?" :
+                    "Lo siento, mi conexión culinaria ha fallado un momento. ¿Podemos intentarlo de nuevo?");
 
         res.json({ text: aiText });
     } catch (error) {

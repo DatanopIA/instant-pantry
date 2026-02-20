@@ -36,7 +36,7 @@ const RecipeView = () => {
                             fontWeight: 700
                         }}
                     >
-                        <Filter size={16} /> FILTRAR
+                        <Filter size={16} /> {t('filtrar')}
                     </motion.button>
                 </div>
             </header>
@@ -84,7 +84,7 @@ const RecipeView = () => {
                                     fontSize: '0.6rem',
                                     fontWeight: 800
                                 }}>
-                                    {matchCount}/{totalIng} ITEMS
+                                    {matchCount}/{totalIng} {t('items')}
                                 </div>
                             </div>
 

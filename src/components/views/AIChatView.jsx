@@ -5,12 +5,19 @@ import { Send, Sparkles, Trash2, User, Bot } from 'lucide-react';
 
 const AIChatView = () => {
     const { t, inventory, recipes, dietSettings, language } = usePantry();
-    const [messages, setMessages] = useState([
-        { id: 1, sender: 'bot', text: t('saludo_ia'), time: new Date() }
-    ]);
+    const [messages, setMessages] = useState([]);
     const [inputText, setInputText] = useState('');
     const [isTyping, setIsTyping] = useState(false);
     const scrollRef = useRef(null);
+
+    // Initialize/Update first message on language change if no other messages
+    useEffect(() => {
+        if (messages.length === 0) {
+            setMessages([
+                { id: 'initial', sender: 'bot', text: t('saludo_ia'), time: new Date() }
+            ]);
+        }
+    }, [language]);
 
     useEffect(() => {
         if (scrollRef.current) {

@@ -18,7 +18,7 @@ import OnboardingView from './components/views/OnboardingView';
 import LandingView from './components/views/LandingView';
 
 function AppContent() {
-  const { view, goTo, user, showOnboarding, theme } = usePantry();
+  const { view, goTo, user, showOnboarding, theme, t } = usePantry();
 
   // Primary navigation views
   const navItems = [
@@ -79,14 +79,13 @@ function AppContent() {
                 {item.icon}
               </div>
               {!item.special && <span className="label">
-                {item.id === 'home' ? 'Inicio' :
-                  item.id === 'inventory' ? 'Despensa' :
-                    item.id === 'recipes' ? 'Recetas' : 'Perfil'}
+                {t(item.id)}
               </span>}
             </button>
           ))}
         </nav>
       )}
+
     </div>
   );
 }

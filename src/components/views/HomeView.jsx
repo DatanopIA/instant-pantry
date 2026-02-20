@@ -4,7 +4,7 @@ import { usePantry } from '../../lib/PantryContext';
 import { Sparkles, Clock, Flame, ChevronRight, Apple, Zap } from 'lucide-react';
 
 const HomeView = () => {
-    const { t, goTo, profileImage, inventory, recipes, setSelectedRecipe } = usePantry();
+    const { t, goTo, profileImage, inventory, recipes, setSelectedRecipe, theme } = usePantry();
 
     const urgentItems = inventory
         .filter(item => item.exp <= 3)
@@ -91,12 +91,6 @@ const HomeView = () => {
                             {t('inspeccionar_despensa')}
                         </motion.button>
                     </div>
-                    {/* Animated background shape */}
-                    <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                        style={{ position: 'absolute', right: '-50px', top: '-50px', width: '200px', height: '200px', background: 'radial-gradient(circle, var(--primary) 0%, transparent 70%)', opacity: 0.1 }}
-                    />
                 </motion.div>
 
                 {/* Expiry Alert Card */}
@@ -163,7 +157,7 @@ const HomeView = () => {
                                         }}
                                     />
                                     <div style={{ position: 'absolute', top: '15px', left: '15px', background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(10px)', color: 'white', padding: '5px 12px', borderRadius: '20px', fontSize: '0.65rem', fontWeight: 800, letterSpacing: '1px' }}>
-                                        {recipe.tags?.[0]?.toUpperCase() || 'MODERNO'}
+                                        {recipe.tags?.[0]?.toUpperCase() || t('moderno')}
                                     </div>
                                 </div>
                                 <div style={{ padding: '1.25rem', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
@@ -180,7 +174,6 @@ const HomeView = () => {
                             </div>
                         </motion.div>
                     ))}
-                    {/* View All Card in Carousel */}
                     <motion.div
                         className="carousel-item"
                         style={{ flex: '0 0 50%' }}
