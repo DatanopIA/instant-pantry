@@ -1,9 +1,9 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     ChevronRight, Globe, Moon, Sun,
     Bell, User, Shield, HelpCircle, ArrowRight,
-    LogOut, Settings, CreditCard, Award
+    LogOut, Settings, CreditCard, Award, Camera, Send, X
 } from 'lucide-react';
 import { usePantry } from '../../lib/PantryContext';
 
@@ -19,19 +19,61 @@ const ProfileView = () => {
         t,
         logout,
         profileImage,
+        updateProfileImage,
+        notificationsEnabled,
+        setNotificationsEnabled,
         user
     } = usePantry();
+
+    const [showHelpModal, setShowHelpModal] = useState(false);
+    const [helpMessage, setHelpMessage] = useState('');
+    const imageInputRef = useRef(null);
 
     const handleLogout = async () => {
         await logout();
         window.location.reload();
     };
 
-    const MenuItem = ({ icon, label, value, onClick, toggle, checked, danger }) => (
+    const handleImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                updateProfileImage(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handlePrivacyRedirect = () => {
+        const country = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        let url = 'https://www.google.com/search?q=privacy+policy+terms';
+
+        if (country.includes('Europe/Madrid')) {
+            url = 'https://www.aepd.es/es/derechos-y-deberes/conoce-tus-derechos';
+        } else if (country.includes('America/Mexico_City')) {
+            url = 'https://home.inai.org.mx/';
+        } else if (country.includes('America/New_York') || country.includes('America/Los_Angeles')) {
+            url = 'https://www.ftc.gov/business-guidance/privacy-security';
+        } else {
+            // General link for general terms
+            url = 'https://es.wikipedia.org/wiki/Privacidad_en_Internet';
+        }
+        window.open(url, '_blank');
+    };
+
+    const handleHelpSubmit = (e) => {
+        e.preventDefault();
+        window.location.href = `mailto:info@artbymaeki.com?subject=Ayuda Instant Pantry&body=${encodeURIComponent(helpMessage)}`;
+        setShowHelpModal(false);
+        setHelpMessage('');
+    };
+
+    const MenuItem = ({ icon, label, value, onClick, toggle, checked, danger, disabled }) => (
         <motion.div
-            whileHover={{ x: 5, background: 'rgba(var(--primary-rgb), 0.05)' }}
-            whileTap={{ scale: 0.98 }}
-            onClick={onClick}
+            whileHover={!disabled ? { x: 5, background: 'rgba(var(--primary-rgb), 0.05)' } : {}}
+            whileTap={!disabled ? { scale: 0.98 } : {}}
+            onClick={!disabled ? onClick : undefined}
             className="premium-card"
             style={{
                 display: 'flex',
@@ -39,10 +81,11 @@ const ProfileView = () => {
                 justifyContent: 'space-between',
                 padding: '1.25rem',
                 marginBottom: '0.75rem',
-                cursor: 'pointer',
+                cursor: disabled ? 'not-allowed' : 'pointer',
                 borderRadius: '1.5rem',
                 border: '1px solid var(--border-color)',
-                background: 'var(--card-bg)'
+                background: 'var(--card-bg)',
+                opacity: disabled ? 0.5 : 1
             }}
         >
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
@@ -98,6 +141,15 @@ const ProfileView = () => {
 
     return (
         <div className="container" style={{ paddingBottom: '120px' }}>
+            {/* Hidden Input for Image */}
+            <input
+                type="file"
+                ref={imageInputRef}
+                onChange={handleImageUpload}
+                accept="image/*"
+                style={{ display: 'none' }}
+            />
+
             {/* Header / Profile Hero */}
             <header className="pt-8 pb-8">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
@@ -134,15 +186,20 @@ const ProfileView = () => {
                         border: '1px solid var(--border-color)'
                     }}
                 >
-                    <div style={{
-                        width: '80px',
-                        height: '80px',
-                        borderRadius: '24px',
-                        overflow: 'hidden',
-                        background: 'var(--glass)',
-                        border: '1px solid rgba(var(--primary-rgb), 0.2)',
-                        boxShadow: '0 8px 25px rgba(0,0,0,0.1)'
-                    }}>
+                    <div
+                        onClick={() => imageInputRef.current?.click()}
+                        style={{
+                            width: '80px',
+                            height: '80px',
+                            borderRadius: '24px',
+                            overflow: 'hidden',
+                            background: 'var(--glass)',
+                            border: '2px solid var(--primary)',
+                            boxShadow: '0 8px 25px rgba(0,0,0,0.1)',
+                            cursor: 'pointer',
+                            position: 'relative'
+                        }}
+                    >
                         {profileImage ? (
                             <img src={profileImage} alt="User" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         ) : (
@@ -150,6 +207,9 @@ const ProfileView = () => {
                                 <User size={40} />
                             </div>
                         )}
+                        <div style={{ position: 'absolute', bottom: 0, right: 0, background: 'var(--primary)', color: 'white', padding: '4px', borderRadius: '8px 0 0 0' }}>
+                            <Camera size={12} />
+                        </div>
                     </div>
                     <div style={{ flex: 1 }}>
                         <h2 style={{ fontSize: '1.25rem', fontWeight: 900, marginBottom: '4px' }}>
@@ -210,7 +270,7 @@ const ProfileView = () => {
             {/* Config Section */}
             <div style={{ marginBottom: '2.5rem' }}>
                 <h3 style={{ fontSize: '0.7rem', fontWeight: 900, letterSpacing: '2px', opacity: 0.4, marginBottom: '1.25rem', paddingLeft: '0.5rem', textTransform: 'uppercase' }}>
-                    {t('configuracion')}
+                    {t('configuracion') || 'Configuración'}
                 </h3>
                 <MenuItem
                     icon={<Globe />}
@@ -230,20 +290,61 @@ const ProfileView = () => {
                 />
                 <MenuItem
                     icon={<Bell />}
-                    label={t('alertas_hoy', { count: 3 })}
-                    value="Push & Email Synchronized"
+                    label={t('preferencias')}
+                    value={isPro ? t('alertas_personalizadas') : t('solo_premium')}
+                    disabled={!isPro}
+                    toggle={isPro}
+                    checked={notificationsEnabled}
+                    onClick={() => setNotificationsEnabled(!notificationsEnabled)}
                 />
             </div>
 
             {/* Legacy / Account Section */}
             <div style={{ marginBottom: '2.5rem' }}>
                 <h3 style={{ fontSize: '0.7rem', fontWeight: 900, letterSpacing: '2px', opacity: 0.4, marginBottom: '1.25rem', paddingLeft: '0.5rem', textTransform: 'uppercase' }}>
-                    {t('preferencias')}
+                    {t('preferencias') || 'Preferencias'}
                 </h3>
                 <MenuItem icon={<Settings />} label={t('pref_alimentarias')} onClick={() => goTo('diet-settings')} />
-                <MenuItem icon={<Shield />} label={t('privacidad')} />
-                <MenuItem icon={<HelpCircle />} label={t('ayuda')} />
+                <MenuItem icon={<Shield />} label={t('privacidad')} onClick={handlePrivacyRedirect} />
+                <MenuItem icon={<HelpCircle />} label={t('ayuda')} onClick={() => setShowHelpModal(true)} />
             </div>
+
+            {/* Help Modal */}
+            <AnimatePresence>
+                {showHelpModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            style={{ background: 'var(--card-bg)', width: '100%', maxWidth: '400px', borderRadius: '2rem', padding: '2rem', position: 'relative', border: '1px solid var(--border-color)' }}
+                        >
+                            <button onClick={() => setShowHelpModal(false)} style={{ position: 'absolute', top: '20px', right: '20px', background: 'none', border: 'none', color: 'var(--text-main)', opacity: 0.5 }}>
+                                <X size={24} />
+                            </button>
+                            <h2 style={{ fontSize: '1.5rem', fontWeight: 900, marginBottom: '1rem' }}>Centro de Ayuda</h2>
+                            <p style={{ opacity: 0.6, fontSize: '0.9rem', marginBottom: '1.5rem' }}>Cuéntanos tu problema o duda y te responderemos en info@artbymaeki.com</p>
+
+                            <form onSubmit={handleHelpSubmit}>
+                                <textarea
+                                    value={helpMessage}
+                                    onChange={(e) => setHelpMessage(e.target.value)}
+                                    placeholder="Escribe aquí tu mensaje..."
+                                    style={{ width: '100%', height: '150px', background: 'rgba(0,0,0,0.05)', border: '1px solid var(--border-color)', borderRadius: '1rem', padding: '1rem', color: 'var(--text-main)', fontSize: '1rem', resize: 'none', marginBottom: '1.5rem' }}
+                                    required
+                                />
+                                <button type="submit" style={{ width: '100%', background: 'var(--primary)', color: 'white', padding: '1.2rem', borderRadius: '1rem', border: 'none', fontWeight: 900, fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+                                    <Send size={18} /> ENVIAR CONSULTA
+                                </button>
+                            </form>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

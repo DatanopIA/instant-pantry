@@ -25,6 +25,10 @@ export const PantryProvider = ({ children }) => {
     const [recipes, setRecipes] = useState([]);
     const [diet, setDiet] = useState(() => localStorage.getItem('pantry_diet') || 'Omnívora');
     const [selectedRecipe, setSelectedRecipe] = useState(null);
+    const [notificationsEnabled, setNotificationsEnabled] = useState(() => {
+        const saved = localStorage.getItem('pantry_notifications');
+        return saved === 'true';
+    });
 
     useEffect(() => {
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -51,6 +55,28 @@ export const PantryProvider = ({ children }) => {
     useEffect(() => {
         localStorage.setItem('pantry_diet', diet);
     }, [diet]);
+
+    useEffect(() => {
+        localStorage.setItem('pantry_notifications', notificationsEnabled);
+        if (notificationsEnabled && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+    }, [notificationsEnabled]);
+
+    useEffect(() => {
+        if (notificationsEnabled && inventory.length > 0) {
+            const expiringSoon = inventory.filter(item => item.status === 'red' || (item.exp && item.exp <= 2));
+            if (expiringSoon.length > 0 && Notification.permission === 'granted') {
+                const title = t('vence_pronto');
+                const body = t('despensa_status_msg', { count: expiringSoon.length });
+                new Notification(title, {
+                    body,
+                    icon: '/favicon.ico',
+                    badge: '/favicon.ico'
+                });
+            }
+        }
+    }, [inventory]); // Solo disparamos cuando cambia el inventario
 
     useEffect(() => {
         if (!user) return;
@@ -109,11 +135,53 @@ export const PantryProvider = ({ children }) => {
         profileImage, setProfileImage, isPro, setIsPro,
         recipes, diet, setDiet, logout, t,
         selectedRecipe, setSelectedRecipe,
+        notificationsEnabled, setNotificationsEnabled,
+        addProductToInventory: async (product) => {
+            const newItem = {
+                id: Date.now() + Math.random(),
+                ...product,
+                status: product.status || 'green'
+            };
+            setInventory(prev => [newItem, ...prev]);
+
+            // Sync with backend if needed
+            try {
+                await fetch('/api/inventory', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newItem)
+                });
+            } catch (e) {
+                console.error("Error syncing inventory:", e);
+            }
+        },
         updateProfileImage: (img) => {
             setProfileImage(img);
             localStorage.setItem('pantry_profile_image', img);
         },
-        upgradeToPro: () => setIsPro(true)
+        upgradeToPro: async () => {
+            if (!user) return;
+            try {
+                const res = await fetch('/api/create-checkout-session', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userEmail: user.email,
+                        priceId: 'price_smart_monthly' // Debería coincidir con el ID real de Stripe
+                    })
+                });
+                const data = await res.json();
+                if (data.url) {
+                    window.location.href = data.url;
+                } else {
+                    // Fallback para demo si no hay Stripe configurado
+                    setIsPro(true);
+                }
+            } catch (e) {
+                console.error("Payment error:", e);
+                setIsPro(true);
+            }
+        }
     };
 
     return (

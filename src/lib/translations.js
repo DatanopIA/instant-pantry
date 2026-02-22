@@ -41,7 +41,8 @@ export const translations = {
         alertas_hoy: '{count} alertas hoy', eficiencia: 'Eficiencia', zero_waste: '92% Zero Waste',
         cocinar_ahora: 'Cocinar Ahora', explorar: 'EXPLORAR', ver_todo: 'VER TODO',
         pregunta_chef: 'Pregunta al Chef IA', optimiza_ingredientes: 'Optimiza tus ingredientes hoy',
-        preparacion: 'Preparación', filtrar: 'FILTRAR', items: 'ITEMS', moderno: 'MODERNO'
+        preparacion: 'Preparación', filtrar: 'FILTRAR', items: 'ITEMS', moderno: 'MODERNO',
+        preferencias: 'Preferencias', solo_premium: 'Solo para Premium', alertas_personalizadas: 'Alertas Personalizadas'
     },
     en: {
         home: 'Home', inventory: 'Pantry', recipes: 'Recipes', iachef: 'AI Chef', profile: 'Profile',
@@ -85,7 +86,8 @@ export const translations = {
         alertas_hoy: '{count} alerts today', eficiencia: 'Efficiency', zero_waste: '92% Zero Waste',
         cocinar_ahora: 'Cook Now', explorar: 'EXPLORE', ver_todo: 'VIEW ALL',
         pregunta_chef: 'Ask the AI Chef', optimiza_ingredientes: 'Optimize your ingredients today',
-        preparacion: 'Preparation', filtrar: 'FILTER', items: 'ITEMS', moderno: 'MODERN'
+        preparacion: 'Preparation', filtrar: 'FILTER', items: 'ITEMS', moderno: 'MODERN',
+        preferencias: 'Preferences', solo_premium: 'Premium Only', alertas_personalizadas: 'Personalized Alerts'
     },
     ca: {
         home: 'Inici', inventory: 'Repost', recipes: 'Receptes', iachef: 'IA Xef', profile: 'Perfil',
@@ -129,6 +131,7 @@ export const translations = {
         alertas_hoy: '{count} alertes avui', eficiencia: 'Eficiència', zero_waste: '92% Zero Waste',
         cocinar_ahora: 'Cuinar Ara', explorar: 'EXPLORAR', ver_todo: 'VEURE TOT',
         pregunta_chef: 'Pregunta al Xef IA', optimiza_ingredientes: 'Optimitza els teus ingredients avui',
-        preparacion: 'Preparació', filtrar: 'FILTRAR', items: 'ITEMS', moderno: 'MODERN'
+        preparacion: 'Preparació', filtrar: 'FILTRAR', items: 'ITEMS', moderno: 'MODERN',
+        preferencias: 'Preferències', solo_premium: 'Només per a Premium', alertas_personalizadas: 'Alertes Personalitzades'
     }
 };
