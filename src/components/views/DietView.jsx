@@ -6,7 +6,14 @@ import { ArrowLeft, Save } from 'lucide-react';
 const DietView = () => {
     const { t, goTo, dietSettings, setDietSettings } = usePantry();
 
-    const dietaryTypes = ['Omnívora', 'Vegetariana', 'Vegana', 'Keto', 'Paleo', 'Gluten Free'];
+    const dietaryTypes = [
+        { id: 'Omnívora', label: 'Omnívora' },
+        { id: 'Vegetariana', label: 'Vegetariana' },
+        { id: 'Vegana', label: t('vegano') },
+        { id: 'Keto', label: t('keto') },
+        { id: 'Paleo', label: 'Paleo' },
+        { id: 'Gluten Free', label: t('sin_gluten') }
+    ];
     const currentType = dietSettings.type || 'Omnívora';
     const currentCalories = dietSettings.dailyCalories || 2000;
 
@@ -16,7 +23,7 @@ const DietView = () => {
                 <motion.button onClick={() => goTo('profile')} style={{ background: 'var(--glass)', border: '1px solid var(--border-color)', color: 'var(--text-main)', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <ArrowLeft size={20} />
                 </motion.button>
-                <h1 style={{ fontSize: '1.25rem', fontWeight: 800 }}>{t('dieta').toUpperCase()}</h1>
+                <h1 style={{ fontSize: '1.25rem', fontWeight: 800 }}>{t('pref_alimentarias').toUpperCase()}</h1>
                 <div style={{ width: '40px' }}></div>
             </header>
 
@@ -25,20 +32,20 @@ const DietView = () => {
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                         {dietaryTypes.map(type => (
                             <motion.button
-                                key={type}
+                                key={type.id}
                                 whileTap={{ scale: 0.95 }}
-                                onClick={() => setDietSettings({ ...dietSettings, type })}
+                                onClick={() => setDietSettings({ ...dietSettings, type: type.id })}
                                 style={{
                                     padding: '1.25rem',
                                     borderRadius: '1.25rem',
-                                    background: currentType === type ? 'var(--primary)' : 'var(--glass)',
-                                    color: currentType === type ? 'white' : 'var(--text-main)',
+                                    background: currentType === type.id ? 'var(--primary)' : 'var(--glass)',
+                                    color: currentType === type.id ? 'white' : 'var(--text-main)',
                                     border: '1px solid var(--border-color)',
                                     fontWeight: 700,
                                     fontSize: '0.85rem'
                                 }}
                             >
-                                {type}
+                                {type.label}
                             </motion.button>
                         ))}
                     </div>

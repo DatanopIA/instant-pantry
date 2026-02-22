@@ -1,10 +1,10 @@
 import React, { useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { usePantry } from '../../lib/PantryContext';
 import { X, Camera, Receipt, Box, Sparkles, Check, Trash2, Plus } from 'lucide-react';
 
 const ScannerView = () => {
-    const { t, goTo, prevView, addProductToInventory } = usePantry();
+    const { goTo, prevView, addProductToInventory } = usePantry();
     const [isScanning, setIsScanning] = useState(false);
     const [scanMode, setScanMode] = useState('ticket'); // 'ticket' or 'fridge'
     const [detectedProducts, setDetectedProducts] = useState(null);
@@ -43,16 +43,29 @@ const ScannerView = () => {
 
     const handleConfirmProducts = async () => {
         const toAdd = detectedProducts.filter(p => p.selected);
+        let addedCount = 0;
+        let limitReached = false;
+
         for (const product of toAdd) {
-            await addProductToInventory({
+            const success = await addProductToInventory({
                 name: product.name,
                 exp: product.exp || 7,
                 icon: product.icon || '📦',
                 status: (product.exp || 7) > 5 ? 'green' : (product.exp || 7) > 2 ? 'yellow' : 'red'
             });
+
+            if (success) {
+                addedCount++;
+            } else {
+                limitReached = true;
+                break;
+            }
         }
-        setDetectedProducts(null);
-        goTo('inventory');
+
+        if (addedCount > 0 || limitReached) {
+            setDetectedProducts(null);
+            goTo('inventory');
+        }
     };
 
     const toggleProductSelection = (index) => {

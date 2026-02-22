@@ -17,13 +17,13 @@ const AIChatView = () => {
                 { id: 'initial', sender: 'bot', text: t('saludo_ia'), time: new Date() }
             ]);
         }
-    }, [language]);
+    }, [language, t, messages.length]);
 
     useEffect(() => {
         if (scrollRef.current) {
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
-    }, [messages, isTyping]);
+    }, [messages.length, t, isTyping]);
 
     const sendMessage = async (overrideText = null) => {
         const text = overrideText || inputText;
@@ -55,7 +55,7 @@ const AIChatView = () => {
             setMessages(prev => [...prev, {
                 id: Date.now() + 1,
                 sender: 'bot',
-                text: data.text || "Lo siento, mi conexión gourmet ha fallado brevemente.",
+                text: data.text || data.error || (language === 'en' ? "Culinary connection lost." : "Conexión culinaria perdida."),
                 time: new Date()
             }]);
         } catch (err) {
@@ -72,7 +72,14 @@ const AIChatView = () => {
     };
 
     return (
-        <div className="container" style={{ paddingBottom: '100px', height: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <div className="container" style={{
+            paddingBottom: '100px',
+            height: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+            background: 'var(--mesh-1), var(--mesh-2), var(--mesh-3), var(--mesh-4)',
+            backgroundAttachment: 'fixed'
+        }}>
             <header className="pt-8 pb-4 flex justify-between items-center">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -82,7 +89,7 @@ const AIChatView = () => {
                         <h1 style={{ fontSize: '1.25rem', fontWeight: 800 }}>CHEF VIRTUAL</h1>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                             <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--status-green)' }}></div>
-                            <span style={{ fontSize: '0.65rem', fontWeight: 700, opacity: 0.6 }}>CONECTADO CON GEMINI 2.0</span>
+                            <span style={{ fontSize: '0.65rem', fontWeight: 700, opacity: 0.6 }}>CONECTADO CON IA INTELIGENTE</span>
                         </div>
                     </div>
                 </div>

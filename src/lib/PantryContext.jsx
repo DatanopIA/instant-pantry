@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from './supabase';
 import { ALL_RECIPES } from './recipes';
 import { translations } from './translations';
@@ -23,7 +23,11 @@ export const PantryProvider = ({ children }) => {
     const [profileImage, setProfileImage] = useState(() => localStorage.getItem('pantry_profile_image'));
     const [isPro, setIsPro] = useState(false);
     const [recipes, setRecipes] = useState([]);
-    const [diet, setDiet] = useState(() => localStorage.getItem('pantry_diet') || 'Omnívora');
+    const [dietSettings, setDietSettings] = useState(() => {
+        const saved = localStorage.getItem('pantry_diet_settings');
+        return saved ? JSON.parse(saved) : { type: 'Omnívora', dailyCalories: 2000 };
+    });
+    const diet = dietSettings.type;
     const [selectedRecipe, setSelectedRecipe] = useState(null);
     const [notificationsEnabled, setNotificationsEnabled] = useState(() => {
         const saved = localStorage.getItem('pantry_notifications');
@@ -53,8 +57,8 @@ export const PantryProvider = ({ children }) => {
     }, [inventory]);
 
     useEffect(() => {
-        localStorage.setItem('pantry_diet', diet);
-    }, [diet]);
+        localStorage.setItem('pantry_diet_settings', JSON.stringify(dietSettings));
+    }, [dietSettings]);
 
     useEffect(() => {
         localStorage.setItem('pantry_notifications', notificationsEnabled);
@@ -62,6 +66,13 @@ export const PantryProvider = ({ children }) => {
             Notification.requestPermission();
         }
     }, [notificationsEnabled]);
+
+    useEffect(() => {
+        if (notificationsEnabled) {
+            // Mock notification setup
+            console.log(t('notificaciones_activadas') || "Notificaciones habilitadas");
+        }
+    }, [notificationsEnabled, t]);
 
     useEffect(() => {
         if (notificationsEnabled && inventory.length > 0) {
@@ -76,13 +87,13 @@ export const PantryProvider = ({ children }) => {
                 });
             }
         }
-    }, [inventory]); // Solo disparamos cuando cambia el inventario
+    }, [inventory, notificationsEnabled, t]); // Escuchar cambios en inventario, permisos y traducciones
 
     useEffect(() => {
         if (!user) return;
         const checkSub = async () => {
             try {
-                const res = await fetch('/api/subscription-status');
+                const res = await fetch(`/api/subscription-status?email=${encodeURIComponent(user.email)}`);
                 const data = await res.json();
                 setIsPro(data.isPro);
             } catch (e) {
@@ -99,13 +110,24 @@ export const PantryProvider = ({ children }) => {
         console.log(`[PantryContext] Filtering recipes for lang: ${currentLang}, diet: ${diet}`);
 
         const filtered = langRecipes.filter(recipe => {
-            if (diet === 'Vegano' && !recipe.tags?.some(t => t.toLowerCase() === 'vegano' || t.toLowerCase() === 'vegan')) return false;
-            if (diet === 'Sin Gluten' && !recipe.tags?.some(t => t.toLowerCase().includes('gluten'))) return false;
-            if (diet === 'Keto' && !recipe.tags?.some(t => t.toLowerCase() === 'keto')) return false;
+            if (diet === 'Omnívora') return true;
+
+            const dietLower = diet.toLowerCase();
+            const tags = (recipe.tags || []).map(t => t.toLowerCase());
+
+            // Lógica de exclusión estricta
+            if (dietLower.includes('vegan') && !tags.some(t => t.includes('vegan'))) return false;
+            if (dietLower.includes('vegetar') && !tags.some(t => t.includes('vegetar') || t.includes('vegan'))) return false;
+            if (dietLower.includes('keto') && !tags.some(t => t.includes('keto'))) return false;
+            if (dietLower.includes('gluten') && !tags.some(t => t.includes('gluten'))) return false;
+            if (dietLower.includes('paleo') && !tags.some(t => t.includes('paleo'))) return false;
+            if (dietLower.includes('lacto') && !tags.some(t => t.includes('lacto'))) return false;
+
             return true;
         });
 
-        setRecipes(filtered.length > 0 ? filtered : langRecipes.slice(0, 5));
+        console.log(`[PantryContext] Filtered: ${filtered.length} recipes match ${diet}`);
+        setRecipes(filtered);
     }, [language, diet]);
 
     const goTo = (newView) => {
@@ -119,7 +141,7 @@ export const PantryProvider = ({ children }) => {
         setView('landing');
     };
 
-    const t = (key, params = {}) => {
+    const t = useCallback((key, params = {}) => {
         const dict = translations[language] || translations['es'] || {};
         let text = dict[key] || translations['es']?.[key] || key;
 
@@ -127,16 +149,22 @@ export const PantryProvider = ({ children }) => {
             text = text.replace(`{${p}}`, params[p]);
         });
         return text;
-    };
+    }, [language]);
 
     const value = {
         user, loading, language, setLanguage, theme, setTheme,
         inventory, setInventory, view, goTo, prevView,
         profileImage, setProfileImage, isPro, setIsPro,
-        recipes, diet, setDiet, logout, t,
+        recipes, dietSettings, setDietSettings, diet, logout, t,
         selectedRecipe, setSelectedRecipe,
         notificationsEnabled, setNotificationsEnabled,
         addProductToInventory: async (product) => {
+            // Check limits for Free users
+            if (!isPro && inventory.length >= 15) {
+                alert(t('limite_superado') || "Has alcanzado el límite de 15 productos. ¡Pásate a Pro para tener inventario ilimitado!");
+                return false;
+            }
+
             const newItem = {
                 id: Date.now() + Math.random(),
                 ...product,
@@ -151,8 +179,32 @@ export const PantryProvider = ({ children }) => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(newItem)
                 });
+                return true;
             } catch (e) {
                 console.error("Error syncing inventory:", e);
+                return true; // Still return true as it's added locally
+            }
+        },
+        deleteProduct: async (id) => {
+            setInventory(prev => prev.filter(item => item.id !== id));
+            try {
+                await fetch(`/api/inventory/${id}`, { method: 'DELETE' });
+            } catch (e) {
+                console.error("Error deleting product:", e);
+            }
+        },
+        toggleFavorite: async (recipeId, currentStatus) => {
+            setRecipes(prev => prev.map(r =>
+                r.id === recipeId ? { ...r, is_favorite: !currentStatus } : r
+            ));
+            try {
+                await fetch(`/api/recipes/${recipeId}/favorite`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ is_favorite: !currentStatus })
+                });
+            } catch (e) {
+                console.error("Error toggling favorite:", e);
             }
         },
         updateProfileImage: (img) => {
@@ -160,34 +212,32 @@ export const PantryProvider = ({ children }) => {
             localStorage.setItem('pantry_profile_image', img);
         },
         upgradeToPro: async () => {
-            if (!user) return;
+            const email = user?.email || 'guest@example.com';
             try {
                 const res = await fetch('/api/create-checkout-session', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        userEmail: user.email,
-                        priceId: 'price_smart_monthly' // Debería coincidir con el ID real de Stripe
+                        userEmail: email,
+                        priceId: 'price_smart_monthly'
                     })
                 });
                 const data = await res.json();
                 if (data.url) {
                     window.location.href = data.url;
-                } else {
-                    // Fallback para demo si no hay Stripe configurado
-                    setIsPro(true);
                 }
             } catch (e) {
                 console.error("Payment error:", e);
+                alert("Error al conectar con Stripe. Verifica tu conexión o configuración.");
                 setIsPro(true);
             }
         }
     };
 
     return (
-        <PantryContext.Provider value={value}>
+        <PantryContext.Provider value={value} >
             {children}
-        </PantryContext.Provider>
+        </PantryContext.Provider >
     );
 };
 
