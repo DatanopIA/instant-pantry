@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePantry } from '../../lib/PantryContext';
 import { apiFetch } from '../../lib/api';
