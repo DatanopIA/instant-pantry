@@ -27,7 +27,7 @@ const AIChatView = () => {
 
     const sendMessage = async (overrideText = null) => {
         const text = overrideText || inputText;
-        if (!text.trim()) return;
+        if (!text.trim() || isTyping) return;
 
         const newMessage = { id: Date.now(), sender: 'user', text, time: new Date() };
         setMessages(prev => [...prev, newMessage]);
@@ -177,9 +177,10 @@ const AIChatView = () => {
                 ].map((chip) => (
                     <motion.button
                         key={chip.text}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => sendMessage(chip.text)}
+                        whileHover={!isTyping ? { scale: 1.05 } : {}}
+                        whileTap={!isTyping ? { scale: 0.95 } : {}}
+                        onClick={() => !isTyping && sendMessage(chip.text)}
+                        disabled={isTyping}
                         style={{
                             flexShrink: 0,
                             padding: '0.6rem 1rem',
@@ -207,7 +208,8 @@ const AIChatView = () => {
                         value={inputText}
                         onChange={(e) => setInputText(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                        placeholder={t('preguntar_ia')}
+                        placeholder={isTyping ? "Chef Virtual está cocinando una respuesta..." : t('preguntar_ia')}
+                        disabled={isTyping}
                         style={{
                             width: '100%',
                             padding: '1.25rem 4rem 1.25rem 1.5rem',
@@ -217,13 +219,16 @@ const AIChatView = () => {
                             color: 'var(--text-main)',
                             outline: 'none',
                             fontSize: '1rem',
-                            backdropFilter: 'blur(20px)'
+                            backdropFilter: 'blur(20px)',
+                            opacity: isTyping ? 0.6 : 1,
+                            cursor: isTyping ? 'wait' : 'text'
                         }}
                     />
                     <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
+                        whileHover={!isTyping ? { scale: 1.1 } : {}}
+                        whileTap={!isTyping ? { scale: 0.9 } : {}}
                         onClick={() => sendMessage()}
+                        disabled={isTyping}
                         style={{
                             position: 'absolute',
                             right: '8px',
@@ -236,7 +241,8 @@ const AIChatView = () => {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            cursor: 'pointer'
+                            cursor: isTyping ? 'not-allowed' : 'pointer',
+                            opacity: isTyping ? 0.5 : 1
                         }}
                     >
                         <Send size={20} />

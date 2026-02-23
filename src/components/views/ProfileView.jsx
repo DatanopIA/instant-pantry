@@ -22,7 +22,8 @@ const ProfileView = () => {
         updateProfileImage,
         notificationsEnabled,
         setNotificationsEnabled,
-        user
+        user,
+        manageSubscription
     } = usePantry();
 
     const [showHelpModal, setShowHelpModal] = useState(false);
@@ -231,6 +232,16 @@ const ProfileView = () => {
                         </div>
                     </div>
                 </motion.div>
+                {isPro && (
+                    <div style={{ marginTop: '1rem' }}>
+                        <MenuItem
+                            icon={<CreditCard />}
+                            label={t('gestionar_suscripcion') || 'Gestionar Suscripción'}
+                            value={t('cancelar_o_cambiar') || 'Portal de pagos de Stripe'}
+                            onClick={manageSubscription}
+                        />
+                    </div>
+                )}
             </header>
 
             {!isPro && (

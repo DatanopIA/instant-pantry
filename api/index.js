@@ -1,25 +1,125 @@
 import express from 'express';
 import cors from 'cors';
+import { rateLimit } from 'express-rate-limit';
 import db from './db.js';
 import { supabase } from './supabaseClient.js';
 import dotenv from 'dotenv';
 import Stripe from 'stripe';
-
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { z } from 'zod';
+import DOMPurify from 'dompurify';
+import { JSDOM } from 'jsdom';
+
+const window = new JSDOM('').window;
+const purify = DOMPurify(window);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-dotenv.config({ path: path.join(__dirname, '.env') });
+dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
-app.use(cors());
+const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'https://instant-pantry.vercel.app',
+    'https://instant-pantry-pro.vercel.app'
+];
 
-// Webhook endpoint must stay ABOVE express.json() to get raw body
+app.use(cors({
+    origin: function (origin, callback) {
+        // Permitir peticiones sin origen (como apps móviles o curl)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) === -1) {
+            const msg = 'La política de CORS de este sitio no permite el acceso desde el origen especificado.';
+            return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
+
+// --- MIDDLEWARE DE AUTENTICACIÓN ---
+const authenticate = async (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return next();
+
+    const token = authHeader.split(' ')[1];
+    try {
+        const { data: { user }, error } = await supabase.auth.getUser(token);
+        if (!error && user) req.user = user;
+    } catch (e) {
+        console.error("Auth error:", e);
+    }
+    next();
+};
+
+// --- ESQUEMAS DE VALIDACIÓN (ZOD) ---
+const inventorySchema = z.object({
+    name: z.string().min(1, "El nombre es obligatorio").max(100, "Nombre demasiado largo"),
+    exp: z.number().int().min(0, "La expiración no puede ser negativa").max(3650, "Expiración demasiado lejana"),
+    icon: z.string().emoji("Debe ser un emoji").or(z.string().length(0)).optional().default("📦"),
+    status: z.enum(['green', 'yellow', 'red']).optional().default('green'),
+    user_email: z.string().email("Email inválido").optional()
+});
+
+const chatSchema = z.object({
+    text: z.string().min(1, "El mensaje no puede estar vacío").max(1000, "Mensaje demasiado largo"),
+    history: z.array(z.object({
+        sender: z.enum(['user', 'ai', 'model']),
+        text: z.string()
+    })).default([]),
+    inventory: z.array(z.any()).optional().default([]),
+    dietSettings: z.object({
+        type: z.string().optional()
+    }).optional().default({}),
+    language: z.string().length(2).optional().default('es')
+});
+
+// Utility para respuestas de error estandarizadas
+const sendError = (res, error, publicMessage = "Error interno del servidor", statusCode = 500) => {
+    console.error(`[INTERNAL ERROR]:`, error); // Log completo para el desarrollador
+    res.status(statusCode).json({
+        error: process.env.NODE_ENV === 'production' ? publicMessage : error.message
+    });
+};
+
+const validate = (schema) => (req, res, next) => {
+    try {
+        req.body = schema.parse(req.body);
+        next();
+    } catch (error) {
+        return res.status(400).json({
+            error: "Error de validación de datos",
+            details: error.errors.map(e => `${e.path.join('.')}: ${e.message}`)
+        });
+    }
+};
+
+// --- CONFIGURACIÓN DE RATE LIMITING ---
+const generalLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutos
+    limit: 100, // 100 peticiones por ventana
+    message: { error: "Demasiadas peticiones. Por favor, inténtalo de nuevo en 15 minutos." },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+const aiLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hora
+    limit: 20, // 20 consultas por hora (ajustable según tier)
+    message: { error: "Has alcanzado el límite de consultas de IA por hora." },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+// Webhook endpoint (Mandatory signature in prod)
 app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
     const sig = req.headers['stripe-signature'];
     const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -27,13 +127,19 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
     let event;
 
     try {
-        if (stripe && endpointSecret && sig) {
+        if (!stripe) throw new Error("Stripe not configured");
+
+        if (endpointSecret && sig) {
             event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
-        } else {
-            // Mock or Manual update if keys are missing
-            console.log("⚠️ No Stripe Webhook Secret or Signature - Using manual test mode");
+        } else if (process.env.NODE_ENV !== 'production' && !endpointSecret) {
+            // Solo permitir el bypass en desarrollo local si NO hay secreto configurado.
+            // Si hay secreto y falla la firma, el constructor de arriba lanzará error.
+            console.warn("⚠️ MODO DESARROLLO: Procesando webhook sin verificación de firma.");
             const body = JSON.parse(req.body.toString());
             event = { type: body.type, data: body.data };
+        } else {
+            // En producción o si hay secreto configurado, la firma es obligatoria.
+            throw new Error("Firma de Stripe ausente o secreto de webhook no configurado.");
         }
     } catch (err) {
         console.error(`Webhook Error: ${err.message}`);
@@ -48,11 +154,11 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
         console.log(`💰 Payment confirmed for ${email}. Upgrading to ${tier}.`);
 
         try {
-            // First try Supabase if available
-            if (supabase) {
-                await supabase.from('users').upsert({ email, tier, updated_at: new Date() });
-            }
-            db.prepare('INSERT OR REPLACE INTO users (email, tier) VALUES (?, ?)').run(email, tier);
+            await supabase.from('users').upsert({
+                email,
+                tier,
+                updated_at: new Date().toISOString()
+            }, { onConflict: 'email' });
         } catch (error) {
             console.error('Database update error:', error);
         }
@@ -63,181 +169,132 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
+app.use(authenticate);
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-console.log('API Status: Gemini Key', GEMINI_API_KEY ? 'is present' : 'is missing');
 
-// --- INVENTORY ENDPOINTS ---
+// --- API ROUTES ---
 
-app.get('/api/inventory', async (req, res) => {
+app.get('/api/inventory', generalLimiter, async (req, res) => {
+    // Blindaje de privacidad: Ignorar email de query, usar solo el del token autenticado
+    const userEmail = req.user?.email;
+
+    if (!userEmail) {
+        return res.status(401).json({ error: "No autorizado. Inicie sesión para ver su inventario." });
+    }
     try {
-        if (supabase) {
-            const { data, error } = await supabase.from('inventory').select('*').order('exp', { ascending: true });
-            if (!error && data) return res.json(data);
-        }
-        const items = db.prepare('SELECT * FROM inventory ORDER BY exp ASC').all();
-        res.json(items);
+        const { data, error } = await supabase
+            .from('inventory')
+            .select('*')
+            .eq('user_email', userEmail)
+            .order('exp', { ascending: true });
+
+        if (error) throw error;
+        res.json(data || []);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        sendError(res, error, "No se pudo recuperar el inventario");
     }
 });
 
-app.post('/api/inventory', async (req, res) => {
+app.post('/api/inventory', generalLimiter, validate(inventorySchema), async (req, res) => {
     const { name, exp, icon, status } = req.body;
+    const email = req.user?.email;
+
+    if (!email) {
+        return res.status(401).json({ error: "No autorizado" });
+    }
+
     try {
-        if (supabase) {
-            const { data, error } = await supabase.from('inventory').insert([{ name, exp, icon, status: status || 'green' }]).select();
-            if (!error && data) return res.json(data[0]);
+        const { data, error } = await supabase
+            .from('inventory')
+            .insert([{ name, exp, icon, status: status || 'green', user_email: email }])
+            .select();
+
+        if (error) throw error;
+        res.json(data[0]);
+    } catch (error) {
+        sendError(res, error, "No se pudo añadir el item al inventario");
+    }
+});
+
+app.delete('/api/inventory/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const { error } = await supabase.from('inventory').delete().eq('id', id);
+        if (error) throw error;
+
+        if (process.env.NODE_ENV !== 'production') {
+            try {
+                db.prepare('DELETE FROM inventory WHERE id = ?').run(id);
+            } catch (e) {
+                console.error("Local DB sync error:", e);
+            }
         }
-        const info = db.prepare('INSERT INTO inventory (name, exp, icon, status) VALUES (?, ?, ?, ?)').run(name, exp, icon, status || 'green');
-        res.json({ id: info.lastInsertRowid, name, exp, icon, status });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-app.delete('/api/inventory/:id', (req, res) => {
-    try {
-        db.prepare('DELETE FROM inventory WHERE id = ?').run(req.params.id);
         res.json({ success: true });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        sendError(res, error, "No se pudo eliminar el item del inventario");
     }
 });
 
-// --- RECIPES ENDPOINTS ---
+// --- AI INTELLIGENCE ---
 
-app.get('/api/recipes', (req, res) => {
-    try {
-        const recipes = db.prepare('SELECT * FROM recipes').all();
-        const formattedRecipes = recipes.map(r => ({
-            ...r,
-            tags: r.tags ? JSON.parse(r.tags) : [],
-            ingredients: r.ingredients ? JSON.parse(r.ingredients) : [],
-            steps: r.steps ? JSON.parse(r.steps) : []
-        }));
-        res.json(formattedRecipes);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
+app.post('/api/ai/chat', aiLimiter, validate(chatSchema), async (req, res) => {
+    const { text, history, inventory = [], dietSettings = {}, language = 'es' } = req.body;
 
-app.patch('/api/recipes/:id/favorite', (req, res) => {
-    const { is_favorite } = req.body;
-    try {
-        db.prepare('UPDATE recipes SET is_favorite = ? WHERE id = ?').run(is_favorite ? 1 : 0, req.params.id);
-        res.json({ success: true, is_favorite });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// --- CHAT ENDPOINTS ---
-
-app.get('/api/messages', (req, res) => {
-    try {
-        const messages = db.prepare('SELECT * FROM messages ORDER BY timestamp ASC').all();
-        res.json(messages);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-app.post('/api/messages', (req, res) => {
-    const { text, sender } = req.body;
-    try {
-        db.prepare('INSERT INTO messages (text, sender) VALUES (?, ?)').run(text, sender);
-        res.json({ success: true });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Real AI Chat Endpoint with Gemini
-app.post('/api/ai/chat', async (req, res) => {
-    const { text, history, inventory = [], recipes = [], dietSettings = {}, language = 'es' } = req.body;
-    console.log('Chat request received:', text, 'Language:', language);
-
-    if (!GEMINI_API_KEY || GEMINI_API_KEY === 'TU_API_KEY_AQUI_GEMINI') {
-        return res.json({
-            text: language === 'es'
-                ? "⚠️ [MODO DEMO] Hola, para activar mi inteligencia completa, por favor introduce una GEMINI_API_KEY válida."
-                : language === 'en'
-                    ? "⚠️ [DEMO MODE] Hello, to activate my full intelligence, please provide a valid GEMINI_API_KEY."
-                    : "⚠️ [MODE DEMO] Hola, per activar la meva intel·ligència completa, si us plau introdueix una GEMINI_API_KEY vàlida."
-        });
+    if (!GEMINI_API_KEY) {
+        return res.json({ text: "⚠️ IA no configurada. Configure GEMINI_API_KEY." });
     }
 
     try {
-        const inventoryContext = inventory.map(i => `${i.name} (vence en ${i.exp} días)`).join(', ');
-        const recipesContext = recipes.map(r => r.title).join(', ');
+        const inventoryContext = inventory.slice(0, 20).map(i => `${i.name} (vence en ${i.exp} días)`).join(', ');
         const dietType = dietSettings.type || 'Omnívora';
 
-        const systemPrompt = `Eres el "Chef de Casa" de Instant Pantry. Tu personalidad es cálida, entusiasta y muy humana.
+        const systemPrompt = `Eres el "Chef de Casa" de Instant Pantry. Personalidad: Cálida, experta y eficiente.
+        Misión: Minimizar el desperdicio (Zero Waste) y maximizar el sabor.
         
-        Sigue estas instrucciones estrictamente:
-        1. RESPONDE SIEMPRE EN EL IDIOMA: ${language === 'es' ? 'Español' : language === 'en' ? 'Inglés' : 'Catalán'}.
-        2. Tienes en cuenta las PREFERENCIAS DIETÉTICAS del usuario: ${dietType}. 
-           - Si el usuario es vegetariano o vegano, no sugieras carne.
-           - Si el usuario tiene alergias o dietas especiales (Keto, Gluten Free), tómalas en cuenta.
-        3. NO SEAS ROBÓTICO: Usa expresiones naturales como "¡Vaya!", "¡Qué buena pinta!".
-        4. BREVEDAD Y DIÁLOGO: Tus respuestas iniciales deben ser cortas (máximo 2-3 frases). Termina SIEMPRE con una pregunta abierta.
-        5. ZERO WASTE: Tu misión es que no se tire nada. Menciona productos próximos a caducar.
-        6. CONTEXTO ACTUAL:
-           - DESPENSA: ${inventoryContext}
-           - RECETAS PERSONALIZADAS: ${recipesContext}
-        7. Si el usuario te saluda, dile algo como: "¡Hola! Qué alegría verte. He estado echando un ojo a tu nevera y tienes cosas interesantes. ¿Cocinamos algo rico?".`;
+        Reglas:
+        1. Idioma: ${language}.
+        2. Dieta: ${dietType}. No sugerir ingredientes incompatibles.
+        3. Estilo: Breve (máximo 3 frases) y dialógico. Termina siempre con pregunta útil.
+        4. Contexto: Despensa actual: ${inventoryContext}. Prioriza ingredientes por caducar.
+        5. No eres un bot genérico, eres un asistente culinario personal.`;
 
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                system_instruction: {
-                    parts: [{ text: systemPrompt }]
-                },
+                system_instruction: { parts: [{ text: systemPrompt }] },
                 contents: [
-                    ...history.slice(-10).map(m => ({
+                    ...history.slice(-6).map(m => ({
                         role: m.sender === 'user' ? 'user' : 'model',
                         parts: [{ text: m.text }]
-                    })).filter(m => m.parts[0].text), // Asegurar que no hay textos vacíos
+                    })).filter(m => m.parts[0].text),
                     { role: 'user', parts: [{ text }] }
                 ]
             })
         });
 
         const data = await response.json();
-
-        if (data.error) {
-            console.error('Gemini API Error details:', data.error);
-
-            // Handle leaked API key error specifically
-            if (data.error.message && data.error.message.includes('leaked')) {
-                const leakedMsg = {
-                    es: "⚠️ [ERROR CRÍTICO] Tu clave de API de Gemini ha sido filtrada y bloqueada por seguridad. Por favor, genera una nueva en Google AI Studio (https://aistudio.google.com/) y actualiza el archivo .env.",
-                    en: "⚠️ [CRITICAL ERROR] Your Gemini API key has been leaked and blocked for security. Please generate a new one at Google AI Studio (https://aistudio.google.com/) and update your .env file.",
-                    ca: "⚠️ [ERROR CRÍTIC] La teva clau d'API de Gemini ha estat filtrada i bloquejada per seguretat. Si us plau, genera una de nova a Google AI Studio (https://aistudio.google.com/) i actualitza el fitxer .env."
-                };
-                return res.json({ text: leakedMsg[language] || leakedMsg['es'] });
-            }
-
-            return res.json({ text: `⚠️ Error: ${data.error.message}` });
+        // Verificación de estructura de respuesta de Gemini con defensa en profundidad
+        let rawAiText = "";
+        if (data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
+            rawAiText = data.candidates[0].content.parts[0].text;
+        } else {
+            console.error("Estructura de respuesta de IA inesperada:", JSON.stringify(data));
+            rawAiText = "Lo siento, mi conexión culinaria ha fallado. ¿Podemos intentarlo de nuevo?";
         }
 
-        const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text ||
-            (language === 'en' ? "Sorry, my culinary connection failed. Shall we try again?" :
-                language === 'ca' ? "Ho sento, la meva connexió culinària ha fallat. Ho provem de nou?" :
-                    "Lo siento, mi conexión culinaria ha fallado un momento. ¿Podemos intentarlo de nuevo?");
+        // Sanitización Anti-XSS antes de enviar al cliente
+        const safeAiText = purify.sanitize(rawAiText);
 
-        res.json({ text: aiText });
+        res.json({ text: safeAiText });
     } catch (error) {
-        console.error('Gemini Error:', error);
-        res.status(500).json({ error: "Error conectando con la IA" });
+        sendError(res, error, "Error procesando la consulta de IA");
     }
 });
 
-// Real Vision Endpoint (OCR & Fridge Analysis)
 app.post('/api/ai/analyze-image', async (req, res) => {
-    const { image, mode } = req.body; // image as base64
+    const { image, mode } = req.body;
 
     if (!GEMINI_API_KEY) {
         return res.status(500).json({ error: "API Key missing" });
@@ -245,8 +302,8 @@ app.post('/api/ai/analyze-image', async (req, res) => {
 
     try {
         const prompt = mode === 'ticket'
-            ? "Eres un sistema OCR experto en tickets de supermercado. Extrae una lista de productos alimentarios de este ticket. Devuelve SOLO un array JSON de objetos con {name: string, exp: number (estimado de días para vencer), icon: string (emoji)}. Ejemplo: [{\"name\": \"Leche\", \"exp\": 7, \"icon\": \"🥛\"}]"
-            : "Eres un experto en visión artificial para cocina. Analiza esta imagen de una nevera o despensa e identifica los alimentos visibles. Devuelve SOLO un array JSON de objetos con {name: string, exp: number (estimado de días para vencer), icon: string (emoji)}. Ejemplo: [{\"name\": \"Manzanas\", \"exp\": 14, \"icon\": \"🍎\"}]";
+            ? "Extrae PRODUCTOS ALIMENTARIOS de este ticket. Devuelve SOLO un array JSON: [{\"name\": \"Producto\", \"exp\": 7, \"icon\": \"🍎\"}]"
+            : "Identifica alimentos en esta imagen de nevera. Devuelve SOLO un array JSON: [{\"name\": \"Alimento\", \"exp\": 14, \"icon\": \"🥦\"}]";
 
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
@@ -255,106 +312,85 @@ app.post('/api/ai/analyze-image', async (req, res) => {
                 contents: [{
                     parts: [
                         { text: prompt },
-                        {
-                            inline_data: {
-                                mime_type: "image/jpeg",
-                                data: image.includes(',') ? image.split(',')[1] : image // Robust handling of base64
-                            }
-                        }
+                        { inline_data: { mime_type: "image/jpeg", data: image.includes(',') ? image.split(',')[1] : image } }
                     ]
                 }],
-                generationConfig: {
-                    response_mime_type: "application/json",
-                }
+                generationConfig: { response_mime_type: "application/json" }
             })
         });
 
         const data = await response.json();
-        const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || "[]";
-
-        // Ensure it's valid JSON
-        let products = [];
-        try {
-            products = JSON.parse(aiResponse);
-        } catch (e) {
-            console.error("Failed to parse AI JSON:", aiResponse);
-            // Fallback: search for something that looks like an array in the text
-            const match = aiResponse.match(/\[.*\]/s);
-            if (match) products = JSON.parse(match[0]);
-        }
-
+        const products = JSON.parse(data.candidates?.[0]?.content?.parts?.[0]?.text || "[]");
         res.json({ products });
     } catch (error) {
-        console.error('Gemini Vision Error:', error);
-        res.status(500).json({ error: "Error procesando la imagen" });
+        sendError(res, error, "Error analizando la imagen");
     }
 });
 
-// --- USER & SUBSCRIPTION ENDPOINTS ---
-
-app.get('/api/subscription/:email', (req, res) => {
-    const { email } = req.params;
-    try {
-        const user = db.prepare('SELECT tier FROM users WHERE email = ?').get(email);
-        res.json({ tier: user ? user.tier : 'free' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
+// --- SUBSCRIPTIONS & STRIPE ---
 
 app.get('/api/subscription-status', async (req, res) => {
-    const { email } = req.query;
+    const email = req.user?.email;
+    if (!email) return res.json({ isPro: false });
+
     try {
-        if (supabase) {
-            const { data, error } = await supabase.from('users').select('tier').eq('email', email).single();
-            if (!error && data) return res.json({ isPro: data.tier === 'pro' });
-        }
-        const user = db.prepare('SELECT tier FROM users WHERE email = ?').get(email);
-        res.json({ isPro: user ? user.tier === 'pro' : false });
+        const { data, error } = await supabase.from('users').select('tier').eq('email', email).maybeSingle();
+        if (error) throw error;
+        res.json({ isPro: data?.tier === 'pro' || data?.tier === 'enterprise' });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        sendError(res, error, "Error obteniendo estado de suscripción");
     }
 });
 
-// --- STRIPE PAYMENTS ENDPOINTS ---
-
 app.post('/api/create-checkout-session', async (req, res) => {
-    const { priceId, userEmail } = req.body;
+    const { priceId, userEmail, tier = 'pro' } = req.body;
 
-    if (!stripe) {
-        return res.status(500).json({ error: "Stripe no está configurado. Añade STRIPE_SECRET_KEY en el servidor." });
-    }
+    if (!stripe) return res.status(500).json({ error: "Stripe missing" });
 
     try {
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
-            line_items: [
-                {
-                    price: process.env.STRIPE_PRICE_ID || priceId || 'price_smart_monthly',
-                    quantity: 1,
-                },
-            ],
+            line_items: [{
+                price: priceId || process.env.STRIPE_PRICE_ID,
+                quantity: 1,
+            }],
             mode: 'subscription',
-            success_url: `${req.headers.origin}/?session_id={CHECKOUT_SESSION_ID}&status=success`,
-            cancel_url: `${req.headers.origin}/?status=cancel`,
+            success_url: `${req.headers.origin}/profile?session_id={CHECKOUT_SESSION_ID}&status=success`,
+            cancel_url: `${req.headers.origin}/profile?status=cancel`,
             customer_email: userEmail,
-            metadata: {
-                user_tier: 'pro'
-            }
+            metadata: { user_tier: tier }
         });
 
         res.json({ url: session.url });
     } catch (error) {
-        console.error('Stripe Session Error:', error);
-        res.status(500).json({ error: error.message });
+        sendError(res, error, "Error creando sesión de pago");
     }
 });
 
-// Para despliegue local (opcional)
+app.post('/api/create-portal-session', async (req, res) => {
+    const { userEmail } = req.body;
+    if (!stripe) return res.status(500).json({ error: "Stripe missing" });
+
+    try {
+        // Search for customer by email
+        const customers = await stripe.customers.list({ email: userEmail, limit: 1 });
+        if (customers.data.length === 0) {
+            return res.status(404).json({ error: "Customer not found in Stripe" });
+        }
+
+        const session = await stripe.billingPortal.sessions.create({
+            customer: customers.data[0].id,
+            return_url: `${req.headers.origin}/profile`,
+        });
+
+        res.json({ url: session.url });
+    } catch (error) {
+        sendError(res, error, "Error al acceder al portal de gestión");
+    }
+});
+
 if (process.env.NODE_ENV !== 'production') {
-    app.listen(PORT, () => {
-        console.log(`Server running at http://localhost:${PORT}`);
-    });
+    app.listen(PORT, () => console.log(`Stable API running at http://localhost:${PORT}`));
 }
 
 export default app;

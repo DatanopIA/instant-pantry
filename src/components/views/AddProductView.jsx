@@ -4,20 +4,29 @@ import { usePantry } from '../../lib/PantryContext';
 import { ArrowLeft, Save, Plus } from 'lucide-react';
 
 const AddProductView = () => {
-    const { t, goTo, addProductToInventory } = usePantry();
+    const { goTo, addProductToInventory } = usePantry();
+    const [isLoading, setIsLoading] = useState(false);
     const [name, setName] = useState('');
     const [exp, setExp] = useState(7);
     const [icon, setIcon] = useState('🍎');
 
     const handleSave = async () => {
-        if (!name.trim()) return;
-        await addProductToInventory({
-            name,
-            exp: parseInt(exp),
-            icon,
-            status: exp > 5 ? 'green' : exp > 2 ? 'yellow' : 'red'
-        });
-        goTo('inventory');
+        if (!name.trim() || isLoading) return;
+        setIsLoading(true);
+        try {
+            await addProductToInventory({
+                name,
+                exp: parseInt(exp),
+                icon,
+                status: exp > 5 ? 'green' : exp > 2 ? 'yellow' : 'red'
+            });
+            goTo('inventory');
+        } catch (error) {
+            console.error("Error saving product:", error);
+            // Podríamos añadir un toast o mensaje de error aquí
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const icons = ['🍎', '🥦', '🥩', '🥚', '🥛', '🍞', '🧀', '🍗', '🥬', '🍫'];
@@ -73,13 +82,33 @@ const AddProductView = () => {
                 </Section>
 
                 <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    whileHover={!isLoading ? { scale: 1.02 } : {}}
+                    whileTap={!isLoading ? { scale: 0.98 } : {}}
                     onClick={handleSave}
+                    disabled={isLoading}
                     className="btn-primary"
-                    style={{ padding: '1.25rem', borderRadius: '1.5rem', fontWeight: 800, fontSize: '1rem', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginTop: '1rem' }}
+                    style={{
+                        padding: '1.25rem',
+                        borderRadius: '1.5rem',
+                        fontWeight: 800,
+                        fontSize: '1rem',
+                        border: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '10px',
+                        marginTop: '1rem',
+                        opacity: isLoading ? 0.7 : 1,
+                        cursor: isLoading ? 'not-allowed' : 'pointer'
+                    }}
                 >
-                    <Save size={20} /> GUARDAR EN DESPENSA
+                    {isLoading ? (
+                        <div className="dot-animate" style={{ fontSize: '1.2rem' }}>...</div>
+                    ) : (
+                        <>
+                            <Save size={20} /> GUARDAR EN DESPENSA
+                        </>
+                    )}
                 </motion.button>
             </div>
         </div>

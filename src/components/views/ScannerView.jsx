@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { usePantry } from '../../lib/PantryContext';
+import { apiFetch } from '../../lib/api';
 import { X, Camera, Receipt, Box, Sparkles, Check, Trash2, Plus } from 'lucide-react';
 
 const ScannerView = () => {
@@ -10,6 +11,36 @@ const ScannerView = () => {
     const [detectedProducts, setDetectedProducts] = useState(null);
     const scanInputRef = useRef(null);
 
+    const resizeImage = (base64Str, maxWidth = 1024, maxHeight = 1024) => {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.src = base64Str;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > maxWidth) {
+                        height *= maxWidth / width;
+                        width = maxWidth;
+                    }
+                } else {
+                    if (height > maxHeight) {
+                        width *= maxHeight / height;
+                        height = maxHeight;
+                    }
+                }
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                // Comprimir a JPEG al 80% de calidad
+                resolve(canvas.toDataURL('image/jpeg', 0.8));
+            };
+        });
+    };
+
     const handleScanImage = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -17,14 +48,15 @@ const ScannerView = () => {
         setIsScanning(true);
         const reader = new FileReader();
         reader.onloadend = async () => {
-            const base64Image = reader.result;
+            const originalBase64 = reader.result;
             try {
-                const res = await fetch('/api/ai/analyze-image', {
+                // Optimización: Redimensionar y comprimir antes de enviar a la IA
+                const compressedBase64 = await resizeImage(originalBase64);
+
+                const data = await apiFetch('/api/ai/analyze-image', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ image: base64Image, mode: scanMode })
+                    body: JSON.stringify({ image: compressedBase64, mode: scanMode })
                 });
-                const data = await res.json();
 
                 if (data.products && data.products.length > 0) {
                     setDetectedProducts(data.products.map(p => ({ ...p, selected: true })));
@@ -41,30 +73,38 @@ const ScannerView = () => {
         reader.readAsDataURL(file);
     };
 
+    const [isConfirming, setIsConfirming] = useState(false);
+
     const handleConfirmProducts = async () => {
-        const toAdd = detectedProducts.filter(p => p.selected);
-        let addedCount = 0;
-        let limitReached = false;
+        if (isConfirming) return;
+        setIsConfirming(true);
+        try {
+            const toAdd = detectedProducts.filter(p => p.selected);
+            let addedCount = 0;
+            let limitReached = false;
 
-        for (const product of toAdd) {
-            const success = await addProductToInventory({
-                name: product.name,
-                exp: product.exp || 7,
-                icon: product.icon || '📦',
-                status: (product.exp || 7) > 5 ? 'green' : (product.exp || 7) > 2 ? 'yellow' : 'red'
-            });
+            for (const product of toAdd) {
+                const success = await addProductToInventory({
+                    name: product.name,
+                    exp: product.exp || 7,
+                    icon: product.icon || '📦',
+                    status: (product.exp || 7) > 5 ? 'green' : (product.exp || 7) > 2 ? 'yellow' : 'red'
+                });
 
-            if (success) {
-                addedCount++;
-            } else {
-                limitReached = true;
-                break;
+                if (success) {
+                    addedCount++;
+                } else {
+                    limitReached = true;
+                    break;
+                }
             }
-        }
 
-        if (addedCount > 0 || limitReached) {
-            setDetectedProducts(null);
-            goTo('inventory');
+            if (addedCount > 0 || limitReached) {
+                setDetectedProducts(null);
+                goTo('inventory');
+            }
+        } finally {
+            setIsConfirming(false);
         }
     };
 
@@ -283,9 +323,21 @@ const ScannerView = () => {
                             </button>
                             <button
                                 onClick={handleConfirmProducts}
-                                style={{ flex: 2, padding: '1.2rem', borderRadius: '1.5rem', background: 'var(--primary)', color: '#fff', border: 'none', fontWeight: 900, cursor: 'pointer', boxShadow: '0 10px 30px rgba(var(--primary-rgb), 0.3)' }}
+                                disabled={isConfirming}
+                                style={{
+                                    flex: 2,
+                                    padding: '1.2rem',
+                                    borderRadius: '1.5rem',
+                                    background: 'var(--primary)',
+                                    color: '#fff',
+                                    border: 'none',
+                                    fontWeight: 900,
+                                    cursor: isConfirming ? 'not-allowed' : 'pointer',
+                                    boxShadow: '0 10px 30px rgba(var(--primary-rgb), 0.3)',
+                                    opacity: isConfirming ? 0.7 : 1
+                                }}
                             >
-                                AÑADIR SELECCIONADOS ({detectedProducts.filter(p => p.selected).length})
+                                {isConfirming ? 'AÑADIENDO...' : `AÑADIR SELECCIONADOS (${detectedProducts.filter(p => p.selected).length})`}
                             </button>
                         </div>
                     </motion.div>
