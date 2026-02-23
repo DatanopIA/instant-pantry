@@ -4,14 +4,19 @@ import { usePantry } from '../../lib/PantryContext';
 import { Sparkles, Clock, Flame, ChevronRight, Apple, Zap } from 'lucide-react';
 
 const HomeView = () => {
-    const { t, goTo, profileImage, inventory, recipes, setSelectedRecipe, theme } = usePantry();
+    const { t, goTo, profileImage, inventory, recipes, setSelectedRecipe, theme, checkRecipeIngredients } = usePantry();
 
     const urgentItems = inventory
         .filter(item => item.exp <= 3)
         .sort((a, b) => a.exp - b.exp)
         .slice(0, 3);
 
-    const suggestedRecipes = recipes.slice(0, 2);
+    const recipesWithMatch = recipes.map(r => ({
+        ...r,
+        comparison: checkRecipeIngredients(r.ingredients)
+    })).sort((a, b) => b.comparison.match - a.comparison.match);
+
+    const suggestedRecipes = recipesWithMatch.slice(0, 5);
 
     return (
         <div className="container" style={{ paddingBottom: '120px' }}>
@@ -134,18 +139,38 @@ const HomeView = () => {
                 </div>
 
                 <div className="carousel-container hide-scrollbar">
-                    {recipes.slice(0, 5).map((recipe, index) => (
+                    {suggestedRecipes.map((recipe, index) => (
                         <motion.div
                             key={recipe.id}
                             className="carousel-item"
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.4 + (index * 0.1) }}
+                            style={{ position: 'relative' }}
                             onClick={() => {
                                 setSelectedRecipe(recipe);
                                 goTo('recipe-detail');
                             }}
                         >
+                            {index === 0 && (
+                                <div style={{
+                                    position: 'absolute',
+                                    top: '12px',
+                                    left: '12px',
+                                    zIndex: 10,
+                                    background: 'var(--terrakotta)',
+                                    color: 'white',
+                                    padding: '4px 10px',
+                                    borderRadius: '20px',
+                                    fontSize: '0.55rem',
+                                    fontWeight: 900,
+                                    letterSpacing: '1px',
+                                    boxShadow: '0 4px 12px rgba(188, 108, 37, 0.4)',
+                                    textTransform: 'uppercase'
+                                }}>
+                                    TOP PICK
+                                </div>
+                            )}
                             <div className="premium-card" style={{ padding: 0, height: '300px', display: 'flex', flexDirection: 'column' }}>
                                 <div style={{ height: '65%', position: 'relative', overflow: 'hidden' }}>
                                     <img
@@ -161,7 +186,20 @@ const HomeView = () => {
                                     </div>
                                 </div>
                                 <div style={{ padding: '1.25rem', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                                    <h3 style={{ fontSize: '1.15rem', marginBottom: '8px', lineHeight: 1.2 }}>{recipe.title}</h3>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                                        <h3 style={{ fontSize: '1.15rem', lineHeight: 1.2, margin: 0 }}>{recipe.title}</h3>
+                                        <div style={{
+                                            background: recipe.comparison.match === 100 ? 'rgba(74, 222, 128, 0.2)' : 'rgba(188, 108, 37, 0.1)',
+                                            padding: '2px 8px',
+                                            borderRadius: '6px',
+                                            fontSize: '0.6rem',
+                                            fontWeight: 800,
+                                            color: recipe.comparison.match === 100 ? 'var(--status-green)' : 'var(--terrakotta)',
+                                            border: `1px solid ${recipe.comparison.match === 100 ? 'rgba(74, 222, 128, 0.3)' : 'rgba(188, 108, 37, 0.2)'}`
+                                        }}>
+                                            {recipe.comparison.match === 100 ? 'READY' : `${Math.round(recipe.comparison.match)}%`}
+                                        </div>
+                                    </div>
                                     <div style={{ display: 'flex', gap: '15px', fontSize: '0.75rem', opacity: 0.6, fontWeight: 700 }}>
                                         <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                                             <Clock size={14} /> {recipe.time}

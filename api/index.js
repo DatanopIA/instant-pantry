@@ -17,15 +17,25 @@ const purify = DOMPurify(window);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Intentar cargar variables de múltiples localizaciones para máxima compatibilidad local/Vercel
+dotenv.config(); // Por defecto busca .env en el CWD (raíz en Vercel)
 dotenv.config({ path: path.join(__dirname, '../.env') });
+dotenv.config({ path: path.join(__dirname, '../.env.local') });
 
+// Inicializar Stripe solo si hay clave
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
+
+if (!stripe) {
+    console.warn("⚠️ [STRIPE]: STRIPE_SECRET_KEY no detectada. Las funciones de pago estarán deshabilitadas.");
+}
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 const allowedOrigins = [
     'http://localhost:5173',
     'http://localhost:3000',
+    'http://localhost:4173',
     'https://instant-pantry.vercel.app',
     'https://instant-pantry-pro.vercel.app'
 ];
@@ -34,11 +44,18 @@ app.use(cors({
     origin: function (origin, callback) {
         // Permitir peticiones sin origen (como apps móviles o curl)
         if (!origin) return callback(null, true);
-        if (allowedOrigins.indexOf(origin) === -1) {
+
+        // Permitir cualquier subdominio de vercel.app o localhost para facilitar previews
+        const isAllowedVercel = origin.endsWith('.vercel.app');
+        const isLocalhost = origin.includes('localhost');
+
+        if (allowedOrigins.indexOf(origin) !== -1 || isAllowedVercel || isLocalhost) {
+            return callback(null, true);
+        } else {
+            console.warn(`[CORS]: Origen bloqueado: ${origin}`);
             const msg = 'La política de CORS de este sitio no permite el acceso desde el origen especificado.';
             return callback(new Error(msg), false);
         }
-        return callback(null, true);
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -72,7 +89,7 @@ const inventorySchema = z.object({
 const chatSchema = z.object({
     text: z.string().min(1, "El mensaje no puede estar vacío").max(1000, "Mensaje demasiado largo"),
     history: z.array(z.object({
-        sender: z.enum(['user', 'ai', 'model']),
+        sender: z.enum(['user', 'ai', 'model', 'bot']),
         text: z.string()
     })).default([]),
     inventory: z.array(z.any()).optional().default([]),
@@ -113,7 +130,7 @@ const generalLimiter = rateLimit({
 
 const aiLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 1 hora
-    limit: 20, // 20 consultas por hora (ajustable según tier)
+    limit: 30, // 30 consultas por hora (ajustado de 20)
     message: { error: "Has alcanzado el límite de consultas de IA por hora." },
     standardHeaders: true,
     legacyHeaders: false,
@@ -132,13 +149,10 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
         if (endpointSecret && sig) {
             event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
         } else if (process.env.NODE_ENV !== 'production' && !endpointSecret) {
-            // Solo permitir el bypass en desarrollo local si NO hay secreto configurado.
-            // Si hay secreto y falla la firma, el constructor de arriba lanzará error.
             console.warn("⚠️ MODO DESARROLLO: Procesando webhook sin verificación de firma.");
             const body = JSON.parse(req.body.toString());
             event = { type: body.type, data: body.data };
         } else {
-            // En producción o si hay secreto configurado, la firma es obligatoria.
             throw new Error("Firma de Stripe ausente o secreto de webhook no configurado.");
         }
     } catch (err) {
@@ -148,7 +162,7 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
 
     if (event.type === 'checkout.session.completed') {
         const session = event.data.object;
-        const email = session.customer_email;
+        const email = session.customer_email || session.customer_details?.email;
         const tier = session.metadata?.user_tier || 'pro';
 
         console.log(`💰 Payment confirmed for ${email}. Upgrading to ${tier}.`);
@@ -176,7 +190,6 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 // --- API ROUTES ---
 
 app.get('/api/inventory', generalLimiter, async (req, res) => {
-    // Blindaje de privacidad: Ignorar email de query, usar solo el del token autenticado
     const userEmail = req.user?.email;
 
     if (!userEmail) {
@@ -275,7 +288,6 @@ app.post('/api/ai/chat', aiLimiter, validate(chatSchema), async (req, res) => {
         });
 
         const data = await response.json();
-        // Verificación de estructura de respuesta de Gemini con defensa en profundidad
         let rawAiText = "";
         if (data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
             rawAiText = data.candidates[0].content.parts[0].text;
@@ -284,9 +296,7 @@ app.post('/api/ai/chat', aiLimiter, validate(chatSchema), async (req, res) => {
             rawAiText = "Lo siento, mi conexión culinaria ha fallado. ¿Podemos intentarlo de nuevo?";
         }
 
-        // Sanitización Anti-XSS antes de enviar al cliente
         const safeAiText = purify.sanitize(rawAiText);
-
         res.json({ text: safeAiText });
     } catch (error) {
         sendError(res, error, "Error procesando la consulta de IA");
@@ -344,51 +354,81 @@ app.get('/api/subscription-status', async (req, res) => {
 
 app.post('/api/create-checkout-session', async (req, res) => {
     const { priceId, userEmail, tier = 'pro' } = req.body;
+    const finalEmail = userEmail || req.user?.email;
 
-    if (!stripe) return res.status(500).json({ error: "Stripe missing" });
+    if (!stripe) {
+        console.error("❌ Stripe object is null. Check STRIPE_SECRET_KEY.");
+        return res.status(500).json({ error: "Stripe no configurado en el servidor." });
+    }
 
     try {
-        const baseUrl = req.headers.origin || 'https://instant-pantry.vercel.app';
+        const origin = req.headers.origin || 'https://instant-pantry.vercel.app';
+        const price = priceId || process.env.STRIPE_PRICE_ID;
+
+        console.log("🚀 Iniciando Checkout:", { email: finalEmail, price });
+
+        if (!price) {
+            throw new Error("STRIPE_PRICE_ID no configurado en variables de entorno.");
+        }
+
+        if (!finalEmail) {
+            return res.status(400).json({ error: "Se requiere un email de usuario para la sesión." });
+        }
 
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             line_items: [{
-                price: priceId || process.env.STRIPE_PRICE_ID,
+                price: price,
                 quantity: 1,
             }],
             mode: 'subscription',
-            success_url: `${baseUrl}/profile?session_id={CHECKOUT_SESSION_ID}&status=success`,
-            cancel_url: `${baseUrl}/profile?status=cancel`,
-            customer_email: userEmail,
-            metadata: { user_tier: tier }
+            success_url: `${origin}/?session_id={CHECKOUT_SESSION_ID}&status=success`,
+            cancel_url: `${origin}/?status=cancel`,
+            customer_email: finalEmail,
+            metadata: {
+                user_tier: tier,
+                email: finalEmail
+            },
+            allow_promotion_codes: true,
         });
 
+        console.log("✅ Sesión creada:", session.id);
         res.json({ url: session.url });
     } catch (error) {
-        sendError(res, error, "Error creando sesión de pago");
+        console.error("❌ Error en Stripe Checkout:", error);
+        sendError(res, error, "No se pudo iniciar la pasarela de pago.");
     }
 });
 
 app.post('/api/create-portal-session', async (req, res) => {
-    const { userEmail } = req.body;
+    const userEmail = req.body.userEmail || req.user?.email;
     if (!stripe) return res.status(500).json({ error: "Stripe missing" });
 
     try {
         // Search for customer by email
         const customers = await stripe.customers.list({ email: userEmail, limit: 1 });
         if (customers.data.length === 0) {
-            return res.status(404).json({ error: "Customer not found in Stripe" });
+            return res.status(404).json({ error: "Cliente no encontrado en Stripe. Asegúrate de haber completado un pago primero." });
         }
 
         const session = await stripe.billingPortal.sessions.create({
             customer: customers.data[0].id,
-            return_url: `${req.headers.origin}/profile`,
+            return_url: `${req.headers.origin || 'https://instant-pantry.vercel.app'}`,
         });
 
         res.json({ url: session.url });
     } catch (error) {
         sendError(res, error, "Error al acceder al portal de gestión");
     }
+});
+
+// Endpoint de prueba para verificar configuración de Stripe
+app.get('/api/stripe-config', (req, res) => {
+    res.json({
+        configured: !!stripe,
+        hasPriceId: !!process.env.STRIPE_PRICE_ID,
+        nodeEnv: process.env.NODE_ENV
+    });
 });
 
 if (process.env.NODE_ENV !== 'production') {

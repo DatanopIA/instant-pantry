@@ -48,21 +48,16 @@
 /* Dark Mode Theme (Premium - High Contrast Deep Obsidian) */
 [data-theme='dark'] {
   --bg-color: #08090A;
-  /* Deeper Obsidian */
   --card-bg: rgba(22, 24, 26, 0.7);
-  /* Solid but translucent dark card */
   --text-main: #FFFFFF;
-  /* Pure white for maximum contrast */
   --text-muted: rgba(255, 255, 255, 0.65);
-  /* More legible muted text */
   --border-color: rgba(255, 255, 255, 0.1);
-  /* Subtle but sharp border */
-  --glass: rgba(15, 17, 18, 0.8);
-  --nav-bg: rgba(10, 11, 12, 0.9);
-  --primary: #A4C3A2;
-  /* Softer, more luminescent Sage for dark mode */
-  --primary-rgb: 164, 195, 162;
-  --accent-sage: #B2D8B7;
+  --glass: rgba(15, 17, 18, 0.82);
+  --nav-bg: rgba(10, 11, 12, 0.92);
+  --primary: #D88C51;
+  /* Terrakotta Vibrante para PRO */
+  --primary-rgb: 216, 140, 81;
+  --accent-sage: #84A98C;
   --secondary: #E9EDC9;
 }
 
@@ -463,9 +458,14 @@ h4 {
 @media (min-width: 768px) {
   .ios-tab-bar {
     max-width: 900px;
-    border-radius: 0 0 40px 40px;
-    bottom: 40px;
-    /* Alineada con el contenedor en iPad */
+    border-radius: 40px;
+    bottom: 30px;
+  }
+
+  .bento-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
   }
 }
 

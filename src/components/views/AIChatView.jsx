@@ -4,7 +4,7 @@ import { usePantry } from '../../lib/PantryContext';
 import { Send, Sparkles, Trash2, User, Bot } from 'lucide-react';
 
 const AIChatView = () => {
-    const { t, inventory, recipes, dietSettings, language } = usePantry();
+    const { t, inventory, recipes, dietSettings, language, pendingAiPrompt, setPendingAiPrompt } = usePantry();
     const [messages, setMessages] = useState([]);
     const [inputText, setInputText] = useState('');
     const [isTyping, setIsTyping] = useState(false);
@@ -17,7 +17,12 @@ const AIChatView = () => {
                 { id: 'initial', sender: 'bot', text: t('saludo_ia'), time: new Date() }
             ]);
         }
-    }, [language, t, messages.length]);
+
+        if (pendingAiPrompt) {
+            sendMessage(pendingAiPrompt);
+            setPendingAiPrompt(null);
+        }
+    }, [language, t, messages.length, pendingAiPrompt]);
 
     useEffect(() => {
         if (scrollRef.current) {

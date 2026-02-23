@@ -24,15 +24,31 @@ export const PantryProvider = ({ children }) => {
     const diet = dietSettings.type;
     const [selectedRecipe, setSelectedRecipe] = useState(null);
     const [notificationsEnabled, setNotificationsEnabled] = useState(() => localStorage.getItem('pantry_notifications') === 'true');
+    const [pendingAiPrompt, setPendingAiPrompt] = useState(null);
 
     // --- AUTH & INITIAL DATA ---
     useEffect(() => {
+        // Detectar éxito/cancelación de Stripe en la URL
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('status') === 'success') {
+            setView('profile');
+            // Intentar recargar datos varias veces con delay para esperar al webhook
+            const refreshData = async () => {
+                await fetchUserData(); // Primer intento
+                setTimeout(fetchUserData, 2000); // Re-intento tras 2s (margen para webhook)
+                setTimeout(fetchUserData, 5000); // Re-intento tras 5s
+            };
+            refreshData();
+            // Limpiar la URL sin recargar
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
             const currentUser = session?.user ?? null;
             setUser(currentUser);
 
             if (currentUser) {
-                await fetchUserData(currentUser);
+                await fetchUserData();
             } else {
                 setInventory([]);
                 setIsPro(false);
@@ -43,7 +59,7 @@ export const PantryProvider = ({ children }) => {
         return () => subscription.unsubscribe();
     }, []);
 
-    const fetchUserData = async (currentUser) => {
+    const fetchUserData = async () => {
         try {
             // 1. Fetch Subscription Status (JWT used for email identification)
             const subData = await apiFetch('/api/subscription-status');
@@ -134,7 +150,17 @@ export const PantryProvider = ({ children }) => {
         }
     };
 
+    const checkRecipeIngredients = useCallback((recipeIngredients = []) => {
+        if (!recipeIngredients.length) return { missing: [], match: 0 };
+        const invNames = inventory.map(i => i.name.toLowerCase());
+        const missing = recipeIngredients.filter(ing => !invNames.some(inv => inv.includes(ing.toLowerCase()) || ing.toLowerCase().includes(inv)));
+        const matchCount = recipeIngredients.length - missing.length;
+        const matchPercent = (matchCount / recipeIngredients.length) * 100;
+        return { missing, match: matchPercent };
+    }, [inventory]);
+
     const upgradeToPro = async () => {
+        console.log("Iniciando upgradeToPro para:", user?.email);
         if (!user) {
             goTo('landing');
             return;
@@ -174,6 +200,7 @@ export const PantryProvider = ({ children }) => {
         selectedRecipe, setSelectedRecipe,
         notificationsEnabled, setNotificationsEnabled,
         addProductToInventory, deleteProduct, upgradeToPro, manageSubscription,
+        checkRecipeIngredients, pendingAiPrompt, setPendingAiPrompt,
         logout: async () => {
             await supabase.auth.signOut();
             setUser(null);

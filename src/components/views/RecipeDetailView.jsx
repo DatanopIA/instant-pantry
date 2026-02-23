@@ -4,7 +4,7 @@ import { usePantry } from '../../lib/PantryContext';
 import { Clock, Zap, ArrowLeft, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
 
 const RecipeDetailView = () => {
-    const { t, selectedRecipe, inventory, goTo, sendMessage } = usePantry();
+    const { t, selectedRecipe, inventory, goTo, setPendingAiPrompt } = usePantry();
 
     if (!selectedRecipe) return null;
 
@@ -99,8 +99,8 @@ const RecipeDetailView = () => {
                                                 whileHover={{ scale: 1.05 }}
                                                 whileTap={{ scale: 0.95 }}
                                                 onClick={() => {
+                                                    setPendingAiPrompt(`Hola Chef, me falta "${ing}" para preparar la receta "${selectedRecipe.title}". ¿Por qué alimento gourmet me recomiendas substituirlo?`);
                                                     goTo('chat');
-                                                    sendMessage(`Hola Chef, me falta "${ing}" para preparar la receta "${selectedRecipe.title}". ¿Por qué alimento gourmet me recomiendas substituirlo?`);
                                                 }}
                                                 style={{
                                                     background: 'rgba(var(--primary-rgb), 0.1)',
