@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import fs from 'fs';
 import { rateLimit } from 'express-rate-limit';
 import { supabase } from './supabaseClient.js';
 import dotenv from 'dotenv';
@@ -184,8 +185,15 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // --- SERVIR ARCHIVOS ESTÁTICOS (Railway/Render/etc) ---
-const distPath = path.join(__dirname, '../dist');
-app.use(express.static(distPath));
+const distPath = path.resolve(__dirname, '../dist');
+console.log(`📂 Verificando carpeta estática en: ${distPath}`);
+
+if (fs.existsSync(distPath)) {
+    console.log("✅ Carpeta 'dist' encontrada. Sirviendo archivos estáticos.");
+    app.use(express.static(distPath));
+} else {
+    console.warn("⚠️ ADVERTENCIA: No se encontró la carpeta 'dist'. ¿Ha fallado el build?");
+}
 
 app.use(authenticate);
 
