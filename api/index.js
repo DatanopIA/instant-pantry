@@ -437,7 +437,7 @@ app.get('/api/stripe-config', (req, res) => {
 });
 
 // Catch-all para SPA: sirve index.html para cualquier ruta que no sea API
-app.get('*', (req, res) => {
+app.get('*path', (req, res) => {
     // Si la ruta empieza por /api/, no servimos el index.html (esto ya lo manejan los otros handlers)
     if (req.path.startsWith('/api/')) return res.status(404).json({ error: "Not found" });
     res.sendFile(path.join(__dirname, '../dist/index.html'));
