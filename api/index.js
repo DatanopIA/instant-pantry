@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import { rateLimit } from 'express-rate-limit';
-import db from './db.js';
 import { supabase } from './supabaseClient.js';
 import dotenv from 'dotenv';
 import Stripe from 'stripe';
@@ -183,6 +182,11 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
+
+// --- SERVIR ARCHIVOS ESTÁTICOS (Railway/Render/etc) ---
+const distPath = path.join(__dirname, '../dist');
+app.use(express.static(distPath));
+
 app.use(authenticate);
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
@@ -236,13 +240,6 @@ app.delete('/api/inventory/:id', async (req, res) => {
         const { error } = await supabase.from('inventory').delete().eq('id', id);
         if (error) throw error;
 
-        if (process.env.NODE_ENV !== 'production') {
-            try {
-                db.prepare('DELETE FROM inventory WHERE id = ?').run(id);
-            } catch (e) {
-                console.error("Local DB sync error:", e);
-            }
-        }
         res.json({ success: true });
     } catch (error) {
         sendError(res, error, "No se pudo eliminar el item del inventario");
@@ -431,8 +428,16 @@ app.get('/api/stripe-config', (req, res) => {
     });
 });
 
-if (process.env.NODE_ENV !== 'production') {
-    app.listen(PORT, () => console.log(`Stable API running at http://localhost:${PORT}`));
-}
+// Catch-all para SPA: sirve index.html para cualquier ruta que no sea API
+app.get('*', (req, res) => {
+    // Si la ruta empieza por /api/, no servimos el index.html (esto ya lo manejan los otros handlers)
+    if (req.path.startsWith('/api/')) return res.status(404).json({ error: "Not found" });
+    res.sendFile(path.join(__dirname, '../dist/index.html'));
+});
+
+// En Railway/Heroku/Render, necesitamos escuchar siempre el puerto
+app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+});
 
 export default app;
