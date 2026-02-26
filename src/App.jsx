@@ -1,6 +1,6 @@
 import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Home, ClipboardList, Utensils, MessageCircle, User, Scan } from 'lucide-react';
+import { Home, ClipboardList, Utensils, User, Scan } from 'lucide-react';
 import { PantryProvider, usePantry } from './lib/PantryContext';
 
 // Views

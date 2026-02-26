@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePantry } from '../../lib/PantryContext';
-import { Sparkles, ArrowRight, Scan, Utensils, Zap, Globe, CookingPot } from 'lucide-react';
+import { ArrowRight, Scan, Utensils, Zap, Globe, CookingPot } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { AuroraBackground } from '../ui/AuroraBackground';
 import { MagneticText } from '../ui/MagneticText';
