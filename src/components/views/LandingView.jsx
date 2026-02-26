@@ -44,116 +44,104 @@ const LandingView = () => {
 
     return (
         <AuroraBackground>
-            <div className="relative z-10 w-full max-w-[1400px] mx-auto min-h-screen px-4 md:px-12 py-8 flex flex-col">
+            {/* Main Wrapper: h-screen + overflow-hidden to prevent scroll on mobile */}
+            <div className="relative z-10 w-full max-w-[1400px] mx-auto h-screen overflow-hidden px-6 py-4 md:px-12 md:py-8 flex flex-col">
 
-                {/* Header Section */}
-                <header className="flex justify-between items-center mb-8 md:mb-16">
+                {/* Header: Compact for mobile */}
+                <header className="flex justify-between items-center mb-4 md:mb-10">
                     <motion.div
-                        initial={{ opacity: 0, y: -20 }}
+                        initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="flex items-center gap-3"
+                        className="flex items-center gap-2"
                     >
-                        <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white">
-                            <CookingPot size={22} />
+                        <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-primary flex items-center justify-center text-white">
+                            <CookingPot size={18} className="md:w-[22px] md:h-[22px]" />
                         </div>
                         <div className="flex flex-col">
-                            <span className="font-black text-xs uppercase tracking-[0.2em] text-main">Instant Pantry</span>
-                            <span className="text-[9px] font-bold text-primary-light uppercase tracking-widest">Master 2026</span>
+                            <span className="font-black text-[10px] md:text-xs uppercase tracking-[0.2em] text-main leading-none">Instant Pantry</span>
+                            <span className="text-[8px] md:text-[9px] font-bold text-primary-light uppercase tracking-widest mt-0.5">Master 2026</span>
                         </div>
                     </motion.div>
 
                     <div className="hidden md:flex gap-8 items-center text-[10px] font-black uppercase tracking-widest text-muted">
                         <span className="cursor-pointer hover:text-primary transition-colors">Características</span>
-                        <span className="cursor-pointer hover:text-primary transition-colors">Recetas Premium</span>
                         <span className="cursor-pointer hover:text-primary transition-colors">Club Gourmet</span>
                     </div>
                 </header>
 
-                <main className="flex-1 flex flex-col lg:flex-row items-center gap-12 lg:gap-24">
+                {/* Content: Asymmetric Layout */}
+                <main className="flex-1 flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-6 lg:gap-20 min-h-0">
 
-                    {/* Visual Section - Circular Product Image */}
-                    <div className="flex-1 w-full flex items-center justify-center lg:justify-start">
+                    {/* Visual Section: Sized for no-scroll on mobile */}
+                    <div className="w-full lg:flex-1 flex items-center justify-center max-h-[35vh] lg:max-h-full">
                         <motion.div
-                            initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
-                            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-                            className="relative w-full max-w-[500px] md:max-w-[700px] aspect-square flex items-center justify-center"
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                            className="relative w-full aspect-square max-w-[280px] md:max-w-[450px] lg:max-w-[600px] flex items-center justify-center"
                         >
-                            {/* Decorative element behind image */}
-                            <div className="absolute inset-0 bg-primary-soft/30 rounded-full blur-[100px] -z-1" />
+                            <div className="absolute inset-0 bg-primary-soft/20 rounded-full blur-[60px] md:blur-[100px] -z-1" />
 
-                            <div className="landing-image-circle">
+                            <div className="landing-image-circle border-4 border-white shadow-premium">
                                 <img
                                     src="/gourmet-landing.png"
                                     alt="Gourmet Ingredients"
+                                    className="scale-110"
                                 />
                             </div>
 
-                            {/* Floating Highlight Card */}
+                            {/* Floating Card: Hidden on very small mobile if needed, but styled to fit */}
                             <motion.div
-                                animate={{ y: [0, -15, 0] }}
+                                animate={{ y: [0, -10, 0] }}
                                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                                className="absolute top-10 right-0 md:top-20 md:right-10 glass-panel p-6 rounded-3xl shadow-premium z-20 flex flex-col gap-2"
+                                className="absolute -top-4 -right-4 md:top-10 md:right-0 glass-panel p-3 md:p-5 rounded-2xl shadow-premium z-20 flex flex-col gap-1"
                             >
-                                <div className="flex text-primary gap-1">
-                                    {[1, 2, 3, 4, 5].map(i => <Star key={i} size={14} fill="currentColor" />)}
+                                <div className="flex text-primary gap-0.5">
+                                    {[1, 2, 3, 4, 5].map(i => <Star key={i} size={10} fill="currentColor" />)}
                                 </div>
-                                <span className="text-xs font-black uppercase text-main tracking-widest">Plan Maestro IA</span>
-                                <span className="text-[10px] font-bold text-muted">Diseñado para tu salud.</span>
+                                <span className="text-[8px] md:text-[10px] font-black uppercase text-main tracking-widest">Master IA</span>
                             </motion.div>
                         </motion.div>
                     </div>
 
-                    {/* Content Section */}
-                    <div className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left gap-8 md:gap-12 w-full max-w-[500px]">
+                    {/* Form Section: Optimized for vertical space */}
+                    <div className="w-full lg:flex-1 flex flex-col items-center lg:items-start text-center lg:text-left gap-4 md:gap-8 max-w-[450px]">
                         <motion.div
-                            initial={{ opacity: 0, x: 20 }}
+                            initial={{ opacity: 0, x: 10 }}
                             animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.3, duration: 1 }}
-                            className="flex flex-col gap-4 md:gap-6"
+                            className="flex flex-col gap-2 md:gap-4"
                         >
-                            <span className="text-primary font-black uppercase tracking-[0.4em] text-[10px] md:text-xs">
+                            <span className="text-primary font-black uppercase tracking-[0.3em] text-[10px]">
                                 Inteligencia Culinaria
                             </span>
-                            <h1 className="text-5xl md:text-8xl font-black text-main leading-[0.95] tracking-tighter">
+                            <h1 className="text-4xl md:text-7xl font-black text-main leading-[1] tracking-tighter">
                                 Tu cocina, <br />
                                 <span className="text-primary-light italic">rediseñada.</span>
                             </h1>
-                            <p className="text-lg md:text-xl text-muted font-medium max-w-md mx-auto lg:mx-0 leading-relaxed pt-2">
-                                Gestionamos tu despensa, diseñamos tus recetas y eliminamos el desperdicio. Todo con un toque Michelin.
-                            </p>
                         </motion.div>
 
                         <motion.div
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={{ opacity: 0, y: 15 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.5, duration: 1 }}
-                            className="w-full flex flex-col gap-6"
+                            className="w-full flex flex-col gap-4"
                         >
-                            {/* Auth Actions Area */}
-                            <div className="flex flex-col gap-4">
+                            <div className="flex flex-col gap-3">
                                 <button
                                     onClick={loginGuest}
-                                    className="btn-primary"
+                                    className="btn-primary w-full md:w-auto py-3.5 px-8"
                                 >
-                                    Comenzar como Invitado
+                                    Acceso Invitado
                                     <ArrowRight size={18} />
                                 </button>
 
-                                <div className="flex items-center gap-4 py-2">
-                                    <div className="flex-1 h-px bg-border-color" />
-                                    <span className="text-[9px] font-black uppercase text-zinc-300 tracking-widest">Acceso para profesionales</span>
-                                    <div className="flex-1 h-px bg-border-color" />
-                                </div>
-
-                                <div className="flex flex-col gap-3">
+                                <div className="flex flex-col gap-2 pt-2 border-t border-border-color">
                                     <button
                                         onClick={handleGoogleLogin}
                                         disabled={loading}
-                                        className="btn-secondary"
+                                        className="btn-secondary w-full py-3 text-xs"
                                     >
-                                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
-                                        Continuar con Google
+                                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
+                                        Google Login
                                     </button>
 
                                     <form onSubmit={handleLogin} className="flex flex-col gap-2">
@@ -163,34 +151,34 @@ const LandingView = () => {
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
                                             required
-                                            className="w-full py-4 px-6 rounded-2xl bg-white border border-border-color focus:border-primary focus:outline-none text-sm font-bold placeholder:text-zinc-300 transition-all shadow-sm"
+                                            className="w-full py-3 px-5 rounded-xl bg-white/80 border border-border-color focus:border-primary outline-none text-xs font-bold shadow-sm"
                                         />
                                         <button
                                             disabled={loading}
                                             type="submit"
-                                            className="w-full py-4 rounded-2xl bg-zinc-900 text-white font-black text-[10px] uppercase tracking-[0.2em] hover:bg-black transition-colors"
+                                            className="w-full py-3 rounded-xl bg-zinc-900 text-white font-black text-[9px] uppercase tracking-[0.2em]"
                                         >
-                                            {loading ? 'Preparando...' : 'Obtener Enlace Mágico'}
+                                            {loading ? 'Preparando...' : 'Enlace Mágico'}
                                         </button>
                                     </form>
                                 </div>
                             </div>
 
-                            {/* Trust Badge */}
-                            <div className="flex items-center justify-center lg:justify-start gap-3 mt-4 text-muted pt-8 border-t border-border-color">
-                                <ShieldCheck size={18} className="text-primary-light" />
-                                <span className="text-[10px] font-bold uppercase tracking-widest leading-none">Acceso seguro con encriptación de grado militar</span>
+                            {/* Trust Badge: Compact */}
+                            <div className="flex items-center justify-center lg:justify-start gap-2 opacity-60">
+                                <ShieldCheck size={14} className="text-primary-light" />
+                                <span className="text-[8px] font-bold uppercase tracking-widest text-muted">Encriptación Grado Militar</span>
                             </div>
                         </motion.div>
                     </div>
                 </main>
 
-                <footer className="mt-auto py-12 flex flex-col md:flex-row justify-between items-center gap-4 text-muted border-t border-border-color">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.2em]">© 2026 DatanopIA. Hecho por chefs para el mundo.</p>
-                    <div className="flex gap-8 text-[10px] font-black uppercase tracking-widest">
-                        <span className="cursor-pointer hover:text-primary">Términos</span>
-                        <span className="cursor-pointer hover:text-primary">Privacidad</span>
-                        <span className="cursor-pointer hover:text-primary">Soporte</span>
+                {/* Footer: Single line on mobile */}
+                <footer className="mt-8 py-4 flex flex-row items-center justify-between text-[8px] md:text-[10px] font-bold uppercase tracking-widest opacity-40 border-t border-border-color/10">
+                    <p>© 2026 DatanopIA Labs.</p>
+                    <div className="flex gap-4">
+                        <span>Privacidad</span>
+                        <span>Términos</span>
                     </div>
                 </footer>
             </div>
