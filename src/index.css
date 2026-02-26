@@ -247,6 +247,14 @@ h4 {
   justify-content: center;
   gap: 12px;
   transition: var(--transition);
+  cursor: pointer;
+  position: relative;
+  z-index: 5;
+}
+
+.btn-primary:active {
+  transform: scale(0.98) translateY(2px);
+  box-shadow: 0 5px 15px -5px rgba(58, 90, 64, 0.4);
 }
 
 .btn-primary:hover {
@@ -267,6 +275,11 @@ h4 {
   justify-content: center;
   gap: 10px;
   transition: var(--transition);
+  cursor: pointer;
+}
+
+.btn-secondary:active {
+  transform: scale(0.98);
 }
 
 .btn-secondary:hover {
