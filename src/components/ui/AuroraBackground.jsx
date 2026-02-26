@@ -7,12 +7,14 @@ export const AuroraBackground = ({
 }) => {
     return (
         <div
-            className={`aurora-container ${className || ""}`}
+            className={`aurora-wrapper ${className || ""}`}
             {...props}
         >
-            <div className="aurora-inner" />
-            <div className="aurora-mask" />
-            <div className="relative z-10 w-full h-full">
+            <div className="aurora-container">
+                <div className="aurora-inner" />
+                <div className="aurora-mask" />
+            </div>
+            <div className="relative z-10 w-full min-h-screen">
                 {children}
             </div>
         </div>
