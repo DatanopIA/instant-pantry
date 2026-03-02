@@ -25,7 +25,7 @@ const PremiumSubscription = () => {
             id: 'plus',
             name: 'Pantry Plus',
             description: 'Escáner inteligente y organización total.',
-            price: '5,99',
+            price: '4,99',
             features: [
                 'Escáner de visión IA ilimitado',
                 'Recetas personalizadas ilimitadas',
@@ -40,7 +40,7 @@ const PremiumSubscription = () => {
             id: 'chef',
             name: 'Chef Elite',
             description: 'La experiencia definitiva con análisis nutricional.',
-            price: '12,99',
+            price: '9,99',
             features: [
                 'Todo lo anterior',
                 'Análisis nutricional detallado',
@@ -134,7 +134,7 @@ const PremiumSubscription = () => {
                         </div>
 
                         {/* Feature List (Expanded on selection) */}
-                        <div className={`mt-6 overflow-hidden transition-all duration-500 ease-in-out ${selectedTier === tier.id ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+                        <div className={`mt-6 overflow-hidden transition-all duration-500 ease-in-out ${selectedTier === tier.id ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-6 border-t border-gray-200 dark:border-gray-700/50">
                                 {tier.features.map((feature, idx) => (
                                     <div key={idx} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
@@ -143,6 +143,24 @@ const PremiumSubscription = () => {
                                     </div>
                                 ))}
                             </div>
+
+                            {tier.id !== 'free' && (
+                                <div className="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700/50 flex flex-col sm:flex-row justify-end items-center gap-4">
+                                    <span className="text-sm text-gray-500 hidden sm:block">
+                                        Pago seguro mediante Stripe
+                                    </span>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            window.open(tier.checkoutUrl, '_blank');
+                                        }}
+                                        className="w-full sm:w-auto flex items-center justify-center gap-2 py-2.5 px-6 bg-primary hover:bg-primary-dark text-white rounded-xl font-bold transition-all duration-300 shadow-lg shadow-primary/20 transform hover:-translate-y-0.5"
+                                    >
+                                        <span>Suscribirme a {tier.name}</span>
+                                        <Zap className="w-4 h-4 fill-current" />
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
                 ))}

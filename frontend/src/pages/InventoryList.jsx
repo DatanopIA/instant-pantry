@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Search, Plus, Package, ShoppingCart, CheckCircle2, Archive,
-    Sparkles, X, ChevronRight, AlertCircle, Loader2
+    Sparkles, X, ChevronRight, Loader2, Trash2,
+    ShoppingBasket, ShoppingBag, Calendar
 } from 'lucide-react';
 import { inventoryService } from '../services/inventoryService';
 
@@ -11,7 +12,8 @@ const InventoryList = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState('pantry'); // 'pantry' or 'shopping'
-    const [confirmModal, setConfirmModal] = useState({ isOpen: false, item: null });
+    const [confirmModal, setConfirmModal] = useState({ isOpen: false, item: null, mode: 'consume' }); // modes: 'consume' (from check), 'delete' (from trash)
+    const [dateModal, setDateModal] = useState({ isOpen: false, item: null, date: '' });
 
     // Search master products state
     const [searchResults, setSearchResults] = useState([]);
@@ -57,7 +59,22 @@ const InventoryList = () => {
     }, [searchTerm, activeTab]);
 
     const handleMarkConsumed = async (item) => {
-        setConfirmModal({ isOpen: true, item });
+        setConfirmModal({ isOpen: true, item, mode: 'consume' });
+    };
+
+    const handleDeleteClick = (item) => {
+        setConfirmModal({ isOpen: true, item, mode: 'delete' });
+    };
+
+    const handlePermanentDelete = async () => {
+        if (!confirmModal.item) return;
+        try {
+            await inventoryService.deleteItem(confirmModal.item.id);
+            setItems(prev => prev.filter(i => i.id !== confirmModal.item.id));
+            setConfirmModal({ isOpen: false, item: null, mode: 'consume' });
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     const confirmConsume = async () => {
@@ -67,18 +84,38 @@ const InventoryList = () => {
             setItems(prev => prev.map(i =>
                 i.id === confirmModal.item.id ? { ...i, status: 'consumed' } : i
             ));
-            setConfirmModal({ isOpen: false, item: null });
+            setConfirmModal({ isOpen: false, item: null, mode: 'consume' });
         } catch (err) {
             console.error(err);
         }
     };
 
-    const handleRestoreItem = async (item) => {
+    const handleRestoreItem = (item) => {
+        // Suggested date: 1 week from now
+        const defaultDate = new Date();
+        defaultDate.setDate(defaultDate.getDate() + 7);
+        const dateStr = defaultDate.toISOString().split('T')[0];
+
+        setDateModal({
+            isOpen: true,
+            item,
+            date: dateStr
+        });
+    };
+
+    const confirmRestore = async () => {
+        if (!dateModal.item) return;
         try {
-            await inventoryService.updateItemStatus(item.id, 'active');
+            const updates = {
+                status: 'active',
+                expires_at: dateModal.date || null
+            };
+            await inventoryService.updateItem(dateModal.item.id, updates);
+
             setItems(prev => prev.map(i =>
-                i.id === item.id ? { ...i, status: 'active' } : i
+                i.id === dateModal.item.id ? { ...i, ...updates } : i
             ));
+            setDateModal({ isOpen: false, item: null, date: '' });
         } catch (err) {
             console.error(err);
         }
@@ -245,9 +282,18 @@ const InventoryList = () => {
                                         <button
                                             type="button"
                                             onClick={handleManualAdd}
-                                            className="w-full text-primary font-bold text-sm mt-2 flex items-center justify-center gap-1 mx-auto hover:scale-105 active:scale-95 transition-all p-2"
+                                            className="w-full bg-primary/5 dark:bg-primary/10 text-primary font-bold text-sm mt-4 flex items-center justify-between px-5 py-4 rounded-2xl hover:bg-primary/10 dark:hover:bg-primary/20 active:scale-95 transition-all"
                                         >
-                                            Añadir "{searchTerm}" manualmente <ChevronRight className="w-4 h-4" />
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center">
+                                                    <Plus className="w-5 h-5" />
+                                                </div>
+                                                <span className="truncate max-w-[150px]">Añadir "{searchTerm}"</span>
+                                            </div>
+                                            <div className="flex items-center gap-1 opacity-60">
+                                                <span className="text-[10px] uppercase">Manual</span>
+                                                <ChevronRight className="w-4 h-4" />
+                                            </div>
                                         </button>
                                     </div>
                                 )}
@@ -276,12 +322,15 @@ const InventoryList = () => {
                                         layoutId={item.id}
                                         className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-700/50 flex items-center gap-4 group"
                                     >
-                                        <div className="w-16 h-16 rounded-xl bg-gray-50 dark:bg-gray-700 flex items-center justify-center overflow-hidden flex-shrink-0">
-                                            {item.products_master?.image_url ? (
-                                                <img src={item.products_master.image_url} alt={item.products_master.name} className="w-full h-full object-cover" />
-                                            ) : (
-                                                <Package className="w-8 h-8 text-gray-300" />
-                                            )}
+                                        <div className="w-16 h-16 rounded-xl bg-gray-50 dark:bg-gray-700 flex items-center justify-center overflow-hidden flex-shrink-0 border border-gray-100 dark:border-gray-700">
+                                            <img
+                                                src={item.products_master?.image_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=100&auto=format&fit=crop'}
+                                                alt={item.products_master?.name}
+                                                className="w-full h-full object-cover"
+                                                onError={(e) => {
+                                                    e.target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=100&auto=format&fit=crop';
+                                                }}
+                                            />
                                         </div>
 
                                         <div className="flex-1 min-w-0">
@@ -297,12 +346,20 @@ const InventoryList = () => {
                                             </div>
                                         </div>
 
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); handleMarkConsumed(item); }}
-                                            className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-xl text-gray-400 hover:text-red-500 active:scale-90 transition-all"
-                                        >
-                                            <CheckCircle2 className="w-5 h-5" />
-                                        </button>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); handleDeleteClick(item); }}
+                                                className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-xl text-gray-400 hover:text-red-500 active:scale-90 transition-all border border-transparent hover:border-red-100 dark:hover:border-red-500/20"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); handleMarkConsumed(item); }}
+                                                className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-xl text-gray-400 hover:text-primary active:scale-90 transition-all border border-transparent hover:border-primary/20"
+                                            >
+                                                <CheckCircle2 className="w-5 h-5" />
+                                            </button>
+                                        </div>
                                     </motion.div>
                                 ))
                             ) : (
@@ -354,12 +411,15 @@ const InventoryList = () => {
                                                 layoutId={item.id}
                                                 className="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-100 dark:border-gray-800 flex items-center gap-4 group"
                                             >
-                                                <div className="w-12 h-12 rounded-xl bg-orange-50 dark:bg-orange-900/10 flex items-center justify-center text-orange-500">
-                                                    <AlertCircle className="w-6 h-6" />
+                                                <div className="w-14 h-14 rounded-2xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary overflow-hidden border border-primary/20">
+                                                    <ShoppingBasket className="w-7 h-7" />
                                                 </div>
                                                 <div className="flex-1">
-                                                    <h3 className="text-sm font-bold text-gray-900 dark:text-white">{item.products_master?.name}</h3>
-                                                    <p className="text-[10px] text-gray-400">Status: Agotado</p>
+                                                    <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-0.5">{item.products_master?.name}</h3>
+                                                    <div className="flex items-center gap-1.5">
+                                                        <span className="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded-md uppercase">Agotado</span>
+                                                        <span className="text-[10px] text-gray-400">• {item.products_master?.category || 'General'}</span>
+                                                    </div>
                                                 </div>
                                                 <button
                                                     onClick={() => handleRestoreItem(item)}
@@ -382,13 +442,13 @@ const InventoryList = () => {
             </div>
 
             <AnimatePresence>
-                {confirmModal.isOpen && (
+                {dateModal.isOpen && (
                     <div className="fixed inset-0 z-[60] flex items-end justify-center px-4 pb-12 sm:items-center sm:p-0">
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            onClick={() => setConfirmModal({ isOpen: false, item: null })}
+                            onClick={() => setDateModal({ ...dateModal, isOpen: false })}
                             className="absolute inset-0 bg-gray-950/40 backdrop-blur-sm"
                         />
                         <motion.div
@@ -398,32 +458,121 @@ const InventoryList = () => {
                             className="relative bg-white dark:bg-gray-900 w-full max-w-[400px] rounded-[32px] p-8 shadow-2xl overflow-hidden border border-gray-100 dark:border-gray-800"
                         >
                             <div className="absolute top-0 right-0 p-6">
-                                <button onClick={() => setConfirmModal({ isOpen: false, item: null })} className="text-gray-400 hover:text-gray-600 dark:hover:text-white">
+                                <button onClick={() => setDateModal({ ...dateModal, isOpen: false })} className="text-gray-400 hover:text-gray-600 dark:hover:text-white">
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+
+                            <div className="flex flex-col items-center">
+                                <div className="w-20 h-20 bg-primary/10 text-primary rounded-3xl flex items-center justify-center mb-6">
+                                    <Calendar className="w-10 h-10" />
+                                </div>
+
+                                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 list-item-none">
+                                    Fecha de caducidad
+                                </h3>
+                                <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 text-center">
+                                    ¿Cuándo caduca <span className="font-bold text-primary">{dateModal.item?.products_master?.name}</span>?
+                                </p>
+
+                                <div className="w-full mb-8">
+                                    <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3 ml-1">
+                                        Fecha límite
+                                    </label>
+                                    <div className="relative group">
+                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 transition-colors group-focus-within:text-primary text-gray-400">
+                                            <Calendar className="w-5 h-5" />
+                                        </div>
+                                        <input
+                                            type="date"
+                                            value={dateModal.date}
+                                            onChange={(e) => setDateModal({ ...dateModal, date: e.target.value })}
+                                            className="w-full bg-gray-50 dark:bg-gray-800 border-none rounded-2xl py-4 pl-12 pr-4 text-sm font-bold shadow-sm focus:ring-2 focus:ring-primary/50 transition-all dark:text-white appearance-none"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-col w-full gap-3">
+                                    <button
+                                        onClick={confirmRestore}
+                                        className="w-full bg-primary text-white py-4 rounded-2xl font-bold text-lg shadow-lg shadow-primary/20 hover:scale-102 active:scale-98 transition-all"
+                                    >
+                                        Añadir a Despensa
+                                    </button>
+                                    <button
+                                        onClick={() => setDateModal({ ...dateModal, isOpen: false })}
+                                        className="w-full bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 py-4 rounded-2xl font-bold text-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all text-center"
+                                    >
+                                        Omitir fecha
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            <AnimatePresence>
+                {confirmModal.isOpen && (
+                    <div className="fixed inset-0 z-[60] flex items-end justify-center px-4 pb-12 sm:items-center sm:p-0">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setConfirmModal({ isOpen: false, item: null, mode: 'consume' })}
+                            className="absolute inset-0 bg-gray-950/40 backdrop-blur-sm"
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, y: 100 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 100 }}
+                            className="relative bg-white dark:bg-gray-900 w-full max-w-[400px] rounded-[32px] p-8 shadow-2xl overflow-hidden border border-gray-100 dark:border-gray-800"
+                        >
+                            <div className="absolute top-0 right-0 p-6">
+                                <button onClick={() => setConfirmModal({ isOpen: false, item: null, mode: 'consume' })} className="text-gray-400 hover:text-gray-600 dark:hover:text-white">
                                     <X className="w-5 h-5" />
                                 </button>
                             </div>
 
                             <div className="flex flex-col items-center text-center">
-                                <div className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center mb-6">
-                                    <ShoppingCart className="w-10 h-10 text-primary" />
+                                <div className={`w-20 h-20 ${confirmModal.mode === 'delete' ? 'bg-red-50 text-red-500' : 'bg-primary/10 text-primary'} rounded-3xl flex items-center justify-center mb-6`}>
+                                    {confirmModal.mode === 'delete' ? <Trash2 className="w-10 h-10" /> : <ShoppingCart className="w-10 h-10" />}
                                 </div>
-                                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">¿Se ha agotado?</h3>
+
+                                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                                    {confirmModal.mode === 'delete' ? '¿Qué quieres hacer?' : '¿Se ha agotado?'}
+                                </h3>
+
                                 <p className="text-gray-500 dark:text-gray-400 text-sm mb-8">
-                                    Vamos a marcar <span className="font-bold text-primary">{confirmModal.item?.products_master?.name}</span> como consumido y añadirlo a tu lista de la compra.
+                                    {confirmModal.mode === 'delete' ? (
+                                        <>Puedes añadir <span className="font-bold text-gray-900 dark:text-white">{confirmModal.item?.products_master?.name}</span> a la lista de la compra o eliminarlo por completo.</>
+                                    ) : (
+                                        <>Vamos a marcar <span className="font-bold text-primary">{confirmModal.item?.products_master?.name}</span> como consumido y añadirlo a tu lista de la compra.</>
+                                    )}
                                 </p>
 
                                 <div className="flex flex-col w-full gap-3">
                                     <button
                                         onClick={confirmConsume}
-                                        className="w-full bg-primary text-white py-4 rounded-2xl font-bold text-lg shadow-lg shadow-primary/20 hover:scale-105 transition-all"
+                                        className="w-full bg-primary text-white py-4 rounded-2xl font-bold text-lg shadow-lg shadow-primary/20 hover:scale-102 active:scale-98 transition-all"
                                     >
-                                        Sí, añadir a la lista
+                                        Se ha acabado (lista)
                                     </button>
+
+                                    {confirmModal.mode === 'delete' && (
+                                        <button
+                                            onClick={handlePermanentDelete}
+                                            className="w-full bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 py-4 rounded-2xl font-bold text-lg hover:bg-red-100 dark:hover:bg-red-900/20 transition-all border border-red-100 dark:border-red-900/30"
+                                        >
+                                            Sólo eliminar
+                                        </button>
+                                    )}
+
                                     <button
-                                        onClick={() => setConfirmModal({ isOpen: false, item: null })}
+                                        onClick={() => setConfirmModal({ isOpen: false, item: null, mode: 'consume' })}
                                         className="w-full bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 py-4 rounded-2xl font-bold text-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
                                     >
-                                        Ahora mismo no
+                                        Cancelar
                                     </button>
                                 </div>
                             </div>

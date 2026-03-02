@@ -1,15 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Settings, Shield, Bell, CreditCard, ChevronRight, BarChart3, PieChart, Activity, LogOut, CheckCircle2 } from 'lucide-react';
+import { Settings, Shield, Bell, CreditCard, ChevronRight, BarChart3, PieChart, Activity, LogOut, CheckCircle2, Upload, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const ProfileAnalytics = () => {
     const navigate = useNavigate();
     const [notificationsEnabled, setNotificationsEnabled] = useState(true);
     const [showToast, setShowToast] = useState(null);
+    const [profilePic, setProfilePic] = useState("https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=200");
+    const [isUploading, setIsUploading] = useState(false);
+    const fileInputRef = useRef(null);
 
-    const triggerToast = (message) => {
-        setShowToast(message);
+    const triggerToast = (message, type = 'success') => {
+        setShowToast({ message, type });
         setTimeout(() => setShowToast(null), 3000);
     };
 
@@ -32,10 +35,46 @@ const ProfileAnalytics = () => {
                 navigate('/premium');
                 break;
             case 'Configuración de Cuenta':
-                triggerToast('Abriendo ajustes de perfil...');
+                navigate('/settings/account');
                 break;
             default:
                 break;
+        }
+    };
+
+    const handleFileClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        // Validar tamaño del archivo (2MB = 2,097,152 bytes)
+        const MAX_SIZE = 2 * 1024 * 1024;
+        if (file.size > MAX_SIZE) {
+            triggerToast('La imagen es demasiado grande. Máximo 2MB soportados.', 'error');
+            return;
+        }
+
+        // Crear preview local
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setProfilePic(reader.result);
+        };
+        reader.readAsDataURL(file);
+
+        // Simular subida al backend
+        setIsUploading(true);
+        try {
+            // Aquí iría la llamada real al endpoint que crearemos
+            // const response = await fetch('/api/profile/upload', { ... });
+            await new Promise(resolve => setTimeout(resolve, 1500)); // Simulación
+            triggerToast('Foto de perfil actualizada correctamente');
+        } catch (error) {
+            triggerToast('Error al subir la imagen', 'error');
+        } finally {
+            setIsUploading(false);
         }
     };
 
@@ -63,22 +102,43 @@ const ProfileAnalytics = () => {
                         exit={{ opacity: 0, y: 20, x: '-50%' }}
                         className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-gray-900/90 backdrop-blur-md text-white px-6 py-3 rounded-2xl shadow-2xl z-50 flex items-center gap-2 border border-white/10"
                     >
-                        <CheckCircle2 className="w-4 h-4 text-green-400" />
-                        <span className="text-sm font-medium">{showToast}</span>
+                        {showToast.type === 'error' ? (
+                            <AlertCircle className="w-4 h-4 text-red-400" />
+                        ) : (
+                            <CheckCircle2 className="w-4 h-4 text-green-400" />
+                        )}
+                        <span className="text-sm font-medium">{showToast.message}</span>
                     </motion.div>
                 )}
             </AnimatePresence>
 
             <header className="flex flex-col items-center mb-8">
-                <div className="relative mb-4 group cursor-pointer" onClick={() => triggerToast('Cambiar foto de perfil')}>
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    accept="image/*"
+                    className="hidden"
+                />
+                <div
+                    className="relative mb-4 group cursor-pointer"
+                    onClick={handleFileClick}
+                >
                     <div className="absolute -inset-1 bg-gradient-to-tr from-primary to-blue-500 rounded-full blur opacity-20 group-hover:opacity-40 transition-opacity" />
-                    <img
-                        className="w-24 h-24 rounded-full border-4 border-white dark:border-gray-800 object-cover relative"
-                        src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=200"
-                        alt="Profile"
-                    />
-                    <div className="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full shadow-lg border-2 border-white dark:border-gray-800">
-                        <Settings className="w-4 h-4" />
+                    <div className="w-24 h-24 rounded-full border-4 border-white dark:border-gray-800 object-cover relative overflow-hidden bg-gray-100 dark:bg-gray-700">
+                        <img
+                            className={`w-full h-full object-cover transition-opacity ${isUploading ? 'opacity-40' : 'opacity-100'}`}
+                            src={profilePic}
+                            alt="Profile"
+                        />
+                        {isUploading && (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                            </div>
+                        )}
+                    </div>
+                    <div className="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full shadow-lg border-2 border-white dark:border-gray-800 group-hover:scale-110 transition-transform">
+                        <Upload className="w-4 h-4" />
                     </div>
                 </div>
                 <h2 className="text-xl font-bold dark:text-white">Alex Johnson</h2>

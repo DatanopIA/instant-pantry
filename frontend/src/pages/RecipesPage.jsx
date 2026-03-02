@@ -260,9 +260,12 @@ const RecipesPage = () => {
                                 >
                                     <div className="aspect-video bg-gray-100 dark:bg-gray-900 overflow-hidden relative">
                                         <img
-                                            src={recipe.image_url || `https://source.unsplash.com/800x600/?cooking,${recipe.title}`}
+                                            src={recipe.image_url || `https://images.unsplash.com/photo-1547592166-23ac45744acd?q=80&w=400&auto=format&fit=crop`}
                                             alt={recipe.title}
                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                            onError={(e) => {
+                                                e.target.src = 'https://images.unsplash.com/photo-1547592166-23ac45744acd?q=80&w=400&auto=format&fit=crop';
+                                            }}
                                         />
                                         <div className="absolute top-3 left-3 flex gap-2">
                                             <span className="px-2 py-1 bg-white/90 dark:bg-black/80 backdrop-blur-md rounded-full text-[10px] font-bold uppercase tracking-wider text-gray-700 dark:text-gray-200 shadow-sm border border-white/20">

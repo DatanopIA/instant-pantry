@@ -55,15 +55,29 @@ export const inventoryService = {
         return data
     },
 
-    async updateItemStatus(itemId, status) {
+    async updateItem(itemId, updates) {
         const { data, error } = await supabase
             .from('inventory_items')
-            .update({ status })
+            .update(updates)
             .eq('id', itemId)
             .select();
 
         if (error) throw error
         return data
+    },
+
+    async updateItemStatus(itemId, status) {
+        return this.updateItem(itemId, { status });
+    },
+
+    async deleteItem(itemId) {
+        const { error } = await supabase
+            .from('inventory_items')
+            .delete()
+            .eq('id', itemId);
+
+        if (error) throw error;
+        return true;
     },
 
     async searchProductsMaster(query) {
@@ -108,9 +122,12 @@ export const inventoryService = {
             'limpiador', 'detergente', 'jabón', 'lavavajillas', 'papel higiénico',
             'servilletas', 'lejía', 'suavizante', 'wc', 'baño', 'limpieza',
             'higiene', 'champú', 'gel', 'pasta de dientes', 'cepillo', 'estropajo',
-            'bayeta', 'insecticida', 'ambientador', 'bolsas de basura'
+            'bayeta', 'insecticida', 'ambientador', 'bolsas de basura', 'cocina papel',
+            'papel cocina', 'aluminio papel', 'papel plata', 'film', 'transparente papel',
+            'esponja', 'lavadora', 'plancha', 'vajilla', 'menaje', 'fregona', 'escoba',
+            'reparador', 'abrillantador', 'insecticida', 'insectos'
         ];
-        const nonFoodCategories = ['limpieza', 'higiene', 'hogar', 'droguería', 'baño'];
+        const nonFoodCategories = ['limpieza', 'higiene', 'hogar', 'droguería', 'baño', 'limpieza del hogar', 'cuidado personal'];
 
         const isNonFood = nonFoodKeywords.some(kw => lowerName.includes(kw)) ||
             nonFoodCategories.includes(lowerCategory);

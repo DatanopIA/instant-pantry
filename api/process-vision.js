@@ -19,13 +19,17 @@ export default async function handler(req, res) {
         const guard = new AIGuard(process.env.GEMINI_API_KEY);
         console.log(`[Vision IA] Escaneando con Guardrails...`);
 
-        const prompt = `Analiza esta imagen y devuelve un JSON con:
-        - name: Nombre en español.
+        const prompt = `Analiza esta imagen (nevera, cocina o ticket de compra) y devuelve un JSON con:
+        - name: Nombre claro del producto en español.
         - quantity: Cantidad estimada (número).
         - unit: Unidad (unidades, litros, kg, etc.).
-        - expires_in_days: Días estimados para caducar.
+        - expires_in_days: Días estimados para caducar de media para este tipo de producto.
+        - is_food: Boolean indicando si es estrictamente un alimento o bebida.
+
+        REGLA CRÍTICA: Debes ignorar o marcar como is_food: false cualquier producto de limpieza, droguería, higiene personal o hogar (lejía, detergente, limpiadores, papel wc, champú, etc.).
+        Solo queremos llenar una despensa de ingredientes comestibles.
         
-        Formato: { "items": [ { "name": "...", "quantity": 1, "unit": "...", "expires_in_days": 5 } ] }`;
+        Formato: { "items": [ { "name": "...", "quantity": 1, "unit": "...", "expires_in_days": 5, "is_food": true } ] }`;
 
         const visionData = await guard.call({
             prompt: [
@@ -41,20 +45,22 @@ export default async function handler(req, res) {
             model: "gemini-2.5-flash"
         });
 
-        const processedItems = visionData.items.map(item => {
-            const expiryDate = new Date();
-            expiryDate.setDate(expiryDate.getDate() + (item.expires_in_days || 7));
-            return {
-                household_id,
-                name: item.name,
-                quantity: item.quantity || 1,
-                current_unit: item.unit || 'uds',
-                expires_at: expiryDate.toISOString(),
-                status: 'active',
-                is_opened: false,
-                metadata: { source: 'vision_ia', confidence: 0.95 }
-            };
-        });
+        const processedItems = visionData.items
+            .filter(item => item.is_food === true) // Filtro de seguridad por IA
+            .map(item => {
+                const expiryDate = new Date();
+                expiryDate.setDate(expiryDate.getDate() + (item.expires_in_days || 7));
+                return {
+                    household_id,
+                    name: item.name,
+                    quantity: item.quantity || 1,
+                    current_unit: item.unit || 'uds',
+                    expires_at: expiryDate.toISOString(),
+                    status: 'active',
+                    is_opened: false,
+                    metadata: { source: 'vision_ia', confidence: 0.95 }
+                };
+            });
 
         return res.status(200).json({
             success: true,

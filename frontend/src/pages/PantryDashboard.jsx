@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Wallet, TrendingUp, Sparkles, ChevronRight, Clock } from 'lucide-react';
 import { inventoryService } from '../services/inventoryService';
+import { supabase } from '../utils/supabase';
 
 const PantryDashboard = () => {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState(null);
 
     useEffect(() => {
         const fetchInventory = async () => {
@@ -18,6 +20,11 @@ const PantryDashboard = () => {
                 setLoading(false);
             }
         };
+        const fetchUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            setUser(user);
+        };
+        fetchUser();
         fetchInventory();
     }, []);
 
@@ -32,7 +39,9 @@ const PantryDashboard = () => {
                     animate={{ opacity: 1, x: 0 }}
                 >
                     <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">Buen día,</p>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Alex Johnson</h1>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                        {user?.user_metadata?.full_name || 'Usuario'}
+                    </h1>
                 </motion.div>
                 <motion.div
                     initial={{ opacity: 0, scale: 0.8 }}
@@ -42,8 +51,8 @@ const PantryDashboard = () => {
                     <div className="absolute -inset-0.5 bg-gradient-to-tr from-primary to-blue-500 rounded-full blur opacity-30 group-hover:opacity-60 transition duration-200"></div>
                     <img
                         alt="User Profile"
-                        className="relative w-12 h-12 rounded-full border-2 border-white dark:border-gray-800 object-cover shadow-sm"
-                        src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=100"
+                        className="relative w-12 h-12 rounded-full border-2 border-white dark:border-gray-800 object-cover shadow-sm bg-gray-100"
+                        src={user?.user_metadata?.avatar_url || "https://ui-avatars.com/api/?name=" + encodeURIComponent(user?.user_metadata?.full_name || 'Usuario') + "&background=10B981&color=fff"}
                     />
                     <span className="absolute bottom-0 right-0 block h-3 w-3 rounded-full ring-2 ring-white dark:ring-gray-800 bg-primary"></span>
                 </motion.div>
@@ -104,8 +113,11 @@ const PantryDashboard = () => {
                                 <div className="flex justify-center my-2 group-hover:scale-110 transition-transform">
                                     <img
                                         alt={item.products_master?.name}
-                                        className="w-16 h-16 object-cover rounded-full shadow-md"
-                                        src={item.products_master?.image_url || 'https://via.placeholder.com/100'}
+                                        className="w-16 h-16 object-cover rounded-xl shadow-md border border-gray-100 dark:border-gray-700"
+                                        src={item.products_master?.image_url || `https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=100&auto=format&fit=crop`}
+                                        onError={(e) => {
+                                            e.target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=100&auto=format&fit=crop';
+                                        }}
                                     />
                                 </div>
                                 <div>
