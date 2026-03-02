@@ -2,7 +2,9 @@ import { supabase } from '../utils/supabase'
 import axios from 'axios'
 
 const HOUSEHOLD_ID = import.meta.env.VITE_TEST_HOUSEHOLD_ID
-const API_URL = import.meta.env.VITE_API_URL
+const API_URL = import.meta.env.VITE_API_URL !== undefined
+    ? import.meta.env.VITE_API_URL
+    : (import.meta.env.PROD ? '' : 'http://localhost:3000');
 
 export const inventoryService = {
     async getInventory() {
