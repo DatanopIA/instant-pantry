@@ -18,6 +18,8 @@ const RecipesPage = () => {
     const [savedRecipes, setSavedRecipes] = useState([]);
     const [selectedRecipe, setSelectedRecipe] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [generatedPantryRecipes, setGeneratedPantryRecipes] = useState([]);
+    const [loadingPantryRecipes, setLoadingPantryRecipes] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [showAllRecommended, setShowAllRecommended] = useState(false);
     const [isChatOpen, setIsChatOpen] = useState(false);
@@ -54,8 +56,21 @@ const RecipesPage = () => {
             try {
                 const data = await inventoryService.getInventory();
                 // We keep all active items from pantry
-                setPantryItems(data?.filter(i => i.status === 'active') || []);
+                const activeItems = data?.filter(i => i.status === 'active') || [];
+                setPantryItems(activeItems);
                 await fetchLibrary();
+
+                if (activeItems.length > 0) {
+                    setLoadingPantryRecipes(true);
+                    try {
+                        const recipes = await aiService.generatePantryRecipes(activeItems, 5);
+                        setGeneratedPantryRecipes(recipes);
+                    } catch (e) {
+                        console.error('Error fetching pantry recipes', e);
+                    } finally {
+                        setLoadingPantryRecipes(false);
+                    }
+                }
             } catch (err) {
                 console.error(err);
             } finally {
@@ -114,55 +129,6 @@ const RecipesPage = () => {
         }
     ];
 
-    // Mock potential recipes for pantry matching (5 items as requested)
-    const potentialPantryRecipes = [
-        {
-            id: 'p1',
-            title: 'Tortilla Española a la Minuta',
-            image: 'https://images.unsplash.com/photo-1594911772124-d1a106720510?auto=format&fit=crop&q=80&w=400',
-            time: '15 min',
-            difficulty: 'Fácil',
-            ingredients: ['Huevos', 'Patatas', 'Cebolla'],
-            category: 'Cena rápida'
-        },
-        {
-            id: 'p2',
-            title: 'Risotto de Setas Silvestres',
-            image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&q=80&w=400',
-            time: '40 min',
-            difficulty: 'Media',
-            ingredients: ['Arroz', 'Setas', 'Caldo de verduras', 'Queso Parmesano'],
-            category: 'Gourmet'
-        },
-        {
-            id: 'p3',
-            title: 'Ensalada de Quinoa y Garbanzos',
-            image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=400',
-            time: '15 min',
-            difficulty: 'Muy Fácil',
-            ingredients: ['Quinoa', 'Garbanzos', 'Pepino', 'Tomate', 'Aceitunas'],
-            category: 'Saludable'
-        },
-        {
-            id: 'p4',
-            title: 'Batido Energético de Plátano',
-            image: 'https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&q=80&w=400',
-            time: '5 min',
-            difficulty: 'Muy Fácil',
-            ingredients: ['Plátano', 'Leche de Almendra', 'Avena', 'Miel'],
-            category: 'Desayuno'
-        },
-        {
-            id: 'p5',
-            title: 'Pasta al Aglio e Olio',
-            image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&q=80&w=400',
-            time: '12 min',
-            difficulty: 'Fácil',
-            ingredients: ['Pasta', 'Ajo', 'Aceite de Oliva', 'Guindilla', 'Perejil'],
-            category: 'Cena rápida'
-        }
-    ];
-
     // Logic to calculate how many ingredients are available in pantry for each "personalized" recipe
     const getMatchScore = (recipe) => {
         const pantryNames = pantryItems.map(item => item.products_master?.name?.toLowerCase() || '');
@@ -194,9 +160,8 @@ const RecipesPage = () => {
         };
     };
 
-    const personalizedRecipes = potentialPantryRecipes
+    const personalizedRecipes = generatedPantryRecipes
         .map(recipe => ({ ...recipe, match: getMatchScore(recipe) }))
-        .filter(recipe => recipe.match.count > 0)
         .sort((a, b) => b.match.matchPercent - a.match.matchPercent);
 
     const visibleRecommended = showAllRecommended ? globalRecommended : globalRecommended.slice(0, 3);
@@ -370,8 +335,8 @@ const RecipesPage = () => {
                     </div>
 
                     <div className="space-y-4">
-                        {loading ? (
-                            [1, 2, 3].map(i => <div key={i} className="h-28 bg-gray-100 dark:bg-gray-800 rounded-3xl animate-pulse" />)
+                        {(loading || loadingPantryRecipes) ? (
+                            [1, 2, 3, 4, 5].map(i => <div key={i} className="h-28 bg-gray-100 dark:bg-gray-800 rounded-3xl animate-pulse" />)
                         ) : personalizedRecipes.length > 0 ? (
                             personalizedRecipes.slice(0, 5).map((recipe) => (
                                 <motion.div

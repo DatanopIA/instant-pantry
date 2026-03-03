@@ -105,5 +105,24 @@ export const aiService = {
             console.error('AI Family Menu Error:', error);
             throw new Error('No pudimos generar el menú familiar');
         }
+    },
+
+    /**
+     * Genera recetas basadas exclusivamente en la despensa.
+     */
+    async generatePantryRecipes(pantryContext = [], count = 5) {
+        const foodItems = pantryContext.filter(item =>
+            inventoryService.isFoodItem(item.products_master?.name || item.name, item.products_master?.category)
+        );
+        const pantryNames = foodItems.map(i => i.products_master?.name || i.name);
+
+        try {
+            const fullUrl = `${API_URL}/api/ai/pantry-recipes`;
+            const response = await axios.post(fullUrl, { pantry: pantryNames, count }, { timeout: 45000 });
+            return response.data;
+        } catch (error) {
+            console.error('AI Pantry Recipes Error:', error);
+            throw new Error('No pudimos generar recetas para tu despensa');
+        }
     }
 };
