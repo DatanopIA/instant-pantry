@@ -155,7 +155,7 @@ export default function LandingPage() {
                         <h2 className="text-3xl lg:text-4xl font-extrabold tracking-tight text-gray-900">Magia en cada rincón</h2>
                     </div>
 
-                    <div className="relative aspect-[4/3] sm:aspect-[21/9] lg:aspect-[24/10] w-full rounded-[2.5rem] overflow-hidden bg-white/40 backdrop-blur-2xl border border-white/60 p-3 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)]">
+                    <div className="relative min-h-[480px] sm:min-h-0 sm:aspect-[21/9] lg:aspect-[24/10] w-full rounded-[2.5rem] overflow-hidden bg-white/40 backdrop-blur-2xl border border-white/60 p-3 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] flex">
                         <AnimatePresence mode="wait">
                             <Motion.div
                                 key={currentSlide}
@@ -163,7 +163,7 @@ export default function LandingPage() {
                                 animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
                                 exit={{ opacity: 0, scale: 0.98, filter: 'blur(8px)' }}
                                 transition={{ duration: 0.6, ease: "easeInOut" }}
-                                className={`w-full h-full rounded-[2rem] bg-gradient-to-br ${FEATURES[currentSlide].color} border ${FEATURES[currentSlide].borderColor} flex flex-col items-center justify-center text-center px-6 lg:px-20 relative overflow-hidden shadow-inner`}
+                                className={`w-full h-full flex-1 rounded-[2rem] bg-gradient-to-br ${FEATURES[currentSlide].color} border ${FEATURES[currentSlide].borderColor} flex flex-col items-center justify-center text-center px-6 py-12 pb-24 sm:py-0 sm:pb-0 lg:px-20 relative overflow-hidden shadow-inner`}
                             >
                                 {/* Círculo de luz decorativo */}
                                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-[radial-gradient(circle,rgba(255,255,255,0.8)_0%,transparent_60%)] pointer-events-none" />
