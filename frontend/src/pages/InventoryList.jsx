@@ -186,12 +186,7 @@ const InventoryList = () => {
         item.products_master?.name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const recommendedItems = [
-        { id: 'rec1', name: 'Huevos Bio', category: 'Lácteos', base_unit: 'docena' },
-        { id: 'rec2', name: 'Leche de Almendra', category: 'Lácteos', base_unit: 'litros' },
-        { id: 'rec3', name: 'Aguacate Robusto', category: 'Fruta', base_unit: 'unidades' },
-        { id: 'rec4', name: 'Pan Integral', category: 'Panadería', base_unit: 'unidades' },
-    ];
+    // predefined recommendedItems eliminated per user request
 
     const pantryTotal = items.filter(item => item.status === 'active').length;
     const shoppingTotal = items.filter(item => item.status === 'consumed').length;
@@ -381,26 +376,8 @@ const InventoryList = () => {
                             className="space-y-6"
                         >
                             {!searchTerm && (
-                                <section>
-                                    <div className="flex items-center gap-2 mb-4 px-1 text-primary">
-                                        <Sparkles className="w-5 h-5 fill-primary" />
-                                        <h2 className="text-sm font-bold uppercase tracking-wider">Recomendados</h2>
-                                    </div>
-                                    <div className="flex gap-3 overflow-x-auto pb-2 hide-scrollbar">
-                                        {recommendedItems.map(rec => (
-                                            <div
-                                                key={rec.id}
-                                                onClick={() => handleManualAdd(rec.name)}
-                                                className="flex-none w-40 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm group cursor-pointer active:scale-95 transition-all"
-                                            >
-                                                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                                                    <Plus className="w-5 h-5 text-primary" />
-                                                </div>
-                                                <h4 className="text-sm font-bold text-gray-900 dark:text-white truncate">{rec.name}</h4>
-                                                <p className="text-[10px] text-gray-500">{rec.category}</p>
-                                            </div>
-                                        ))}
-                                    </div>
+                                <section className="hidden">
+                                    {/* Recommended items removed per user request */}
                                 </section>
                             )}
 
@@ -427,12 +404,20 @@ const InventoryList = () => {
                                                         <span className="text-[10px] text-gray-400">• {item.products_master?.category || 'General'}</span>
                                                     </div>
                                                 </div>
-                                                <button
-                                                    onClick={() => handleRestoreItem(item)}
-                                                    className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20 hover:scale-110 active:scale-95 transition-all"
-                                                >
-                                                    <Plus className="w-5 h-5" />
-                                                </button>
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => setConfirmModal({ isOpen: true, item, mode: 'remove_shopping' })}
+                                                        className="w-10 h-10 rounded-full bg-red-50 dark:bg-red-900/20 text-red-500 border border-transparent dark:border-red-500/20 flex items-center justify-center shadow-sm hover:scale-110 active:scale-95 transition-all"
+                                                    >
+                                                        <Trash2 className="w-5 h-5" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleRestoreItem(item)}
+                                                        className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20 hover:scale-110 active:scale-95 transition-all"
+                                                    >
+                                                        <Plus className="w-5 h-5" />
+                                                    </button>
+                                                </div>
                                             </motion.div>
                                         ))
                                     ) : (
@@ -546,31 +531,35 @@ const InventoryList = () => {
                                 </div>
 
                                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                                    {confirmModal.mode === 'delete' ? '¿Qué quieres hacer?' : '¿Se ha agotado?'}
+                                    {confirmModal.mode === 'delete' ? '¿Qué quieres hacer?' : confirmModal.mode === 'remove_shopping' ? '¿Eliminar de la compra?' : '¿Se ha agotado?'}
                                 </h3>
 
                                 <p className="text-gray-500 dark:text-gray-400 text-sm mb-8">
                                     {confirmModal.mode === 'delete' ? (
                                         <>Puedes añadir <span className="font-bold text-gray-900 dark:text-white">{confirmModal.item?.products_master?.name}</span> a la lista de la compra o eliminarlo por completo.</>
+                                    ) : confirmModal.mode === 'remove_shopping' ? (
+                                        <>Se eliminará <span className="font-bold text-gray-900 dark:text-white">{confirmModal.item?.products_master?.name}</span> de tu lista de la compra.</>
                                     ) : (
                                         <>Vamos a marcar <span className="font-bold text-primary">{confirmModal.item?.products_master?.name}</span> como consumido y añadirlo a tu lista de la compra.</>
                                     )}
                                 </p>
 
                                 <div className="flex flex-col w-full gap-3">
-                                    <button
-                                        onClick={confirmConsume}
-                                        className="w-full bg-primary text-white py-4 rounded-2xl font-bold text-lg shadow-lg shadow-primary/20 hover:scale-102 active:scale-98 transition-all"
-                                    >
-                                        Se ha acabado (lista)
-                                    </button>
+                                    {confirmModal.mode !== 'remove_shopping' && (
+                                        <button
+                                            onClick={confirmConsume}
+                                            className="w-full bg-primary text-white py-4 rounded-2xl font-bold text-lg shadow-lg shadow-primary/20 hover:scale-102 active:scale-98 transition-all"
+                                        >
+                                            Se ha acabado (lista)
+                                        </button>
+                                    )}
 
-                                    {confirmModal.mode === 'delete' && (
+                                    {(confirmModal.mode === 'delete' || confirmModal.mode === 'remove_shopping') && (
                                         <button
                                             onClick={handlePermanentDelete}
                                             className="w-full bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 py-4 rounded-2xl font-bold text-lg hover:bg-red-100 dark:hover:bg-red-900/20 transition-all border border-red-100 dark:border-red-900/30"
                                         >
-                                            Sólo eliminar
+                                            {confirmModal.mode === 'remove_shopping' ? 'Eliminar' : 'Sólo eliminar'}
                                         </button>
                                     )}
 

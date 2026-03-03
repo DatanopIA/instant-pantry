@@ -31,13 +31,24 @@ export default async function handler(req, res) {
         
         Formato: { "items": [ { "name": "...", "quantity": 1, "unit": "...", "expires_in_days": 5, "is_food": true } ] }`;
 
+        let mimeType = "image/jpeg";
+        let base64Data = image;
+
+        const match = image.match(/^data:(.*?);base64,(.*)$/);
+        if (match) {
+            mimeType = match[1];
+            base64Data = match[2];
+        } else if (image.includes(',')) {
+            base64Data = image.split(',')[1];
+        }
+
         const visionData = await guard.call({
             prompt: [
                 prompt,
                 {
                     inlineData: {
-                        data: image.split(',')[1] || image,
-                        mimeType: "image/jpeg"
+                        data: base64Data,
+                        mimeType: mimeType
                     }
                 }
             ],

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, RefreshCw, Check, X, Loader2, ArrowLeft } from 'lucide-react';
+import { Camera, RefreshCw, Check, X, Loader2, ArrowLeft, Upload, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { inventoryService } from '../services/inventoryService';
 import { useSubscription } from '../hooks/useSubscription';
@@ -8,6 +8,7 @@ import { useSubscription } from '../hooks/useSubscription';
 const FridgeScanner = () => {
     const navigate = useNavigate();
     const videoRef = useRef(null);
+    const fileInputRef = useRef(null);
     const [stream, setStream] = useState(null);
     const [isProcessing, setIsProcessing] = useState(false);
     const [results, setResults] = useState(null);
@@ -57,6 +58,20 @@ const FridgeScanner = () => {
             stopCamera();
             await processImage(image);
         }
+    };
+
+    const handleFileUpload = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+            const base64Data = reader.result;
+            setCapturedImage(base64Data);
+            stopCamera();
+            await processImage(base64Data);
+        };
+        reader.readAsDataURL(file);
     };
 
     const processImage = async (image) => {
@@ -140,6 +155,12 @@ const FridgeScanner = () => {
                         playsInline
                         className="h-full w-full object-cover"
                     />
+                ) : capturedImage.startsWith('data:application/pdf') ? (
+                    <div className="h-full w-full flex flex-col items-center justify-center text-white bg-gray-900 p-6">
+                        <FileText size={64} className="mb-4 text-primary" />
+                        <p className="text-xl font-bold">Documento cargado</p>
+                        <p className="text-gray-400 mt-2 text-center text-sm">Escaneando contenido del PDF...</p>
+                    </div>
                 ) : (
                     <img src={capturedImage} alt="Captured" className="h-full w-full object-cover" />
                 )}
@@ -212,9 +233,16 @@ const FridgeScanner = () => {
                 )}
             </AnimatePresence>
 
-            {/* Capture Button */}
+            {/* Capture & Upload Buttons */}
             {features.canUseScanner && !results && !isProcessing && (
-                <div className="absolute bottom-12 left-0 right-0 flex justify-center z-20">
+                <div className="absolute bottom-12 left-0 right-0 flex justify-center items-center gap-6 z-20 px-8">
+                    <button
+                        onClick={() => fileInputRef.current?.click()}
+                        className="w-14 h-14 bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center text-white border-2 border-white/20 hover:bg-black/60 transition-colors shadow-lg"
+                    >
+                        <Upload size={24} />
+                    </button>
+
                     <button
                         onClick={takePhoto}
                         className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-2xl border-4 border-white/20 active:scale-90 transition-transform"
@@ -223,6 +251,16 @@ const FridgeScanner = () => {
                             <Camera size={32} className="text-gray-900" />
                         </div>
                     </button>
+
+                    <div className="w-14"></div> {/* Empty div to keep the center button centered */}
+
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        className="hidden"
+                        accept="image/*,application/pdf"
+                        onChange={handleFileUpload}
+                    />
                 </div>
             )}
         </div>
