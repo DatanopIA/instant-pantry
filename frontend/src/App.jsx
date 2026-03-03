@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import PantryDashboard from './pages/PantryDashboard';
 import InventoryList from './pages/InventoryList';
 import FridgeScanner from './pages/FridgeScanner';
@@ -36,12 +36,8 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Rutas Públicas */}
-        <Route path="/landing" element={<LandingPage />} />
-
-        {/* Control Principal */}
-        <Route path="/*" element={
-          session ? (
+        {session ? (
+          <Route path="/*" element={
             <Layout>
               <Routes>
                 <Route path="/" element={<PantryDashboard />} />
@@ -52,15 +48,18 @@ function App() {
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/premium" element={<PremiumSubscription />} />
                 <Route path="/settings/account" element={<AccountSettings />} />
+                {/* Redirigir cualquier otra ruta al dashboard si está autenticado */}
+                <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </Layout>
-          ) : (
+          } />
+        ) : (
+          <Route path="/*" element={
             <Routes>
-              {/* Si no hay sesión, cualquier ruta principal lleva a la Landing Page temporalmente */}
-              <Route path="/*" element={<LandingPage />} />
+              <Route path="*" element={<LandingPage />} />
             </Routes>
-          )
-        } />
+          } />
+        )}
       </Routes>
     </Router>
   );

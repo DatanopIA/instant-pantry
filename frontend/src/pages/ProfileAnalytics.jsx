@@ -1,15 +1,30 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Settings, Shield, Bell, CreditCard, ChevronRight, BarChart3, PieChart, Activity, LogOut, CheckCircle2, Upload, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../utils/supabase';
 
 const ProfileAnalytics = () => {
     const navigate = useNavigate();
     const [notificationsEnabled, setNotificationsEnabled] = useState(true);
     const [showToast, setShowToast] = useState(null);
-    const [profilePic, setProfilePic] = useState("https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=200");
+    const [profilePic, setProfilePic] = useState("");
     const [isUploading, setIsUploading] = useState(false);
+    const [user, setUser] = useState(null);
     const fileInputRef = useRef(null);
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            setUser(user);
+            if (user?.user_metadata?.avatar_url) {
+                setProfilePic(user.user_metadata.avatar_url);
+            } else {
+                setProfilePic("https://ui-avatars.com/api/?name=" + encodeURIComponent(user?.user_metadata?.full_name || 'Usuario') + "&background=10B981&color=fff");
+            }
+        };
+        fetchUser();
+    }, []);
 
     const triggerToast = (message, type = 'success') => {
         setShowToast({ message, type });
@@ -78,8 +93,9 @@ const ProfileAnalytics = () => {
         }
     };
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+            await supabase.auth.signOut();
             window.location.href = '/';
         }
     };
@@ -141,7 +157,7 @@ const ProfileAnalytics = () => {
                         <Upload className="w-4 h-4" />
                     </div>
                 </div>
-                <h2 className="text-xl font-bold dark:text-white">Alex Johnson</h2>
+                <h2 className="text-xl font-bold dark:text-white">{user?.user_metadata?.full_name || 'Usuario'}</h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Usuario Premium desde 2024</p>
             </header>
 

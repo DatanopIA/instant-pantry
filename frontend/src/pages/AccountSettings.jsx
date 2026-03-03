@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../utils/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     ChevronLeft, User, Lock, Users, Home, Bell,
@@ -17,11 +18,20 @@ const AccountSettings = () => {
 
     // States for personalized data
     const [householdName, setHouseholdName] = useState('Mansión Giménez');
-    const [userName, setUserName] = useState('Alex Johnson');
-    const [userEmail, setUserEmail] = useState('alex@example.com');
+    const [userName, setUserName] = useState('Usuario');
+    const [userEmail, setUserEmail] = useState('');
     const [units, setUnits] = useState('Sistema Métrico (kg, l)');
-    const [expiryDays, setExpiryDays] = useState('3 días antes');
+    const [expiryDays, setExpiryDays] = useState(() => localStorage.getItem('expiryDays') || '3 días antes');
     const [favoriteStore, setFavoriteStore] = useState('Mercadona');
+
+    useEffect(() => {
+        supabase.auth.getUser().then(({ data: { user } }) => {
+            if (user) {
+                setUserName(user.user_metadata?.full_name || 'Usuario');
+                setUserEmail(user.email || '');
+            }
+        });
+    }, []);
 
     const triggerToast = (message) => {
         setShowToast(message);
@@ -131,7 +141,10 @@ const AccountSettings = () => {
         if (field === 'userName') setUserName(newValue);
         if (field === 'userEmail') setUserEmail(newValue);
         if (field === 'units') setUnits(newValue);
-        if (field === 'expiryDays') setExpiryDays(newValue);
+        if (field === 'expiryDays') {
+            setExpiryDays(newValue);
+            localStorage.setItem('expiryDays', newValue);
+        }
         if (field === 'favoriteStore') setFavoriteStore(newValue);
         setModal(null);
         triggerToast('Cambios guardados correctamente');
