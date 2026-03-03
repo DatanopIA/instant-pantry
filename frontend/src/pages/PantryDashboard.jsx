@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Wallet, TrendingUp, Sparkles, ChevronRight, Clock } from 'lucide-react';
 import { inventoryService } from '../services/inventoryService';
 import { supabase } from '../utils/supabase';
+import RecipeModal from '../components/RecipeModal';
 
 const getDailySuggestion = (items) => {
     const today = new Date();
@@ -13,46 +14,78 @@ const getDailySuggestion = (items) => {
             title: "Tostada de Aguacate",
             description: "¿Te apetece empezar con esta receta rápida y deliciosa?",
             actionText: "Empezar",
-            image: "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&q=80&w=150"
+            image: "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&q=80&w=150",
+            ingredients: ["Aguacate", "Rebanada de pan", "Aceite de oliva", "Sal", "Zumo de limón"],
+            instructions: ["1. Tuesta el pan a tu gusto.", "2. Corta el aguacate por la mitad y retira el hueso.", "3. Machaca el aguacate en un bol con un tenedor.", "4. Añade sal, un chorrito de aceite de oliva y unas gotas de limón.", "5. Extiende la mezcla sobre el pan tostado."],
+            time: "5 min",
+            difficulty: "Fácil"
         },
         {
             title: "Pancakes de Avena",
             description: "Un desayuno perfecto para comenzar a usar tu despensa.",
             actionText: "Descubrir",
-            image: "https://images.unsplash.com/photo-1528207776546-32248a4c050d?auto=format&fit=crop&q=80&w=150"
+            image: "https://images.unsplash.com/photo-1528207776546-32248a4c050d?auto=format&fit=crop&q=80&w=150",
+            ingredients: ["Avena", "Leche", "Huevo", "Plátano", "Canela"],
+            instructions: ["1. Tritura la avena hasta obtener harina.", "2. Machaca el plátano y mezcla con el huevo y la leche.", "3. Incorpora la avena y la canela a la mezcla húmeda.", "4. Cocina en una sartén con un poco de mantequilla o aceite."],
+            time: "15 min",
+            difficulty: "Fácil"
         },
         {
             title: "Pasta al Pesto",
             description: "Añade ingredientes a tu despensa para crear recetas como esta.",
             actionText: "Ver receta",
-            image: "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&q=80&w=150"
+            image: "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&q=80&w=150",
+            ingredients: ["Pasta", "Albahaca fresca", "Piñones", "Queso Parmesano", "Ajo", "Aceite de oliva"],
+            instructions: ["1. Cuece la pasta según las instrucciones del paquete.", "2. Bate la albahaca, piñones, ajo, parmesano y aceite de oliva.", "3. Escurre la pasta.", "4. Mezcla la pasta caliente con el pesto."],
+            time: "20 min",
+            difficulty: "Fácil"
         }
     ];
 
     const existingUserSuggestions = [
         {
-            title: "Recomendación Diaria",
+            title: "Tostada de Aguacate",
+            category: "Desayuno / Cena",
             description: "Basado en tu despensa: Tostada de aguacate ideal para desayunar o cenar.",
             actionText: "Ver receta",
-            image: "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&q=80&w=150"
+            image: "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&q=80&w=150",
+            ingredients: ["Aguacate", "Rebanada de pan", "Aceite de oliva", "Sal", "Zumo de limón"],
+            instructions: ["1. Tuesta el pan a tu gusto.", "2. Corta el aguacate por la mitad y retira el hueso.", "3. Machaca el aguacate en un bol con un tenedor.", "4. Añade sal, un chorrito de aceite de oliva y unas gotas de limón.", "5. Extiende la mezcla sobre el pan tostado."],
+            time: "5 min",
+            difficulty: "Fácil"
         },
         {
-            title: "Recomendación Diaria",
+            title: "Ensalada Fresca",
+            category: "Comida / Cena",
             description: "Basado en tu despensa: Ensalada fresca y saludable usando tus vegetales.",
             actionText: "Preparar",
-            image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=150"
+            image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=150",
+            ingredients: ["Lechuga o espinacas", "Tomate", "Pepino", "Cebolla", "Aceite de oliva", "Vinagre balsámico", "Sal"],
+            instructions: ["1. Lava y seca bien las hojas verdes.", "2. Corta el tomate, pepino y cebolla en rodajas o dados.", "3. Mezcla todos los vegetales en un bol grande.", "4. Aliña con aceite de oliva, vinagre balsámico y sal al gusto."],
+            time: "10 min",
+            difficulty: "Fácil"
         },
         {
-            title: "Recomendación Diaria",
+            title: "Revuelto Rápido",
+            category: "Comida / Cena",
             description: "Basado en tu despensa: Aprovecha los huevos que tienes en un revuelto rápido.",
             actionText: "Cocinar",
-            image: "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&q=80&w=150"
+            image: "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&q=80&w=150",
+            ingredients: ["Huevos", "Sal", "Aceite", "Restos de vegetales o queso"],
+            instructions: ["1. Bate los huevos en un bol con un poco de sal.", "2. Calienta el aceite en una sartén a fuego medio.", "3. Si usas vegetales, saltéalos ligeramente primero.", "4. Añade los huevos batidos y remueve suavemente hasta que cuajen a tu gusto."],
+            time: "10 min",
+            difficulty: "Fácil"
         },
         {
-            title: "Recomendación Diaria",
+            title: "Salteado de Verduras",
+            category: "Comida / Cena",
             description: "Basado en tu despensa: Salteado de verduras para aprovechar al máximo lo guardado.",
             actionText: "Ver pasos",
-            image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=150"
+            image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=150",
+            ingredients: ["Verduras variadas", "Salsa de soja", "Aceite de sésamo", "Ajo", "Jengibre (opcional)"],
+            instructions: ["1. Corta todas las verduras en trozos de tamaño similar.", "2. Calienta el aceite en un wok o sartén grande con el ajo picado.", "3. Añade las verduras más duras primero (ej. zanahoria) y luego el resto.", "4. Saltea a fuego fuerte y sazona con salsa de soja."],
+            time: "15 min",
+            difficulty: "Media"
         }
     ];
 
@@ -67,6 +100,7 @@ const PantryDashboard = () => {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState(null);
+    const [isRecipeModalOpen, setIsRecipeModalOpen] = useState(false);
 
     useEffect(() => {
         const fetchInventory = async () => {
@@ -89,6 +123,10 @@ const PantryDashboard = () => {
 
     const expiringItems = items.filter(item => item.expires_at).slice(0, 3);
     const currentSuggestion = getDailySuggestion(items);
+
+    const consumedItemsCount = items.filter(i => i.status === 'consumed').length;
+    const ahorroMensual = (consumedItemsCount * 12.50).toFixed(2);
+    const kgAhorrados = (consumedItemsCount * 0.4).toFixed(1);
 
     return (
         <div className="px-5 pt-8">
@@ -133,13 +171,15 @@ const PantryDashboard = () => {
                             <span className="text-xs font-bold uppercase tracking-wider">Ahorros Mensuales</span>
                         </div>
                         <div className="flex items-baseline space-x-1">
-                            <span className="text-4xl font-bold text-gray-900 dark:text-white">$142.50</span>
-                            <span className="text-sm text-green-500 font-medium flex items-center">
-                                <TrendingUp className="w-4 h-4 mr-0.5" />
-                                +12%
-                            </span>
+                            <span className="text-4xl font-bold text-gray-900 dark:text-white">${ahorroMensual}</span>
+                            {consumedItemsCount > 0 && (
+                                <span className="text-sm text-green-500 font-medium flex items-center">
+                                    <TrendingUp className="w-4 h-4 mr-0.5" />
+                                    +12%
+                                </span>
+                            )}
                         </div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">¡Has ahorrado 4.2kg de desperdicio de alimentos!</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">¡Has ahorrado {kgAhorrados}kg de desperdicio de alimentos!</p>
                     </div>
                 </div>
             </motion.section>
@@ -218,7 +258,10 @@ const PantryDashboard = () => {
                         <div className="flex-1">
                             <h3 className="font-bold text-lg leading-tight mb-1">{currentSuggestion.title}</h3>
                             <p className="text-xs text-emerald-100 mb-3">{currentSuggestion.description}</p>
-                            <button className="bg-white text-primary text-xs font-bold py-2.5 px-5 rounded-xl shadow-sm hover:scale-105 active:scale-95 transition-all">
+                            <button
+                                onClick={() => setIsRecipeModalOpen(true)}
+                                className="bg-white text-primary text-xs font-bold py-2.5 px-5 rounded-xl shadow-sm hover:scale-105 active:scale-95 transition-all"
+                            >
                                 {currentSuggestion.actionText}
                             </button>
                         </div>
@@ -230,6 +273,13 @@ const PantryDashboard = () => {
                     </div>
                 </div>
             </motion.section>
+
+            {/* Modal for AI Suggestion */}
+            <RecipeModal
+                recipe={currentSuggestion}
+                isOpen={isRecipeModalOpen}
+                onClose={() => setIsRecipeModalOpen(false)}
+            />
         </div>
     );
 };

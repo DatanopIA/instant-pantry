@@ -4,6 +4,7 @@ import { Settings, Shield, Bell, CreditCard, ChevronRight, BarChart3, PieChart, 
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabase';
 import { useSubscription } from '../hooks/useSubscription';
+import { inventoryService } from '../services/inventoryService';
 
 const ProfileAnalytics = () => {
     const navigate = useNavigate();
@@ -20,6 +21,7 @@ const ProfileAnalytics = () => {
     const [profilePic, setProfilePic] = useState("");
     const [isUploading, setIsUploading] = useState(false);
     const [user, setUser] = useState(null);
+    const [items, setItems] = useState([]);
     const fileInputRef = useRef(null);
 
     useEffect(() => {
@@ -32,7 +34,16 @@ const ProfileAnalytics = () => {
                 setProfilePic("https://ui-avatars.com/api/?name=" + encodeURIComponent(user?.user_metadata?.full_name || 'Usuario') + "&background=10B981&color=fff");
             }
         };
+        const fetchInventory = async () => {
+            try {
+                const data = await inventoryService.getInventory();
+                setItems(data || []);
+            } catch (err) {
+                console.error('Error fetching inventory:', err);
+            }
+        };
         fetchUser();
+        fetchInventory();
     }, []);
 
     const triggerToast = (message, type = 'success') => {
@@ -40,10 +51,20 @@ const ProfileAnalytics = () => {
         setTimeout(() => setShowToast(null), 3000);
     };
 
+    const activeItemsCount = items.filter(i => i.status === 'active').length;
+    const consumedItemsCount = items.filter(i => i.status === 'consumed').length;
+
+    // Estimación de ahorro basada en items consumidos (ej. $12.50 por item para simular valor real)
+    const ahorroMensual = (consumedItemsCount * 12.50).toFixed(2);
+
+    // Eficiencia: % de artículos no caducados sobre el total activo
+    const expiredCount = items.filter(i => i.status === 'active' && i.expires_at && new Date(i.expires_at) < new Date()).length;
+    const efficiency = activeItemsCount === 0 ? 100 : Math.max(0, Math.round(((activeItemsCount - expiredCount) / activeItemsCount) * 100));
+
     const stats = [
-        { label: 'Artículos Totales', value: '42', icon: Activity, color: 'text-blue-500' },
-        { label: 'Ahorro Mensual', value: '$142.50', icon: BarChart3, color: 'text-green-500' },
-        { label: 'Eficiencia', value: '94%', icon: PieChart, color: 'text-purple-500' },
+        { label: 'Artículos Totales', value: activeItemsCount.toString(), icon: Activity, color: 'text-blue-500' },
+        { label: 'Ahorro Mensual', value: `$${ahorroMensual}`, icon: BarChart3, color: 'text-green-500' },
+        { label: 'Eficiencia', value: `${efficiency}%`, icon: PieChart, color: 'text-purple-500' },
     ];
 
     const handleAction = (item) => {
