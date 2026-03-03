@@ -27,7 +27,7 @@ Para cada receta, devuelve el siguiente formato, respondiendo SOLO con un JSON A
   {
     "id": "Un id único tipo string inventado, ej: p1",
     "title": "Nombre de la receta",
-    "image": "Genera una URL directa usando este formato EXACTO: https://image.pollinations.ai/prompt/[KEYWORDS]?width=400&height=400&nologo=true reemplazando [KEYWORDS] por 3-4 palabras clave descriptivas del plato en INGLÉS unidas por el símbolo +. Ejemplo: https://image.pollinations.ai/prompt/delicious+pasta+with+tomato+basil?width=400&height=400&nologo=true",
+    "image": "Simplemente devuelve un string vacío '' o null. No es necesario.",
     "time": "Tiempo en minutos, ej: 15 min",
     "difficulty": "Dificultad, ej: Fácil, Media",
     "ingredients": ["Ingrediente 1", "Ingrediente 2"],

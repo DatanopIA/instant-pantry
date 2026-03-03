@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { inventoryService } from './inventoryService';
 import { supabase } from '../utils/supabase';
+import { getRecipeImage } from '../utils/recipeImages';
+import { FALLBACK_RECIPES } from '../utils/localRecipesFallback';
 
 const API_URL = import.meta.env.DEV
     ? (import.meta.env.VITE_API_URL || 'http://localhost:3000')
@@ -119,10 +121,21 @@ export const aiService = {
         try {
             const fullUrl = `${API_URL}/api/ai/pantry-recipes`;
             const response = await axios.post(fullUrl, { pantry: pantryNames, count }, { timeout: 45000 });
-            return response.data;
+
+            // Reemplazamos la imagen de la IA o de origin con nuestro mapeador seguro
+            const recipesWithImages = (response.data || []).map(recipe => ({
+                ...recipe,
+                image: getRecipeImage(recipe.title)
+            }));
+
+            return recipesWithImages;
         } catch (error) {
-            console.error('AI Pantry Recipes Error:', error);
-            throw new Error('No pudimos generar recetas para tu despensa');
+            console.error('AI Pantry Recipes Error (Probablemente Rate Limit):', error);
+            // Fallback: Si Gemini da timeout o Rate Limit (Status 500 / 429), devolvemos las 5 por defecto mapeadas
+            return FALLBACK_RECIPES.map(recipe => ({
+                ...recipe,
+                image: getRecipeImage(recipe.title)
+            }));
         }
     }
 };
