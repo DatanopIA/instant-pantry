@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { inventoryService } from '../services/inventoryService';
 import { notificationService } from '../services/notificationService';
+import { getCategoryIcon } from '../utils/categoryIcons';
 
 const InventoryList = () => {
     const [items, setItems] = useState([]);
@@ -323,16 +324,14 @@ const InventoryList = () => {
                                         layoutId={item.id}
                                         className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-700/50 flex items-center gap-4 group"
                                     >
-                                        <div className="w-16 h-16 rounded-xl bg-gray-50 dark:bg-gray-700 flex items-center justify-center overflow-hidden flex-shrink-0 border border-gray-100 dark:border-gray-700">
-                                            <img
-                                                src={item.products_master?.image_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=100&auto=format&fit=crop'}
-                                                alt={item.products_master?.name}
-                                                className="w-full h-full object-cover"
-                                                onError={(e) => {
-                                                    e.target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=100&auto=format&fit=crop';
-                                                }}
-                                            />
-                                        </div>
+                                        {(() => {
+                                            const ItemIcon = getCategoryIcon(item.products_master?.category, item.products_master?.name);
+                                            return (
+                                                <div className="w-16 h-16 rounded-xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center flex-shrink-0 border border-primary/20">
+                                                    <ItemIcon className="w-8 h-8 text-primary stroke-[1.5]" />
+                                                </div>
+                                            );
+                                        })()}
 
                                         <div className="flex-1 min-w-0">
                                             <h3 className="font-bold text-gray-900 dark:text-white truncate">{item.products_master?.name}</h3>
@@ -394,9 +393,14 @@ const InventoryList = () => {
                                                 layoutId={item.id}
                                                 className="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-100 dark:border-gray-800 flex items-center gap-4 group"
                                             >
-                                                <div className="w-14 h-14 rounded-2xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary overflow-hidden border border-primary/20">
-                                                    <ShoppingBasket className="w-7 h-7" />
-                                                </div>
+                                                {(() => {
+                                                    const ItemIcon = getCategoryIcon(item.products_master?.category, item.products_master?.name);
+                                                    return (
+                                                        <div className="w-14 h-14 rounded-2xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary flex-shrink-0 border border-primary/20">
+                                                            <ItemIcon className="w-7 h-7 stroke-[1.5]" />
+                                                        </div>
+                                                    );
+                                                })()}
                                                 <div className="flex-1">
                                                     <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-0.5">{item.products_master?.name}</h3>
                                                     <div className="flex items-center gap-1.5">

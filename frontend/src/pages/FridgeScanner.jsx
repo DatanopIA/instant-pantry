@@ -4,6 +4,7 @@ import { Camera, RefreshCw, Check, X, Loader2, ArrowLeft, Upload, FileText } fro
 import { useNavigate } from 'react-router-dom';
 import { inventoryService } from '../services/inventoryService';
 import { useSubscription } from '../hooks/useSubscription';
+import { getCategoryIcon } from '../utils/categoryIcons';
 
 const FridgeScanner = () => {
     const navigate = useNavigate();
@@ -213,23 +214,31 @@ const FridgeScanner = () => {
                                 </div>
 
                                 <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
-                                    {results.items.map((item) => (
-                                        <div key={item.id} className={`flex items-center justify-between p-4 rounded-2xl transition-all ${item.selected ? 'bg-gray-50 dark:bg-gray-800' : 'bg-gray-100/50 dark:bg-gray-800/50 opacity-60'}`}>
-                                            <div>
-                                                <p className={`font-semibold dark:text-white ${!item.selected && 'line-through text-gray-500 dark:text-gray-400'}`}>{item.name}</p>
-                                                <p className="text-xs text-gray-500">Vence en {item.expiry}</p>
+                                    {results.items.map((item) => {
+                                        const ItemIcon = getCategoryIcon(null, item.name);
+                                        return (
+                                            <div key={item.id} className={`flex items-center justify-between p-4 rounded-2xl transition-all ${item.selected ? 'bg-gray-50 dark:bg-gray-800' : 'bg-gray-100/50 dark:bg-gray-800/50 opacity-60'}`}>
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-10 h-10 flex-shrink-0 rounded-xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center border border-primary/20">
+                                                        <ItemIcon className="w-5 h-5 text-primary stroke-[1.5]" />
+                                                    </div>
+                                                    <div className="min-w-0 pr-2">
+                                                        <p className={`font-semibold dark:text-white truncate ${!item.selected && 'line-through text-gray-500 dark:text-gray-400'}`}>{item.name}</p>
+                                                        <p className="text-xs text-gray-500">Vence en {item.expiry}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center space-x-2">
+                                                    <span className="text-[10px] bg-green-100 text-green-600 px-2 py-1 rounded-full">{Math.round(item.confidence * 100)}%</span>
+                                                    <button
+                                                        onClick={() => toggleSelection(item.id)}
+                                                        className={`w-6 h-6 rounded-full flex items-center justify-center text-white transition-colors ${item.selected ? 'bg-primary' : 'bg-gray-300 dark:bg-gray-600'}`}
+                                                    >
+                                                        {item.selected ? <Check size={14} /> : <X size={14} />}
+                                                    </button>
+                                                </div>
                                             </div>
-                                            <div className="flex items-center space-x-2">
-                                                <span className="text-[10px] bg-green-100 text-green-600 px-2 py-1 rounded-full">{Math.round(item.confidence * 100)}%</span>
-                                                <button
-                                                    onClick={() => toggleSelection(item.id)}
-                                                    className={`w-6 h-6 rounded-full flex items-center justify-center text-white transition-colors ${item.selected ? 'bg-primary' : 'bg-gray-300 dark:bg-gray-600'}`}
-                                                >
-                                                    {item.selected ? <Check size={14} /> : <X size={14} />}
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
+                                        )
+                                    })}
                                 </div>
 
                                 <div className="flex space-x-3 pt-4">
