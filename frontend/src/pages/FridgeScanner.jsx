@@ -223,8 +223,8 @@ const FridgeScanner = () => {
                                                         <ItemIcon className="w-5 h-5 text-primary stroke-[1.5]" />
                                                     </div>
                                                     <div className="min-w-0 pr-2">
-                                                        <p className={`font-semibold dark:text-white truncate ${!item.selected && 'line-through text-gray-500 dark:text-gray-400'}`}>{item.name}</p>
-                                                        <p className="text-xs text-gray-500">Vence en {item.expiry}</p>
+                                                        <p className={`font-semibold dark:text-white text-balance leading-tight ${!item.selected && 'line-through text-gray-500 dark:text-gray-400'}`}>{item.name}</p>
+                                                        <p className="text-xs text-gray-500 mt-1">Vence en {item.expiry}</p>
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center space-x-2">

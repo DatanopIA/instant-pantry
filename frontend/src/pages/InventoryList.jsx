@@ -272,7 +272,7 @@ const InventoryList = () => {
                                                     <Plus className="w-5 h-5 group-hover:scale-110 transition-transform" />
                                                 </div>
                                                 <div className="flex-1">
-                                                    <p className="text-sm font-bold text-gray-900 dark:text-white truncate">{prod.name}</p>
+                                                    <p className="text-sm font-bold text-gray-900 dark:text-white text-balance">{prod.name}</p>
                                                     <p className="text-[10px] text-gray-400">{prod.category || 'Varios'} • {prod.base_unit || 'unidades'}</p>
                                                 </div>
                                             </button>
@@ -334,8 +334,8 @@ const InventoryList = () => {
                                         })()}
 
                                         <div className="flex-1 min-w-0">
-                                            <h3 className="font-bold text-gray-900 dark:text-white truncate">{item.products_master?.name}</h3>
-                                            <div className="flex items-center gap-2 mt-0.5">
+                                            <h3 className="font-bold text-gray-900 dark:text-white text-balance leading-tight">{item.products_master?.name}</h3>
+                                            <div className="flex items-center gap-2 mt-1">
                                                 <span className="text-xs font-medium text-primary bg-primary/5 px-2 py-0.5 rounded-lg">
                                                     {item.quantity} {item.current_unit}
                                                 </span>
@@ -402,7 +402,7 @@ const InventoryList = () => {
                                                     );
                                                 })()}
                                                 <div className="flex-1">
-                                                    <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-0.5">{item.products_master?.name}</h3>
+                                                    <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-1 text-balance leading-tight">{item.products_master?.name}</h3>
                                                     <div className="flex items-center gap-1.5">
                                                         <span className="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded-md uppercase">Agotado</span>
                                                         <span className="text-[10px] text-gray-400">• {item.products_master?.category || 'General'}</span>
