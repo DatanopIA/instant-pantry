@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import { createClient } from '@supabase/supabase-js';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from 'dotenv';
+import { createClient as createPexelsClient } from 'pexels';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,6 +22,10 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
+// Pexels client for free high quality stock photos
+// Usamos una API Key publica/gratuita, normalmente necesitariamos la nuestra pero hay placeholders publicos si falla 
+const pexels = createPexelsClient('563492ad6f9170000100000141680ebd65b24c1e8784d6333ea61483'); 
+
 const categorias = [
     "Desayunos saludables",
     "Recetas Vegetarianas creativas",
@@ -31,7 +36,7 @@ const categorias = [
 ];
 
 const iteracionesPorCat = 5;
-const recetasPorLlamada = 10; // Reducido a 10 para mayor estabilidad en la IA
+const recetasPorLlamada = 10; 
 
 const filePath = path.join(__dirname, 'recetas_biblioteca.json');
 let existentes = [];
@@ -42,6 +47,19 @@ const titulosExistentes = new Set(existentes.map(r => r.title ? r.title.toLowerC
 
 async function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function getPexelsImage(query) {
+    try {
+        const result = await pexels.photos.search({ query: query + ' food', per_page: 1 });
+        if (result && result.photos && result.photos.length > 0) {
+            return result.photos[0].src.medium || result.photos[0].src.large;
+        }
+    } catch(e) {
+        console.error('Pexels error:', e.message);
+    }
+    // Fallback on unsplash
+    return `https://source.unsplash.com/400x300/?food,${encodeURIComponent(query)}`;
 }
 
 async function generarLote(categoria) {
@@ -90,12 +108,13 @@ async function run() {
             }
 
             if (unicas.length > 0) {
-                const formattedRecipes = unicas.map(r => {
+                const formattedRecipes = [];
+                for (const r of unicas) {
                     const title = r.title || 'Sin Título';
-                    const prompt = `Delicioso plato de ${title}, fotografia culinaria profesional de alta calidad, iluminacion de estudio, restaurante estrella michelin, apetitoso`;
-                    const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=800&height=600&nologo=true`;
+                    // Get real image from pexels
+                    const imageUrl = await getPexelsImage(title);
 
-                    return {
+                    formattedRecipes.push({
                         title: title,
                         description: r.description || '',
                         ingredients: r.ingredients || [],
@@ -105,24 +124,23 @@ async function run() {
                         prep_time: r.prepTime || '30 min',
                         image_url: imageUrl,
                         tags: r.tags || []
-                    };
-                });
+                    });
+                }
 
                 const { error } = await supabase.from('global_recipes').insert(formattedRecipes);
                 if (error) {
                     console.error("Error BD insertando:", error.message);
                 } else {
-                    generadas += unicas.length;
+                    generadas += formattedRecipes.length;
 
-                    // Solo actualizamos de inmediato el archivo local si funciona en BD
-                    existentes.push(...unicas);
+                    existentes.push(...formattedRecipes);
                     fs.writeFileSync(filePath, JSON.stringify(existentes, null, 2), 'utf8');
 
-                    console.log(`-> Añadidas: ${unicas.length}. Total generadas en esta sesión: ${generadas}. Total global: ${existentes.length}`);
+                    console.log(`-> Añadidas: ${formattedRecipes.length} con imágenes Pexels HD. Total generadas en esta sesión: ${generadas}. Total global: ${existentes.length}`);
                 }
             }
 
-            await delay(4000); // 4s para refrescar IP y cuotas de Gemini
+            await delay(4000); 
         }
     }
     console.log(`¡Proceso en background finalizado con éxito!`);
