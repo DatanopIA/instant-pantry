@@ -21,6 +21,7 @@ const RecipesPage = () => {
     const [generatedPantryRecipes, setGeneratedPantryRecipes] = useState([]);
     const [loadingPantryRecipes, setLoadingPantryRecipes] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [globalRecommended, setGlobalRecommended] = useState([]);
     const [showAllRecommended, setShowAllRecommended] = useState(false);
     const [isChatOpen, setIsChatOpen] = useState(false);
     const [newMessage, setNewMessage] = useState('');
@@ -60,6 +61,9 @@ const RecipesPage = () => {
                 setPantryItems(activeItems);
                 await fetchLibrary();
 
+                const recommended = await aiService.getRecommendedRecipes();
+                setGlobalRecommended(recommended);
+
                 if (activeItems.length > 0) {
                     setLoadingPantryRecipes(true);
                     try {
@@ -79,55 +83,6 @@ const RecipesPage = () => {
         };
         fetchData();
     }, []);
-
-    // Mock data for global recommended recipes (5 items as requested)
-    const globalRecommended = [
-        {
-            id: 'g1',
-            title: 'Pasta al Pesto de Albahaca',
-            image: 'https://images.unsplash.com/photo-1473093226795-af9932fe5856?auto=format&fit=crop&q=80&w=400',
-            time: '20 min',
-            difficulty: 'Fácil',
-            rating: 4.8,
-            ingredients: ['Pasta', 'Albahaca', 'Piñones', 'Queso Parmesano', 'Aceite de Oliva']
-        },
-        {
-            id: 'g2',
-            title: 'Bowl de Salmón y Aguacate',
-            image: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&q=80&w=400',
-            time: '25 min',
-            difficulty: 'Media',
-            rating: 4.9,
-            ingredients: ['Salmón', 'Aguacate', 'Arroz', 'Espinacas', 'Sésamo']
-        },
-        {
-            id: 'g3',
-            title: 'Tacos de Pollo con Lima',
-            image: 'https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?auto=format&fit=crop&q=80&w=400',
-            time: '30 min',
-            difficulty: 'Fácil',
-            rating: 4.7,
-            ingredients: ['Pollo', 'Tortillas', 'Lima', 'Cilantro', 'Cebolla']
-        },
-        {
-            id: 'g4',
-            title: 'Curry de Garbanzos y Coco',
-            image: 'https://images.unsplash.com/photo-1545203525-2965306e9314?auto=format&fit=crop&q=80&w=400',
-            time: '35 min',
-            difficulty: 'Media',
-            rating: 4.6,
-            ingredients: ['Garbanzos', 'Leche de coco', 'Curry', 'Espinacas', 'Arroz']
-        },
-        {
-            id: 'g5',
-            title: 'Shakshuka con Feta',
-            image: 'https://images.unsplash.com/photo-1590412200988-a436970781fa?auto=format&fit=crop&q=80&w=400',
-            time: '20 min',
-            difficulty: 'Fácil',
-            rating: 4.9,
-            ingredients: ['Huevos', 'Tomate', 'Pimiento', 'Cebolla', 'Queso Feta']
-        }
-    ];
 
     // Logic to calculate how many ingredients are available in pantry for each "personalized" recipe
     const getMatchScore = (recipe) => {
@@ -401,7 +356,7 @@ const RecipesPage = () => {
                         ) : (
                             <div className="p-8 text-center bg-gray-50 dark:bg-gray-800/30 rounded-3xl border-2 border-dashed border-gray-200 dark:border-gray-700">
                                 <BookOpen className="w-10 h-10 mx-auto mb-3 text-gray-300" />
-                                <p className="text-sm text-gray-500 font-medium">Escanea tu despensa para recibir recomendaciones personalizadas</p>
+                                <p className="text-sm text-gray-500 font-medium">Añade más ingredientes a tu despensa. Necesitas tener recetas que coincidan en al menos 3 ingredientes para conseguir sugerencias.</p>
                             </div>
                         )}
                     </div>

@@ -137,5 +137,21 @@ export const aiService = {
                 image: getRecipeImage(recipe.title)
             }));
         }
+    },
+
+    /**
+     * Obtiene recetas recomendadas diarias desde la base de datos (sin coste AI)
+     */
+    async getRecommendedRecipes() {
+        try {
+            const response = await axios.get(`${API_URL}/api/recipes/recommended`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching recommended recipes', error);
+            return FALLBACK_RECIPES.slice(0, 5).map(recipe => ({
+                ...recipe,
+                image: getRecipeImage(recipe.title)
+            }));
+        }
     }
 };
