@@ -4,12 +4,13 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 
 // Importar handlers
-import chatHandler from './ai/chat.js';
-import visionHandler from './process-vision.js';
-import nutritionHandler from './ai/nutrition.js';
-import familyMenuHandler from './ai/family-menu.js';
-import pantryRecipesHandler from './ai/pantry-recipes.js';
-import recommendedRecipesHandler from './recipes/recommended.js';
+import chatHandler from './_handlers/ai/chat.js';
+import visionHandler from './_handlers/process-vision.js';
+import nutritionHandler from './_handlers/ai/nutrition.js';
+import familyMenuHandler from './_handlers/ai/family-menu.js';
+import pantryRecipesHandler from './_handlers/ai/pantry-recipes.js';
+import recommendedRecipesHandler from './_handlers/recipes/recommended.js';
+import stripeHandler from './_handlers/webhooks/stripe.js';
 
 dotenv.config();
 
@@ -22,6 +23,10 @@ app.use(cors({
     methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
+
+// Webhook de Stripe: Necesita el cuerpo en RAW para la firma
+// Lo ponemos ANTES de express.json()
+app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), stripeHandler);
 
 app.use((req, res, next) => {
     console.log(`[REQUEST] ${req.method} ${req.url} from ${req.headers.origin || 'unknown'}`);

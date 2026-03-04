@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from 'dotenv';
-import { supabase } from '../utils/supabase.js';
+import { supabase } from '../../utils/supabase.js';
 dotenv.config();
 
 export default async function handler(req, res) {
@@ -40,7 +40,7 @@ export default async function handler(req, res) {
 
                 scored.sort((a, b) => b.matchCount - a.matchCount);
 
-                const validRecipes = scored.filter(r => r.matchCount >= 3).slice(0, count).map(r => ({
+                const validRecipes = scored.filter(r => r.matchCount >= 1).slice(0, count).map(r => ({
                     id: r.id,
                     title: r.title,
                     image: r.image_url || '',
@@ -50,7 +50,7 @@ export default async function handler(req, res) {
                     category: r.category || 'Sugerencia'
                 }));
 
-                console.log(`[Cache Hit] Sirviendo ${validRecipes.length} recetas desde base de datos local con 3 o más matches.`);
+                console.log(`[Cache Hit] Sirviendo ${validRecipes.length} recetas desde base de datos local con 1 o más matches.`);
                 return res.status(200).json(validRecipes);
             }
         } catch (dbErr) {

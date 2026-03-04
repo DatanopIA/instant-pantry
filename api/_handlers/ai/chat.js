@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from 'dotenv';
 dotenv.config();
-import { AIGuard } from '../utils/ai-guard.js';
+import { AIGuard } from '../../utils/ai-guard.js';
 
 /**
  * Endpoint de Chat para el Chef IA
