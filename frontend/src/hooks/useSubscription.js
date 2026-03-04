@@ -28,7 +28,7 @@ export const useSubscription = () => {
     // Features mapping
     const features = {
         canUseScanner: plan === 'plus' || plan === 'chef',
-        maxRecipes: plan === 'free' ? 5 : Infinity,
+        maxPantryRecipes: plan === 'chef' ? 15 : plan === 'plus' ? 10 : 5,
         canInviteUsers: plan === 'plus' || plan === 'chef',
         maxUsers: plan === 'plus' ? 2 : plan === 'chef' ? 10 : 1, // 1 is just the owner
         canUseNutritionalAnalysis: plan === 'chef',

@@ -19,21 +19,23 @@ export default async function handler(req, res) {
         try {
             const { data: globalRecipes } = await supabase.from('global_recipes').select('*');
             if (globalRecipes && globalRecipes.length > 0) {
-                const pantryItems = (pantry || []).map(p => p.toLowerCase());
+                // Normalizar texto (quitar acentos, etc.)
+                const normalize = (str) => str ? str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim() : "";
+                const pantryItems = (pantry || []).map(p => normalize(p));
 
                 // Puntuar recetas según ingredientes coincidentes
                 const scored = globalRecipes.map(r => {
                     let matchCount = 0;
                     if (pantryItems.length > 0 && Array.isArray(r.ingredients)) {
                         r.ingredients.forEach(ing => {
-                            const ingLow = ing.toLowerCase();
-                            if (pantryItems.some(p => ingLow.includes(p) || p.includes(ingLow))) {
+                            const ingNorm = normalize(ing);
+                            if (pantryItems.some(p => ingNorm.includes(p) || p.includes(ingNorm))) {
                                 matchCount++;
                             }
                         });
                     }
                     // Dar un poco de aleatoriedad para que no salgan siempre las mismas recetas
-                    return { ...r, matchCount: matchCount + Math.random() * 0.5 };
+                    return { ...r, matchCount: matchCount + Math.random() * 0.1 };
                 });
 
                 scored.sort((a, b) => b.matchCount - a.matchCount);

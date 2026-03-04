@@ -24,7 +24,7 @@ const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 // Pexels client for free high quality stock photos
 // Usamos una API Key publica/gratuita, normalmente necesitariamos la nuestra pero hay placeholders publicos si falla 
-const pexels = createPexelsClient('563492ad6f9170000100000141680ebd65b24c1e8784d6333ea61483'); 
+const pexels = createPexelsClient('563492ad6f9170000100000141680ebd65b24c1e8784d6333ea61483');
 
 const categorias = [
     "Desayunos saludables",
@@ -36,7 +36,7 @@ const categorias = [
 ];
 
 const iteracionesPorCat = 5;
-const recetasPorLlamada = 10; 
+const recetasPorLlamada = 10;
 
 const filePath = path.join(__dirname, 'recetas_biblioteca.json');
 let existentes = [];
@@ -49,17 +49,9 @@ async function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function getPexelsImage(query) {
-    try {
-        const result = await pexels.photos.search({ query: query + ' food', per_page: 1 });
-        if (result && result.photos && result.photos.length > 0) {
-            return result.photos[0].src.medium || result.photos[0].src.large;
-        }
-    } catch(e) {
-        console.error('Pexels error:', e.message);
-    }
-    // Fallback on unsplash
-    return `https://source.unsplash.com/400x300/?food,${encodeURIComponent(query)}`;
+async function getRecipeImage(title) {
+    const cleanTitle = title.toLowerCase().replace(/[^a-z0-9 ]/g, "").split(" ").slice(0, 3).join(",");
+    return `https://loremflickr.com/800/600/food,${cleanTitle}/all`;
 }
 
 async function generarLote(categoria) {
@@ -111,8 +103,7 @@ async function run() {
                 const formattedRecipes = [];
                 for (const r of unicas) {
                     const title = r.title || 'Sin Título';
-                    // Get real image from pexels
-                    const imageUrl = await getPexelsImage(title);
+                    const imageUrl = await getRecipeImage(title);
 
                     formattedRecipes.push({
                         title: title,
@@ -140,7 +131,7 @@ async function run() {
                 }
             }
 
-            await delay(4000); 
+            await delay(4000);
         }
     }
     console.log(`¡Proceso en background finalizado con éxito!`);

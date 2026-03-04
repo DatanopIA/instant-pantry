@@ -67,7 +67,9 @@ const RecipesPage = () => {
                 if (activeItems.length > 0) {
                     setLoadingPantryRecipes(true);
                     try {
-                        const recipes = await aiService.generatePantryRecipes(activeItems, 5);
+                        // Usamos el límite según el plan (5, 10 o 15)
+                        const limit = features?.maxPantryRecipes || 5;
+                        const recipes = await aiService.generatePantryRecipes(activeItems, limit);
                         setGeneratedPantryRecipes(recipes);
                     } catch (e) {
                         console.error('Error fetching pantry recipes', e);
@@ -82,7 +84,7 @@ const RecipesPage = () => {
             }
         };
         fetchData();
-    }, []);
+    }, [features?.maxPantryRecipes]);
 
     // Logic to calculate how many ingredients are available in pantry for each "personalized" recipe
     const getMatchScore = (recipe) => {
@@ -293,7 +295,7 @@ const RecipesPage = () => {
                         {(loading || loadingPantryRecipes) ? (
                             [1, 2, 3, 4, 5].map(i => <div key={i} className="h-28 bg-gray-100 dark:bg-gray-800 rounded-3xl animate-pulse" />)
                         ) : personalizedRecipes.length > 0 ? (
-                            personalizedRecipes.slice(0, 5).map((recipe) => (
+                            personalizedRecipes.map((recipe) => (
                                 <motion.div
                                     key={recipe.id}
                                     initial={{ opacity: 0, y: 10 }}
